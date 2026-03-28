@@ -1,0 +1,8732 @@
+{
+  "Bulbasaur": {
+    "type": "pokemon",
+    "number": "#001",
+    "name": "Bulbasaur"
+  },
+  "Ivysaur": {
+    "type": "pokemon",
+    "number": "#002",
+    "name": "Ivysaur"
+  },
+  "Venusaur": {
+    "type": "pokemon",
+    "number": "#003",
+    "name": "Venusaur"
+  },
+  "Charmander": {
+    "type": "pokemon",
+    "number": "#004",
+    "name": "Charmander"
+  },
+  "Charmeleon": {
+    "type": "pokemon",
+    "number": "#005",
+    "name": "Charmeleon"
+  },
+  "Charizard": {
+    "type": "pokemon",
+    "number": "#006",
+    "name": "Charizard"
+  },
+  "Squirtle": {
+    "type": "pokemon",
+    "number": "#007",
+    "name": "Squirtle"
+  },
+  "Wartortle": {
+    "type": "pokemon",
+    "number": "#008",
+    "name": "Wartortle"
+  },
+  "Blastoise": {
+    "type": "pokemon",
+    "number": "#009",
+    "name": "Blastoise"
+  },
+  "Pidgey": {
+    "type": "pokemon",
+    "number": "#010",
+    "name": "Pidgey"
+  },
+  "Pidgeotto": {
+    "type": "pokemon",
+    "number": "#011",
+    "name": "Pidgeotto"
+  },
+  "Pidgeot": {
+    "type": "pokemon",
+    "number": "#012",
+    "name": "Pidgeot"
+  },
+  "Oddish": {
+    "type": "pokemon",
+    "number": "#013",
+    "name": "Oddish"
+  },
+  "Gloom": {
+    "type": "pokemon",
+    "number": "#014",
+    "name": "Gloom"
+  },
+  "Vileplume": {
+    "type": "pokemon",
+    "number": "#015",
+    "name": "Vileplume"
+  },
+  "Bellossom": {
+    "type": "pokemon",
+    "number": "#016",
+    "name": "Bellossom"
+  },
+  "Paras": {
+    "type": "pokemon",
+    "number": "#017",
+    "name": "Paras"
+  },
+  "Parasect": {
+    "type": "pokemon",
+    "number": "#018",
+    "name": "Parasect"
+  },
+  "Venonat": {
+    "type": "pokemon",
+    "number": "#019",
+    "name": "Venonat"
+  },
+  "Venomoth": {
+    "type": "pokemon",
+    "number": "#020",
+    "name": "Venomoth"
+  },
+  "Bellsprout": {
+    "type": "pokemon",
+    "number": "#021",
+    "name": "Bellsprout"
+  },
+  "Weepinbell": {
+    "type": "pokemon",
+    "number": "#022",
+    "name": "Weepinbell"
+  },
+  "Victreebel": {
+    "type": "pokemon",
+    "number": "#023",
+    "name": "Victreebel"
+  },
+  "Slowpoke": {
+    "type": "pokemon",
+    "number": "#024",
+    "name": "Slowpoke"
+  },
+  "Slowbro": {
+    "type": "pokemon",
+    "number": "#025",
+    "name": "Slowbro"
+  },
+  "Slowking": {
+    "type": "pokemon",
+    "number": "#026",
+    "name": "Slowking"
+  },
+  "Magnemite": {
+    "type": "pokemon",
+    "number": "#027",
+    "name": "Magnemite"
+  },
+  "Magneton": {
+    "type": "pokemon",
+    "number": "#028",
+    "name": "Magneton"
+  },
+  "Magnezone": {
+    "type": "pokemon",
+    "number": "#029",
+    "name": "Magnezone"
+  },
+  "Onix": {
+    "type": "pokemon",
+    "number": "#030",
+    "name": "Onix"
+  },
+  "Steelix": {
+    "type": "pokemon",
+    "number": "#031",
+    "name": "Steelix"
+  },
+  "Cubone": {
+    "type": "pokemon",
+    "number": "#032",
+    "name": "Cubone"
+  },
+  "Marowak": {
+    "type": "pokemon",
+    "number": "#033",
+    "name": "Marowak"
+  },
+  "Tyrogue": {
+    "type": "pokemon",
+    "number": "#034",
+    "name": "Tyrogue"
+  },
+  "Hitmonlee": {
+    "type": "pokemon",
+    "number": "#035",
+    "name": "Hitmonlee"
+  },
+  "Hitmonchan": {
+    "type": "pokemon",
+    "number": "#036",
+    "name": "Hitmonchan"
+  },
+  "Hitmontop": {
+    "type": "pokemon",
+    "number": "#037",
+    "name": "Hitmontop"
+  },
+  "Koffing": {
+    "type": "pokemon",
+    "number": "#038",
+    "name": "Koffing"
+  },
+  "Weezing": {
+    "type": "pokemon",
+    "number": "#039",
+    "name": "Weezing"
+  },
+  "Tangela": {
+    "type": "pokemon",
+    "number": "#040",
+    "name": "Tangela"
+  },
+  "Tangrowth": {
+    "type": "pokemon",
+    "number": "#041",
+    "name": "Tangrowth"
+  },
+  "Scyther": {
+    "type": "pokemon",
+    "number": "#042",
+    "name": "Scyther"
+  },
+  "Scizor": {
+    "type": "pokemon",
+    "number": "#043",
+    "name": "Scizor"
+  },
+  "Pinsir": {
+    "type": "pokemon",
+    "number": "#044",
+    "name": "Pinsir"
+  },
+  "Magikarp": {
+    "type": "pokemon",
+    "number": "#045",
+    "name": "Magikarp"
+  },
+  "Gyarados": {
+    "type": "pokemon",
+    "number": "#046",
+    "name": "Gyarados"
+  },
+  "Ditto": {
+    "type": "pokemon",
+    "number": "#047",
+    "name": "Ditto"
+  },
+  "Hoothoot": {
+    "type": "pokemon",
+    "number": "#048",
+    "name": "Hoothoot"
+  },
+  "Noctowl": {
+    "type": "pokemon",
+    "number": "#049",
+    "name": "Noctowl"
+  },
+  "Heracross": {
+    "type": "pokemon",
+    "number": "#050",
+    "name": "Heracross"
+  },
+  "Volbeat": {
+    "type": "pokemon",
+    "number": "#051",
+    "name": "Volbeat"
+  },
+  "Illumise": {
+    "type": "pokemon",
+    "number": "#052",
+    "name": "Illumise"
+  },
+  "Gulpin": {
+    "type": "pokemon",
+    "number": "#053",
+    "name": "Gulpin"
+  },
+  "Swalot": {
+    "type": "pokemon",
+    "number": "#054",
+    "name": "Swalot"
+  },
+  "Cacnea": {
+    "type": "pokemon",
+    "number": "#055",
+    "name": "Cacnea"
+  },
+  "Cacturne": {
+    "type": "pokemon",
+    "number": "#056",
+    "name": "Cacturne"
+  },
+  "Combee": {
+    "type": "pokemon",
+    "number": "#057",
+    "name": "Combee"
+  },
+  "Vespiquen": {
+    "type": "pokemon",
+    "number": "#058",
+    "name": "Vespiquen"
+  },
+  "Shellos": {
+    "type": "pokemon",
+    "number": "#059",
+    "name": "Shellos"
+  },
+  "Gastrodon": {
+    "type": "pokemon",
+    "number": "#060",
+    "name": "Gastrodon"
+  },
+  "Drifloon": {
+    "type": "pokemon",
+    "number": "#061",
+    "name": "Drifloon"
+  },
+  "Drifblim": {
+    "type": "pokemon",
+    "number": "#062",
+    "name": "Drifblim"
+  },
+  "Drilbur": {
+    "type": "pokemon",
+    "number": "#063",
+    "name": "Drilbur"
+  },
+  "Excadrill": {
+    "type": "pokemon",
+    "number": "#064",
+    "name": "Excadrill"
+  },
+  "Timburr": {
+    "type": "pokemon",
+    "number": "#065",
+    "name": "Timburr"
+  },
+  "Gurdurr": {
+    "type": "pokemon",
+    "number": "#066",
+    "name": "Gurdurr"
+  },
+  "Conkeldurr": {
+    "type": "pokemon",
+    "number": "#067",
+    "name": "Conkeldurr"
+  },
+  "Litwick": {
+    "type": "pokemon",
+    "number": "#068",
+    "name": "Litwick"
+  },
+  "Lampent": {
+    "type": "pokemon",
+    "number": "#069",
+    "name": "Lampent"
+  },
+  "Chandelure": {
+    "type": "pokemon",
+    "number": "#070",
+    "name": "Chandelure"
+  },
+  "Axew": {
+    "type": "pokemon",
+    "number": "#071",
+    "name": "Axew"
+  },
+  "Fraxure": {
+    "type": "pokemon",
+    "number": "#072",
+    "name": "Fraxure"
+  },
+  "Haxorus": {
+    "type": "pokemon",
+    "number": "#073",
+    "name": "Haxorus"
+  },
+  "Goomy": {
+    "type": "pokemon",
+    "number": "#074",
+    "name": "Goomy"
+  },
+  "Sliggoo": {
+    "type": "pokemon",
+    "number": "#075",
+    "name": "Sliggoo"
+  },
+  "Goodra": {
+    "type": "pokemon",
+    "number": "#076",
+    "name": "Goodra"
+  },
+  "Cramorant": {
+    "type": "pokemon",
+    "number": "#077",
+    "name": "Cramorant"
+  },
+  "Pichu": {
+    "type": "pokemon",
+    "number": "#078",
+    "name": "Pichu"
+  },
+  "Pikachu": {
+    "type": "pokemon",
+    "number": "#079",
+    "name": "Pikachu"
+  },
+  "Raichu": {
+    "type": "pokemon",
+    "number": "#080",
+    "name": "Raichu"
+  },
+  "Zubat": {
+    "type": "pokemon",
+    "number": "#081",
+    "name": "Zubat"
+  },
+  "Golbat": {
+    "type": "pokemon",
+    "number": "#082",
+    "name": "Golbat"
+  },
+  "Crobat": {
+    "type": "pokemon",
+    "number": "#083",
+    "name": "Crobat"
+  },
+  "Meowth": {
+    "type": "pokemon",
+    "number": "#084",
+    "name": "Meowth"
+  },
+  "Persian": {
+    "type": "pokemon",
+    "number": "#085",
+    "name": "Persian"
+  },
+  "Psyduck": {
+    "type": "pokemon",
+    "number": "#086",
+    "name": "Psyduck"
+  },
+  "Golduck": {
+    "type": "pokemon",
+    "number": "#087",
+    "name": "Golduck"
+  },
+  "Growlithe": {
+    "type": "pokemon",
+    "number": "#088",
+    "name": "Growlithe"
+  },
+  "Arcanine": {
+    "type": "pokemon",
+    "number": "#089",
+    "name": "Arcanine"
+  },
+  "Farfetch&#x27;d": {
+    "type": "pokemon",
+    "number": "#090",
+    "name": "Farfetch&#x27;d"
+  },
+  "Grimer": {
+    "type": "pokemon",
+    "number": "#091",
+    "name": "Grimer"
+  },
+  "Muk": {
+    "type": "pokemon",
+    "number": "#092",
+    "name": "Muk"
+  },
+  "Gastly": {
+    "type": "pokemon",
+    "number": "#093",
+    "name": "Gastly"
+  },
+  "Haunter": {
+    "type": "pokemon",
+    "number": "#094",
+    "name": "Haunter"
+  },
+  "Gengar": {
+    "type": "pokemon",
+    "number": "#095",
+    "name": "Gengar"
+  },
+  "Voltorb": {
+    "type": "pokemon",
+    "number": "#096",
+    "name": "Voltorb"
+  },
+  "Electrode": {
+    "type": "pokemon",
+    "number": "#097",
+    "name": "Electrode"
+  },
+  "Exeggcute": {
+    "type": "pokemon",
+    "number": "#098",
+    "name": "Exeggcute"
+  },
+  "Exeggutor": {
+    "type": "pokemon",
+    "number": "#099",
+    "name": "Exeggutor"
+  },
+  "Happiny": {
+    "type": "pokemon",
+    "number": "#100",
+    "name": "Happiny"
+  },
+  "Chansey": {
+    "type": "pokemon",
+    "number": "#101",
+    "name": "Chansey"
+  },
+  "Blissey": {
+    "type": "pokemon",
+    "number": "#102",
+    "name": "Blissey"
+  },
+  "Elekid": {
+    "type": "pokemon",
+    "number": "#103",
+    "name": "Elekid"
+  },
+  "Electabuzz": {
+    "type": "pokemon",
+    "number": "#104",
+    "name": "Electabuzz"
+  },
+  "Electivire": {
+    "type": "pokemon",
+    "number": "#105",
+    "name": "Electivire"
+  },
+  "Lapras": {
+    "type": "pokemon",
+    "number": "#106",
+    "name": "Lapras"
+  },
+  "Munchlax": {
+    "type": "pokemon",
+    "number": "#107",
+    "name": "Munchlax"
+  },
+  "Snorlax": {
+    "type": "pokemon",
+    "number": "#108",
+    "name": "Snorlax"
+  },
+  "Spinarak": {
+    "type": "pokemon",
+    "number": "#109",
+    "name": "Spinarak"
+  },
+  "Ariados": {
+    "type": "pokemon",
+    "number": "#110",
+    "name": "Ariados"
+  },
+  "Mareep": {
+    "type": "pokemon",
+    "number": "#111",
+    "name": "Mareep"
+  },
+  "Flaaffy": {
+    "type": "pokemon",
+    "number": "#112",
+    "name": "Flaaffy"
+  },
+  "Ampharos": {
+    "type": "pokemon",
+    "number": "#113",
+    "name": "Ampharos"
+  },
+  "Azurill": {
+    "type": "pokemon",
+    "number": "#114",
+    "name": "Azurill"
+  },
+  "Marill": {
+    "type": "pokemon",
+    "number": "#115",
+    "name": "Marill"
+  },
+  "Azumarill": {
+    "type": "pokemon",
+    "number": "#116",
+    "name": "Azumarill"
+  },
+  "Wooper": {
+    "type": "pokemon",
+    "number": "#117",
+    "name": "Wooper"
+  },
+  "Clodsire": {
+    "type": "pokemon",
+    "number": "#118",
+    "name": "Clodsire"
+  },
+  "Smeargle": {
+    "type": "pokemon",
+    "number": "#119",
+    "name": "Smeargle"
+  },
+  "Torchic": {
+    "type": "pokemon",
+    "number": "#120",
+    "name": "Torchic"
+  },
+  "Combusken": {
+    "type": "pokemon",
+    "number": "#121",
+    "name": "Combusken"
+  },
+  "Blaziken": {
+    "type": "pokemon",
+    "number": "#122",
+    "name": "Blaziken"
+  },
+  "Wingull": {
+    "type": "pokemon",
+    "number": "#123",
+    "name": "Wingull"
+  },
+  "Pelipper": {
+    "type": "pokemon",
+    "number": "#124",
+    "name": "Pelipper"
+  },
+  "Makuhita": {
+    "type": "pokemon",
+    "number": "#125",
+    "name": "Makuhita"
+  },
+  "Hariyama": {
+    "type": "pokemon",
+    "number": "#126",
+    "name": "Hariyama"
+  },
+  "Absol": {
+    "type": "pokemon",
+    "number": "#127",
+    "name": "Absol"
+  },
+  "Piplup": {
+    "type": "pokemon",
+    "number": "#128",
+    "name": "Piplup"
+  },
+  "Prinplup": {
+    "type": "pokemon",
+    "number": "#129",
+    "name": "Prinplup"
+  },
+  "Empoleon": {
+    "type": "pokemon",
+    "number": "#130",
+    "name": "Empoleon"
+  },
+  "Audino": {
+    "type": "pokemon",
+    "number": "#131",
+    "name": "Audino"
+  },
+  "Trubbish": {
+    "type": "pokemon",
+    "number": "#132",
+    "name": "Trubbish"
+  },
+  "Garbodor": {
+    "type": "pokemon",
+    "number": "#133",
+    "name": "Garbodor"
+  },
+  "Zorua": {
+    "type": "pokemon",
+    "number": "#134",
+    "name": "Zorua"
+  },
+  "Zoroark": {
+    "type": "pokemon",
+    "number": "#135",
+    "name": "Zoroark"
+  },
+  "Minccino": {
+    "type": "pokemon",
+    "number": "#136",
+    "name": "Minccino"
+  },
+  "Cinccino": {
+    "type": "pokemon",
+    "number": "#137",
+    "name": "Cinccino"
+  },
+  "Grubbin": {
+    "type": "pokemon",
+    "number": "#138",
+    "name": "Grubbin"
+  },
+  "Charjabug": {
+    "type": "pokemon",
+    "number": "#139",
+    "name": "Charjabug"
+  },
+  "Vikavolt": {
+    "type": "pokemon",
+    "number": "#140",
+    "name": "Vikavolt"
+  },
+  "Mimikyu": {
+    "type": "pokemon",
+    "number": "#141",
+    "name": "Mimikyu"
+  },
+  "Pawmi": {
+    "type": "pokemon",
+    "number": "#142",
+    "name": "Pawmi"
+  },
+  "Pawmo": {
+    "type": "pokemon",
+    "number": "#143",
+    "name": "Pawmo"
+  },
+  "Pawmot": {
+    "type": "pokemon",
+    "number": "#144",
+    "name": "Pawmot"
+  },
+  "Tatsugiri": {
+    "type": "pokemon",
+    "number": "#145",
+    "name": "Tatsugiri"
+  },
+  "Ekans": {
+    "type": "pokemon",
+    "number": "#146",
+    "name": "Ekans"
+  },
+  "Arbok": {
+    "type": "pokemon",
+    "number": "#147",
+    "name": "Arbok"
+  },
+  "Cleffa": {
+    "type": "pokemon",
+    "number": "#148",
+    "name": "Cleffa"
+  },
+  "Clefairy": {
+    "type": "pokemon",
+    "number": "#149",
+    "name": "Clefairy"
+  },
+  "Clefable": {
+    "type": "pokemon",
+    "number": "#150",
+    "name": "Clefable"
+  },
+  "Igglybuff": {
+    "type": "pokemon",
+    "number": "#151",
+    "name": "Igglybuff"
+  },
+  "Jigglypuff": {
+    "type": "pokemon",
+    "number": "#152",
+    "name": "Jigglypuff"
+  },
+  "Wigglytuff": {
+    "type": "pokemon",
+    "number": "#153",
+    "name": "Wigglytuff"
+  },
+  "Diglett": {
+    "type": "pokemon",
+    "number": "#154",
+    "name": "Diglett"
+  },
+  "Dugtrio": {
+    "type": "pokemon",
+    "number": "#155",
+    "name": "Dugtrio"
+  },
+  "Machop": {
+    "type": "pokemon",
+    "number": "#156",
+    "name": "Machop"
+  },
+  "Machoke": {
+    "type": "pokemon",
+    "number": "#157",
+    "name": "Machoke"
+  },
+  "Machamp": {
+    "type": "pokemon",
+    "number": "#158",
+    "name": "Machamp"
+  },
+  "Geodude": {
+    "type": "pokemon",
+    "number": "#159",
+    "name": "Geodude"
+  },
+  "Graveler": {
+    "type": "pokemon",
+    "number": "#160",
+    "name": "Graveler"
+  },
+  "Golem": {
+    "type": "pokemon",
+    "number": "#161",
+    "name": "Golem"
+  },
+  "Magby": {
+    "type": "pokemon",
+    "number": "#162",
+    "name": "Magby"
+  },
+  "Magmar": {
+    "type": "pokemon",
+    "number": "#163",
+    "name": "Magmar"
+  },
+  "Magmortar": {
+    "type": "pokemon",
+    "number": "#164",
+    "name": "Magmortar"
+  },
+  "Bonsly": {
+    "type": "pokemon",
+    "number": "#165",
+    "name": "Bonsly"
+  },
+  "Sudowoodo": {
+    "type": "pokemon",
+    "number": "#166",
+    "name": "Sudowoodo"
+  },
+  "Murkrow": {
+    "type": "pokemon",
+    "number": "#167",
+    "name": "Murkrow"
+  },
+  "Honchkrow": {
+    "type": "pokemon",
+    "number": "#168",
+    "name": "Honchkrow"
+  },
+  "Larvitar": {
+    "type": "pokemon",
+    "number": "#169",
+    "name": "Larvitar"
+  },
+  "Pupitar": {
+    "type": "pokemon",
+    "number": "#170",
+    "name": "Pupitar"
+  },
+  "Tyranitar": {
+    "type": "pokemon",
+    "number": "#171",
+    "name": "Tyranitar"
+  },
+  "Lotad": {
+    "type": "pokemon",
+    "number": "#172",
+    "name": "Lotad"
+  },
+  "Lombre": {
+    "type": "pokemon",
+    "number": "#173",
+    "name": "Lombre"
+  },
+  "Ludicolo": {
+    "type": "pokemon",
+    "number": "#174",
+    "name": "Ludicolo"
+  },
+  "Mawile": {
+    "type": "pokemon",
+    "number": "#175",
+    "name": "Mawile"
+  },
+  "Torkoal": {
+    "type": "pokemon",
+    "number": "#176",
+    "name": "Torkoal"
+  },
+  "Kricketot": {
+    "type": "pokemon",
+    "number": "#177",
+    "name": "Kricketot"
+  },
+  "Kricketune": {
+    "type": "pokemon",
+    "number": "#178",
+    "name": "Kricketune"
+  },
+  "Chatot": {
+    "type": "pokemon",
+    "number": "#179",
+    "name": "Chatot"
+  },
+  "Riolu": {
+    "type": "pokemon",
+    "number": "#180",
+    "name": "Riolu"
+  },
+  "Lucario": {
+    "type": "pokemon",
+    "number": "#181",
+    "name": "Lucario"
+  },
+  "Rotom": {
+    "type": "pokemon",
+    "number": "#182",
+    "name": "Rotom"
+  },
+  "Larvesta": {
+    "type": "pokemon",
+    "number": "#183",
+    "name": "Larvesta"
+  },
+  "Volcarona": {
+    "type": "pokemon",
+    "number": "#184",
+    "name": "Volcarona"
+  },
+  "Rowlet": {
+    "type": "pokemon",
+    "number": "#185",
+    "name": "Rowlet"
+  },
+  "Dartrix": {
+    "type": "pokemon",
+    "number": "#186",
+    "name": "Dartrix"
+  },
+  "Decidueye": {
+    "type": "pokemon",
+    "number": "#187",
+    "name": "Decidueye"
+  },
+  "Scorbunny": {
+    "type": "pokemon",
+    "number": "#188",
+    "name": "Scorbunny"
+  },
+  "Raboot": {
+    "type": "pokemon",
+    "number": "#189",
+    "name": "Raboot"
+  },
+  "Cinderace": {
+    "type": "pokemon",
+    "number": "#190",
+    "name": "Cinderace"
+  },
+  "Skwovet": {
+    "type": "pokemon",
+    "number": "#191",
+    "name": "Skwovet"
+  },
+  "Greedent": {
+    "type": "pokemon",
+    "number": "#192",
+    "name": "Greedent"
+  },
+  "Rolycoly": {
+    "type": "pokemon",
+    "number": "#193",
+    "name": "Rolycoly"
+  },
+  "Carkol": {
+    "type": "pokemon",
+    "number": "#194",
+    "name": "Carkol"
+  },
+  "Coalossal": {
+    "type": "pokemon",
+    "number": "#195",
+    "name": "Coalossal"
+  },
+  "Toxel": {
+    "type": "pokemon",
+    "number": "#196",
+    "name": "Toxel"
+  },
+  "Toxtricity": {
+    "type": "pokemon",
+    "number": "#197",
+    "name": "Toxtricity"
+  },
+  "Fidough": {
+    "type": "pokemon",
+    "number": "#198",
+    "name": "Fidough"
+  },
+  "Dachsbun": {
+    "type": "pokemon",
+    "number": "#199",
+    "name": "Dachsbun"
+  },
+  "Charcadet": {
+    "type": "pokemon",
+    "number": "#200",
+    "name": "Charcadet"
+  },
+  "Armarouge": {
+    "type": "pokemon",
+    "number": "#201",
+    "name": "Armarouge"
+  },
+  "Ceruledge": {
+    "type": "pokemon",
+    "number": "#202",
+    "name": "Ceruledge"
+  },
+  "Glimmet": {
+    "type": "pokemon",
+    "number": "#203",
+    "name": "Glimmet"
+  },
+  "Glimmora": {
+    "type": "pokemon",
+    "number": "#204",
+    "name": "Glimmora"
+  },
+  "Gimmighoul": {
+    "type": "pokemon",
+    "number": "#205",
+    "name": "Gimmighoul"
+  },
+  "Gholdengo": {
+    "type": "pokemon",
+    "number": "#206",
+    "name": "Gholdengo"
+  },
+  "Vulpix": {
+    "type": "pokemon",
+    "number": "#207",
+    "name": "Vulpix"
+  },
+  "Ninetales": {
+    "type": "pokemon",
+    "number": "#208",
+    "name": "Ninetales"
+  },
+  "Poliwag": {
+    "type": "pokemon",
+    "number": "#209",
+    "name": "Poliwag"
+  },
+  "Poliwhirl": {
+    "type": "pokemon",
+    "number": "#210",
+    "name": "Poliwhirl"
+  },
+  "Poliwrath": {
+    "type": "pokemon",
+    "number": "#211",
+    "name": "Poliwrath"
+  },
+  "Politoed": {
+    "type": "pokemon",
+    "number": "#212",
+    "name": "Politoed"
+  },
+  "Abra": {
+    "type": "pokemon",
+    "number": "#213",
+    "name": "Abra"
+  },
+  "Kadabra": {
+    "type": "pokemon",
+    "number": "#214",
+    "name": "Kadabra"
+  },
+  "Alakazam": {
+    "type": "pokemon",
+    "number": "#215",
+    "name": "Alakazam"
+  },
+  "Mime Jr.": {
+    "type": "pokemon",
+    "number": "#216",
+    "name": "Mime Jr."
+  },
+  "Mr. Mime": {
+    "type": "pokemon",
+    "number": "#217",
+    "name": "Mr. Mime"
+  },
+  "Porygon": {
+    "type": "pokemon",
+    "number": "#218",
+    "name": "Porygon"
+  },
+  "Porygon2": {
+    "type": "pokemon",
+    "number": "#219",
+    "name": "Porygon2"
+  },
+  "Porygon-Z": {
+    "type": "pokemon",
+    "number": "#220",
+    "name": "Porygon-Z"
+  },
+  "Dratini": {
+    "type": "pokemon",
+    "number": "#221",
+    "name": "Dratini"
+  },
+  "Dragonair": {
+    "type": "pokemon",
+    "number": "#222",
+    "name": "Dragonair"
+  },
+  "Dragonite": {
+    "type": "pokemon",
+    "number": "#223",
+    "name": "Dragonite"
+  },
+  "Cyndaquil": {
+    "type": "pokemon",
+    "number": "#224",
+    "name": "Cyndaquil"
+  },
+  "Quilava": {
+    "type": "pokemon",
+    "number": "#225",
+    "name": "Quilava"
+  },
+  "Typhlosion": {
+    "type": "pokemon",
+    "number": "#226",
+    "name": "Typhlosion"
+  },
+  "Misdreavus": {
+    "type": "pokemon",
+    "number": "#227",
+    "name": "Misdreavus"
+  },
+  "Mismagius": {
+    "type": "pokemon",
+    "number": "#228",
+    "name": "Mismagius"
+  },
+  "Girafarig": {
+    "type": "pokemon",
+    "number": "#229",
+    "name": "Girafarig"
+  },
+  "Farigiraf": {
+    "type": "pokemon",
+    "number": "#230",
+    "name": "Farigiraf"
+  },
+  "Ralts": {
+    "type": "pokemon",
+    "number": "#231",
+    "name": "Ralts"
+  },
+  "Kirlia": {
+    "type": "pokemon",
+    "number": "#232",
+    "name": "Kirlia"
+  },
+  "Gardevoir": {
+    "type": "pokemon",
+    "number": "#233",
+    "name": "Gardevoir"
+  },
+  "Gallade": {
+    "type": "pokemon",
+    "number": "#234",
+    "name": "Gallade"
+  },
+  "Plusle": {
+    "type": "pokemon",
+    "number": "#235",
+    "name": "Plusle"
+  },
+  "Minun": {
+    "type": "pokemon",
+    "number": "#236",
+    "name": "Minun"
+  },
+  "Trapinch": {
+    "type": "pokemon",
+    "number": "#237",
+    "name": "Trapinch"
+  },
+  "Vibrava": {
+    "type": "pokemon",
+    "number": "#238",
+    "name": "Vibrava"
+  },
+  "Flygon": {
+    "type": "pokemon",
+    "number": "#239",
+    "name": "Flygon"
+  },
+  "Swablu": {
+    "type": "pokemon",
+    "number": "#240",
+    "name": "Swablu"
+  },
+  "Altaria": {
+    "type": "pokemon",
+    "number": "#241",
+    "name": "Altaria"
+  },
+  "Duskull": {
+    "type": "pokemon",
+    "number": "#242",
+    "name": "Duskull"
+  },
+  "Dusclops": {
+    "type": "pokemon",
+    "number": "#243",
+    "name": "Dusclops"
+  },
+  "Dusknoir": {
+    "type": "pokemon",
+    "number": "#244",
+    "name": "Dusknoir"
+  },
+  "Beldum": {
+    "type": "pokemon",
+    "number": "#245",
+    "name": "Beldum"
+  },
+  "Metang": {
+    "type": "pokemon",
+    "number": "#246",
+    "name": "Metang"
+  },
+  "Metagross": {
+    "type": "pokemon",
+    "number": "#247",
+    "name": "Metagross"
+  },
+  "Snivy": {
+    "type": "pokemon",
+    "number": "#248",
+    "name": "Snivy"
+  },
+  "Servine": {
+    "type": "pokemon",
+    "number": "#249",
+    "name": "Servine"
+  },
+  "Serperior": {
+    "type": "pokemon",
+    "number": "#250",
+    "name": "Serperior"
+  },
+  "Froakie": {
+    "type": "pokemon",
+    "number": "#251",
+    "name": "Froakie"
+  },
+  "Frogadier": {
+    "type": "pokemon",
+    "number": "#252",
+    "name": "Frogadier"
+  },
+  "Greninja": {
+    "type": "pokemon",
+    "number": "#253",
+    "name": "Greninja"
+  },
+  "Dedenne": {
+    "type": "pokemon",
+    "number": "#254",
+    "name": "Dedenne"
+  },
+  "Noibat": {
+    "type": "pokemon",
+    "number": "#255",
+    "name": "Noibat"
+  },
+  "Noivern": {
+    "type": "pokemon",
+    "number": "#256",
+    "name": "Noivern"
+  },
+  "Rookidee": {
+    "type": "pokemon",
+    "number": "#257",
+    "name": "Rookidee"
+  },
+  "Corvisquire": {
+    "type": "pokemon",
+    "number": "#258",
+    "name": "Corvisquire"
+  },
+  "Corviknight": {
+    "type": "pokemon",
+    "number": "#259",
+    "name": "Corviknight"
+  },
+  "Dreepy": {
+    "type": "pokemon",
+    "number": "#260",
+    "name": "Dreepy"
+  },
+  "Drakloak": {
+    "type": "pokemon",
+    "number": "#261",
+    "name": "Drakloak"
+  },
+  "Dragapult": {
+    "type": "pokemon",
+    "number": "#262",
+    "name": "Dragapult"
+  },
+  "Sprigatito": {
+    "type": "pokemon",
+    "number": "#263",
+    "name": "Sprigatito"
+  },
+  "Floragato": {
+    "type": "pokemon",
+    "number": "#264",
+    "name": "Floragato"
+  },
+  "Meowscarada": {
+    "type": "pokemon",
+    "number": "#265",
+    "name": "Meowscarada"
+  },
+  "Wattrel": {
+    "type": "pokemon",
+    "number": "#266",
+    "name": "Wattrel"
+  },
+  "Kilowattrel": {
+    "type": "pokemon",
+    "number": "#267",
+    "name": "Kilowattrel"
+  },
+  "Tinkatink": {
+    "type": "pokemon",
+    "number": "#268",
+    "name": "Tinkatink"
+  },
+  "Tinkatuff": {
+    "type": "pokemon",
+    "number": "#269",
+    "name": "Tinkatuff"
+  },
+  "Tinkaton": {
+    "type": "pokemon",
+    "number": "#270",
+    "name": "Tinkaton"
+  },
+  "Aerodactyl": {
+    "type": "pokemon",
+    "number": "#271",
+    "name": "Aerodactyl"
+  },
+  "Cranidos": {
+    "type": "pokemon",
+    "number": "#272",
+    "name": "Cranidos"
+  },
+  "Rampardos": {
+    "type": "pokemon",
+    "number": "#273",
+    "name": "Rampardos"
+  },
+  "Shieldon": {
+    "type": "pokemon",
+    "number": "#274",
+    "name": "Shieldon"
+  },
+  "Bastiodon": {
+    "type": "pokemon",
+    "number": "#275",
+    "name": "Bastiodon"
+  },
+  "Tyrunt": {
+    "type": "pokemon",
+    "number": "#276",
+    "name": "Tyrunt"
+  },
+  "Tyrantrum": {
+    "type": "pokemon",
+    "number": "#277",
+    "name": "Tyrantrum"
+  },
+  "Amaura": {
+    "type": "pokemon",
+    "number": "#278",
+    "name": "Amaura"
+  },
+  "Aurorus": {
+    "type": "pokemon",
+    "number": "#279",
+    "name": "Aurorus"
+  },
+  "Eevee": {
+    "type": "pokemon",
+    "number": "#280",
+    "name": "Eevee"
+  },
+  "Vaporeon": {
+    "type": "pokemon",
+    "number": "#281",
+    "name": "Vaporeon"
+  },
+  "Jolteon": {
+    "type": "pokemon",
+    "number": "#282",
+    "name": "Jolteon"
+  },
+  "Flareon": {
+    "type": "pokemon",
+    "number": "#283",
+    "name": "Flareon"
+  },
+  "Espeon": {
+    "type": "pokemon",
+    "number": "#284",
+    "name": "Espeon"
+  },
+  "Umbreon": {
+    "type": "pokemon",
+    "number": "#285",
+    "name": "Umbreon"
+  },
+  "Leafeon": {
+    "type": "pokemon",
+    "number": "#286",
+    "name": "Leafeon"
+  },
+  "Glaceon": {
+    "type": "pokemon",
+    "number": "#287",
+    "name": "Glaceon"
+  },
+  "Sylveon": {
+    "type": "pokemon",
+    "number": "#288",
+    "name": "Sylveon"
+  },
+  "Kyogre": {
+    "type": "pokemon",
+    "number": "#289",
+    "name": "Kyogre"
+  },
+  "Raikou": {
+    "type": "pokemon",
+    "number": "#290",
+    "name": "Raikou"
+  },
+  "Entei": {
+    "type": "pokemon",
+    "number": "#291",
+    "name": "Entei"
+  },
+  "Suicune": {
+    "type": "pokemon",
+    "number": "#292",
+    "name": "Suicune"
+  },
+  "Volcanion": {
+    "type": "pokemon",
+    "number": "#293",
+    "name": "Volcanion"
+  },
+  "Articuno": {
+    "type": "pokemon",
+    "number": "#294",
+    "name": "Articuno"
+  },
+  "Zapdos": {
+    "type": "pokemon",
+    "number": "#295",
+    "name": "Zapdos"
+  },
+  "Moltres": {
+    "type": "pokemon",
+    "number": "#296",
+    "name": "Moltres"
+  },
+  "Lugia": {
+    "type": "pokemon",
+    "number": "#297",
+    "name": "Lugia"
+  },
+  "Ho-oh": {
+    "type": "pokemon",
+    "number": "#298",
+    "name": "Ho-oh"
+  },
+  "Mewtwo": {
+    "type": "pokemon",
+    "number": "#299",
+    "name": "Mewtwo"
+  },
+  "Mew": {
+    "type": "pokemon",
+    "number": "#300",
+    "name": "Mew"
+  },
+  "Leppa Berry": {
+    "type": "item",
+    "category": "Food",
+    "name": "Leppa Berry"
+  },
+  "Chesto Berry": {
+    "type": "item",
+    "category": "Food",
+    "name": "Chesto Berry"
+  },
+  "Rawst Berry": {
+    "type": "item",
+    "category": "Food",
+    "name": "Rawst Berry"
+  },
+  "Aspear Berry": {
+    "type": "item",
+    "category": "Food",
+    "name": "Aspear Berry"
+  },
+  "Pecha Berry": {
+    "type": "item",
+    "category": "Food",
+    "name": "Pecha Berry"
+  },
+  "Lum Berry": {
+    "type": "item",
+    "category": "Food",
+    "name": "Lum Berry"
+  },
+  "Bean": {
+    "type": "item",
+    "category": "Food",
+    "name": "Bean"
+  },
+  "Tomato": {
+    "type": "item",
+    "category": "Food",
+    "name": "Tomato"
+  },
+  "Wheat": {
+    "type": "item",
+    "category": "Food",
+    "name": "Wheat"
+  },
+  "Potato": {
+    "type": "item",
+    "category": "Food",
+    "name": "Potato"
+  },
+  "Fresh carrot": {
+    "type": "item",
+    "category": "Food",
+    "name": "Fresh carrot"
+  },
+  "Seaweed": {
+    "type": "item",
+    "category": "Food",
+    "name": "Seaweed"
+  },
+  "Cave mushrooms": {
+    "type": "item",
+    "category": "Food",
+    "name": "Cave mushrooms"
+  },
+  "Simple salad": {
+    "type": "item",
+    "category": "Food",
+    "name": "Simple salad"
+  },
+  "Leppa salad": {
+    "type": "item",
+    "category": "Food",
+    "name": "Leppa salad"
+  },
+  "Seaweed salad": {
+    "type": "item",
+    "category": "Food",
+    "name": "Seaweed salad"
+  },
+  "Shredded salad": {
+    "type": "item",
+    "category": "Food",
+    "name": "Shredded salad"
+  },
+  "Crushed-berry salad": {
+    "type": "item",
+    "category": "Food",
+    "name": "Crushed-berry salad"
+  },
+  "Crouton salad": {
+    "type": "item",
+    "category": "Food",
+    "name": "Crouton salad"
+  },
+  "Simple soup": {
+    "type": "item",
+    "category": "Food",
+    "name": "Simple soup"
+  },
+  "Seaweed soup": {
+    "type": "item",
+    "category": "Food",
+    "name": "Seaweed soup"
+  },
+  "Mushroom soup": {
+    "type": "item",
+    "category": "Food",
+    "name": "Mushroom soup"
+  },
+  "Electrifying soup": {
+    "type": "item",
+    "category": "Food",
+    "name": "Electrifying soup"
+  },
+  "Healthy soup": {
+    "type": "item",
+    "category": "Food",
+    "name": "Healthy soup"
+  },
+  "Flavorful soup": {
+    "type": "item",
+    "category": "Food",
+    "name": "Flavorful soup"
+  },
+  "Simple bread": {
+    "type": "item",
+    "category": "Food",
+    "name": "Simple bread"
+  },
+  "Leppa bread": {
+    "type": "item",
+    "category": "Food",
+    "name": "Leppa bread"
+  },
+  "Carrot bread": {
+    "type": "item",
+    "category": "Food",
+    "name": "Carrot bread"
+  },
+  "Recycled bread": {
+    "type": "item",
+    "category": "Food",
+    "name": "Recycled bread"
+  },
+  "Fluffy bread": {
+    "type": "item",
+    "category": "Food",
+    "name": "Fluffy bread"
+  },
+  "Bread bowl": {
+    "type": "item",
+    "category": "Food",
+    "name": "Bread bowl"
+  },
+  "Simple hamburger steak": {
+    "type": "item",
+    "category": "Food",
+    "name": "Simple hamburger steak"
+  },
+  "Mushroom hamburger steak": {
+    "type": "item",
+    "category": "Food",
+    "name": "Mushroom hamburger steak"
+  },
+  "Tomato hamburger steak": {
+    "type": "item",
+    "category": "Food",
+    "name": "Tomato hamburger steak"
+  },
+  "Potato Hamburger Steak": {
+    "type": "item",
+    "category": "Food",
+    "name": "Potato Hamburger Steak"
+  },
+  "Bitter hamburger steak": {
+    "type": "item",
+    "category": "Food",
+    "name": "Bitter hamburger steak"
+  },
+  "Vibrant hamburger steak": {
+    "type": "item",
+    "category": "Food",
+    "name": "Vibrant hamburger steak"
+  },
+  "Bruised berry": {
+    "type": "item",
+    "category": "Food",
+    "name": "Bruised berry"
+  },
+  "Common candy": {
+    "type": "item",
+    "category": "Food",
+    "name": "Common candy"
+  },
+  "Rare Candy": {
+    "type": "item",
+    "category": "Food",
+    "name": "Rare Candy"
+  },
+  "Curry and rice": {
+    "type": "item",
+    "category": "Food",
+    "name": "Curry and rice"
+  },
+  "Fresh Water": {
+    "type": "item",
+    "category": "Food",
+    "name": "Fresh Water"
+  },
+  "Soda Pop": {
+    "type": "item",
+    "category": "Food",
+    "name": "Soda Pop"
+  },
+  "Moomoo Milk coffee": {
+    "type": "item",
+    "category": "Food",
+    "name": "Moomoo Milk coffee"
+  },
+  "Roserade Tea": {
+    "type": "item",
+    "category": "Food",
+    "name": "Roserade Tea"
+  },
+  "Chili sauce": {
+    "type": "item",
+    "category": "Food",
+    "name": "Chili sauce"
+  },
+  "Honey": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Honey"
+  },
+  "Sturdy stick": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Sturdy stick"
+  },
+  "Stone": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Stone"
+  },
+  "Leaf": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Leaf"
+  },
+  "Small log": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Small log"
+  },
+  "Vine rope": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Vine rope"
+  },
+  "Glowing mushrooms": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Glowing mushrooms"
+  },
+  "Twine": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Twine"
+  },
+  "Sea glass fragments": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Sea glass fragments"
+  },
+  "Seashell": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Seashell"
+  },
+  "Nonburnable garbage": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Nonburnable garbage"
+  },
+  "Squishy clay": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Squishy clay"
+  },
+  "Fluff": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Fluff"
+  },
+  "Wastepaper": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Wastepaper"
+  },
+  "Copper ore": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Copper ore"
+  },
+  "Iron ore": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Iron ore"
+  },
+  "Gold ore": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Gold ore"
+  },
+  "Pok\u00e9metal fragment": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Pok\u00e9metal fragment"
+  },
+  "Rare Pok\u00e9metal fragment": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Rare Pok\u00e9metal fragment"
+  },
+  "Crystal fragment": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Crystal fragment"
+  },
+  "Lumber": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Lumber"
+  },
+  "Brick": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Brick"
+  },
+  "Copper ingot": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Copper ingot"
+  },
+  "Iron ingot": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Iron ingot"
+  },
+  "Gold ingot": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Gold ingot"
+  },
+  "Pok\u00e9metal": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Pok\u00e9metal"
+  },
+  "Rare Pok\u00e9metal": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Rare Pok\u00e9metal"
+  },
+  "Glass": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Glass"
+  },
+  "Concrete": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Concrete"
+  },
+  "Paper": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Paper"
+  },
+  "Tinkagear": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Tinkagear"
+  },
+  "Strange strings": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Strange strings"
+  },
+  "Armor fragment": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Armor fragment"
+  },
+  "Stardust": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Stardust"
+  },
+  "Red paint": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Red paint"
+  },
+  "Blue paint": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Blue paint"
+  },
+  "Green paint": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Green paint"
+  },
+  "Yellow paint": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Yellow paint"
+  },
+  "Pink paint": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Pink paint"
+  },
+  "Cyan paint": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Cyan paint"
+  },
+  "White paint": {
+    "type": "item",
+    "category": "Materials",
+    "name": "White paint"
+  },
+  "Black paint": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Black paint"
+  },
+  "Cotton spores": {
+    "type": "item",
+    "category": "Materials",
+    "name": "Cotton spores"
+  },
+  "Event": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Event"
+  },
+  "Leppa seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Leppa seeds"
+  },
+  "Chesto seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Chesto seeds"
+  },
+  "Rawst seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Rawst seeds"
+  },
+  "Aspear Seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Aspear Seeds"
+  },
+  "Pecha seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Pecha seeds"
+  },
+  "Lum seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Lum seeds"
+  },
+  "Palm seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Palm seeds"
+  },
+  "Pointy-tree seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Pointy-tree seeds"
+  },
+  "Wildflower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Wildflower seeds"
+  },
+  "Seashore-flower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Seashore-flower seeds"
+  },
+  "Mountain-flower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Mountain-flower seeds"
+  },
+  "Skyland-flower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Skyland-flower seeds"
+  },
+  "Beautiful-flower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Beautiful-flower seeds"
+  },
+  "Cute-flower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Cute-flower seeds"
+  },
+  "Elegant-flower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Elegant-flower seeds"
+  },
+  "Robust-flower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Robust-flower seeds"
+  },
+  "Adorable-hedge seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Adorable-hedge seeds"
+  },
+  "Healthy-hedge seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Healthy-hedge seeds"
+  },
+  "Damp-hedge seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Damp-hedge seeds"
+  },
+  "Stylish-hedge seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Stylish-hedge seeds"
+  },
+  "Square-plant seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Square-plant seeds"
+  },
+  "Bean seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Bean seeds"
+  },
+  "Tomato seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Tomato seeds"
+  },
+  "Wheat seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Wheat seeds"
+  },
+  "Potato seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Potato seeds"
+  },
+  "Tall grass": {
+    "type": "habitat",
+    "number": "001",
+    "name": "Tall grass"
+  },
+  "Yellow tall grass": {
+    "type": "habitat",
+    "number": "050",
+    "name": "Yellow tall grass"
+  },
+  "Red tall grass": {
+    "type": "habitat",
+    "number": "098",
+    "name": "Red tall grass"
+  },
+  "Pink tall grass": {
+    "type": "habitat",
+    "number": "137",
+    "name": "Pink tall grass"
+  },
+  "Green shoots": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Green shoots"
+  },
+  "Yellow-green shoots": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Yellow-green shoots"
+  },
+  "Verdant shoots": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Verdant shoots"
+  },
+  "Blue-green shoots": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Blue-green shoots"
+  },
+  "Duckweed": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Duckweed"
+  },
+  "Flowering Duckweed": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Flowering Duckweed"
+  },
+  "Dense vines": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Dense vines"
+  },
+  "Moss": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Moss"
+  },
+  "Fern": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Fern"
+  },
+  "Leppa tree": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Leppa tree"
+  },
+  "Large palm tree": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Large palm tree"
+  },
+  "Pointy tree": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Pointy tree"
+  },
+  "Wildflowers": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Wildflowers"
+  },
+  "Seashore flowers": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Seashore flowers"
+  },
+  "Mountain flowers": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Mountain flowers"
+  },
+  "Skyland flowers": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Skyland flowers"
+  },
+  "Beautiful flower": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Beautiful flower"
+  },
+  "Cute flower": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Cute flower"
+  },
+  "Elegant flower": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Elegant flower"
+  },
+  "Robust flower": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Robust flower"
+  },
+  "Adorable hedge": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Adorable hedge"
+  },
+  "Healthy hedge": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Healthy hedge"
+  },
+  "Damp hedge": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Damp hedge"
+  },
+  "Stylish hedge": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Stylish hedge"
+  },
+  "Square plant": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Square plant"
+  },
+  "Leppa tree stump": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Leppa tree stump"
+  },
+  "Palm tree stump": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Palm tree stump"
+  },
+  "Pointy tree stump": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Pointy tree stump"
+  },
+  "Driftwood": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Driftwood"
+  },
+  "Sticky web": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Sticky web"
+  },
+  "Large boulder": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Large boulder"
+  },
+  "Mossy boulder": {
+    "type": "habitat",
+    "number": "111",
+    "name": "Mossy boulder"
+  },
+  "Molten rock": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Molten rock"
+  },
+  "Cooled molten rock": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Cooled molten rock"
+  },
+  "Stalagmites": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Stalagmites"
+  },
+  "Stalactites": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Stalactites"
+  },
+  "Icicle": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Icicle"
+  },
+  "Crystal cluster": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Crystal cluster"
+  },
+  "Strength rock": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Strength rock"
+  },
+  "Dandy flower seeds": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Dandy flower seeds"
+  },
+  "Dandy flowers": {
+    "type": "item",
+    "category": "Nature",
+    "name": "Dandy flowers"
+  },
+  "Leaf den kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Leaf den kit"
+  },
+  "Leaf hut kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Leaf hut kit"
+  },
+  "Leaf cottage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Leaf cottage kit"
+  },
+  "Leaf house kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Leaf house kit"
+  },
+  "Sand den kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Sand den kit"
+  },
+  "Sand hut kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Sand hut kit"
+  },
+  "Sand cottage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Sand cottage kit"
+  },
+  "Sand house kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Sand house kit"
+  },
+  "Stone den kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Stone den kit"
+  },
+  "Stone hut kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Stone hut kit"
+  },
+  "Stone cottage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Stone cottage kit"
+  },
+  "Stone house kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Stone house kit"
+  },
+  "City den kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "City den kit"
+  },
+  "City hut kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "City hut kit"
+  },
+  "City cottage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "City cottage kit"
+  },
+  "City house kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "City house kit"
+  },
+  "Pok\u00e9 Ball house kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Pok\u00e9 Ball house kit"
+  },
+  "Pok\u00e9 Mart kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Pok\u00e9 Mart kit"
+  },
+  "Wasteland Pok\u00e9mon Center kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Wasteland Pok\u00e9mon Center kit"
+  },
+  "Beach Pok\u00e9mon Center kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Beach Pok\u00e9mon Center kit"
+  },
+  "Ridge Pok\u00e9mon Center kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Ridge Pok\u00e9mon Center kit"
+  },
+  "Skyland Pok\u00e9mon Center kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Skyland Pok\u00e9mon Center kit"
+  },
+  "Windmill kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Windmill kit"
+  },
+  "Waterwheel kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Waterwheel kit"
+  },
+  "Furnace kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Furnace kit"
+  },
+  "Charging station kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Charging station kit"
+  },
+  "Pikachu fountain kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Pikachu fountain kit"
+  },
+  "Moonlight dance statue kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Moonlight dance statue kit"
+  },
+  "Pink hut kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Pink hut kit"
+  },
+  "Pink cottage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Pink cottage kit"
+  },
+  "Orange hut kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Orange hut kit"
+  },
+  "Orange cottage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Orange cottage kit"
+  },
+  "Gray hut kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Gray hut kit"
+  },
+  "Gray cottage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Gray cottage kit"
+  },
+  "Yellow hut kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Yellow hut kit"
+  },
+  "Yellow cottage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Yellow cottage kit"
+  },
+  "Log cabin kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Log cabin kit"
+  },
+  "Small office kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Small office kit"
+  },
+  "Relaxing park kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Relaxing park kit"
+  },
+  "Stylish Caf\u00e9 kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Stylish Caf\u00e9 kit"
+  },
+  "Concert stage kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Concert stage kit"
+  },
+  "Fountain plaza kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Fountain plaza kit"
+  },
+  "Altar of Flame kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Altar of Flame kit"
+  },
+  "Abandoned Power Plant kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Abandoned Power Plant kit"
+  },
+  "Freezing Chambers kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Freezing Chambers kit"
+  },
+  "Relocation kit (prepare)": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Relocation kit (prepare)"
+  },
+  "Demolition kit": {
+    "type": "item",
+    "category": "Kits",
+    "name": "Demolition kit"
+  },
+  "Storage box": {
+    "type": "recipe",
+    "category": "Furniture",
+    "name": "Storage box"
+  },
+  "Recipe": {
+    "type": "item",
+    "category": "Other",
+    "name": "Recipe"
+  },
+  "Wall storage box": {
+    "type": "recipe",
+    "category": "Furniture",
+    "name": "Wall storage box"
+  },
+  "Big storage box": {
+    "type": "recipe",
+    "category": "Furniture",
+    "name": "Big storage box"
+  },
+  "Plain chest": {
+    "type": "recipe",
+    "category": "Furniture",
+    "name": "Plain chest"
+  },
+  "Office cabinet": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Office cabinet"
+  },
+  "Gaming Fridge": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Gaming Fridge"
+  },
+  "Pok\u00e9 Ball Chest": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pok\u00e9 Ball Chest"
+  },
+  "Berry case": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Berry case"
+  },
+  "Antique chest": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Antique chest"
+  },
+  "Plain closet": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Plain closet"
+  },
+  "Office locker": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Office locker"
+  },
+  "Antique closet": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Antique closet"
+  },
+  "Office shelf": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Office shelf"
+  },
+  "Polygonal Shelf": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Polygonal Shelf"
+  },
+  "Straw table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Straw table"
+  },
+  "Log table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Log table"
+  },
+  "Side table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Side table"
+  },
+  "Garden table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Garden table"
+  },
+  "Wooden table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden table"
+  },
+  "Counter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Counter"
+  },
+  "Wall-mounted table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wall-mounted table"
+  },
+  "Pok\u00e9mon Center counter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pok\u00e9mon Center counter"
+  },
+  "Kitchen table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Kitchen table"
+  },
+  "Push cart": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Push cart"
+  },
+  "Exhibition stand": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Exhibition stand"
+  },
+  "Mysterious pedestal": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious pedestal"
+  },
+  "Plain stand": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Plain stand"
+  },
+  "Iron stand": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron stand"
+  },
+  "Food counter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Food counter"
+  },
+  "Plain table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Plain table"
+  },
+  "Antique table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Antique table"
+  },
+  "Industrial desk": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Industrial desk"
+  },
+  "Iron table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron table"
+  },
+  "Office desk": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Office desk"
+  },
+  "Study desk": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Study desk"
+  },
+  "Cute table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cute table"
+  },
+  "Iron rack": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron rack"
+  },
+  "Resort table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Resort table"
+  },
+  "Chic table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Chic table"
+  },
+  "Pop art table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pop art table"
+  },
+  "Pok\u00e9 Ball table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pok\u00e9 Ball table"
+  },
+  "Berry table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Berry table"
+  },
+  "Stone table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stone table"
+  },
+  "Luxury table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Luxury table"
+  },
+  "Office table": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Office table"
+  },
+  "Avalugg Table": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Avalugg Table"
+  },
+  "Straw stool": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Straw stool"
+  },
+  "Berry chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Berry chair"
+  },
+  "Simple cushion": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Simple cushion"
+  },
+  "Log chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Log chair"
+  },
+  "Plain stool": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Plain stool"
+  },
+  "Resort stool": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Resort stool"
+  },
+  "Stylish stool": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Stylish stool"
+  },
+  "Industrial chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Industrial chair"
+  },
+  "Waterproof seat": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Waterproof seat"
+  },
+  "Wooden stool": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Wooden stool"
+  },
+  "Iron chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Iron chair"
+  },
+  "Public seat": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Public seat"
+  },
+  "Soft seat": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Soft seat"
+  },
+  "Box sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Box sofa"
+  },
+  "Plain chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Plain chair"
+  },
+  "Resort chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Resort chair"
+  },
+  "Chic chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Chic chair"
+  },
+  "Fancy chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Fancy chair"
+  },
+  "Antique chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Antique chair"
+  },
+  "Spectator chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Spectator chair"
+  },
+  "Luxury chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Luxury chair"
+  },
+  "Garden chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Garden chair"
+  },
+  "Folding chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Folding chair"
+  },
+  "Office chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Office chair"
+  },
+  "Cute chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Cute chair"
+  },
+  "Pop art chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Pop art chair"
+  },
+  "Gaming Chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Gaming Chair"
+  },
+  "Wooden bench": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Wooden bench"
+  },
+  "Stone bench": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Stone bench"
+  },
+  "Plain sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Plain sofa"
+  },
+  "Resort sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Resort sofa"
+  },
+  "Chic sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Chic sofa"
+  },
+  "Antique sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Antique sofa"
+  },
+  "Iron bench": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Iron bench"
+  },
+  "Industrial bench": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Industrial bench"
+  },
+  "Luxury sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Luxury sofa"
+  },
+  "Garden bench": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Garden bench"
+  },
+  "Cute sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Cute sofa"
+  },
+  "Pop art sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Pop art sofa"
+  },
+  "Pok\u00e9 Ball Sofa": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Pok\u00e9 Ball Sofa"
+  },
+  "Pikachu sofa": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Pikachu sofa"
+  },
+  "Log bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Log bed"
+  },
+  "Mini plain bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Mini plain bed"
+  },
+  "Resort bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Resort bed"
+  },
+  "Iron bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Iron bed"
+  },
+  "Deck chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Deck chair"
+  },
+  "Beach chair": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Beach chair"
+  },
+  "Straw bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Straw bed"
+  },
+  "Pop art bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Pop art bed"
+  },
+  "Pok\u00e9 Ball Bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Pok\u00e9 Ball Bed"
+  },
+  "Berry bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Berry bed"
+  },
+  "Wooden bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Wooden bed"
+  },
+  "Plain bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Plain bed"
+  },
+  "Resort hammock": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Resort hammock"
+  },
+  "Guest-room bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Guest-room bed"
+  },
+  "Antique bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Antique bed"
+  },
+  "Industrial bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Industrial bed"
+  },
+  "Luxury bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Luxury bed"
+  },
+  "Cute bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Cute bed"
+  },
+  "Gaming bed": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Gaming bed"
+  },
+  "Naptime bed": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Naptime bed"
+  },
+  "Wall mirror": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Wall mirror"
+  },
+  "Toy": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Toy"
+  },
+  "Large mirror": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Large mirror"
+  },
+  "Antique dresser": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Antique dresser"
+  },
+  "Luxury dresser": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Luxury dresser"
+  },
+  "Cute dresser": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Cute dresser"
+  },
+  "Wiggly mirror": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Wiggly mirror"
+  },
+  "Flower cushion": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Flower cushion"
+  },
+  "Flower table": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Flower table"
+  },
+  "Wooden plate": {
+    "type": "recipe",
+    "category": "Misc.",
+    "name": "Wooden plate"
+  },
+  "Plate": {
+    "type": "recipe",
+    "category": "Misc.",
+    "name": "Plate"
+  },
+  "Offering dish": {
+    "type": "item",
+    "category": "Misc.",
+    "name": "Offering dish"
+  },
+  "Party platter": {
+    "type": "recipe",
+    "category": "Misc.",
+    "name": "Party platter"
+  },
+  "Picnic basket": {
+    "type": "recipe",
+    "category": "Misc.",
+    "name": "Picnic basket"
+  },
+  "Mug": {
+    "type": "recipe",
+    "category": "Misc.",
+    "name": "Mug"
+  },
+  "Tea set": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tea set"
+  },
+  "Table setting": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Table setting"
+  },
+  "Paper party cups": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Paper party cups"
+  },
+  "Pizza": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pizza"
+  },
+  "Fried Potatoes": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Fried Potatoes"
+  },
+  "Soda Float": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Soda Float"
+  },
+  "Afternoon tea set": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Afternoon tea set"
+  },
+  "Chocolate cookies": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Chocolate cookies"
+  },
+  "Sandwiches": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sandwiches"
+  },
+  "Shaved ice": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Shaved ice"
+  },
+  "Ribbon cake": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Ribbon cake"
+  },
+  "Berry basket": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Berry basket"
+  },
+  "Small vase": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Small vase"
+  },
+  "Leafy plant": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Leafy plant"
+  },
+  "Pitcher-plant pot": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Pitcher-plant pot"
+  },
+  "Extravagant flowers": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Extravagant flowers"
+  },
+  "Tall potted plant": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Tall potted plant"
+  },
+  "Flat-leaf plant": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Flat-leaf plant"
+  },
+  "Twisted potted plant": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Twisted potted plant"
+  },
+  "Munna bank": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Munna bank"
+  },
+  "Small garbage can": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Small garbage can"
+  },
+  "Pencil holder": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pencil holder"
+  },
+  "Fancy pen": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Fancy pen"
+  },
+  "Letter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Letter"
+  },
+  "Notepad": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Notepad"
+  },
+  "Book": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Book"
+  },
+  "Open book": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Open book"
+  },
+  "Book pile": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Book pile"
+  },
+  "Papers": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Papers"
+  },
+  "Newspaper": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Newspaper"
+  },
+  "Photo frame": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Photo frame"
+  },
+  "Wall photo frame": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wall photo frame"
+  },
+  "Corkboard": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Corkboard"
+  },
+  "CD rack": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "CD rack"
+  },
+  "Magazine rack": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Magazine rack"
+  },
+  "Mini bookcase": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Mini bookcase"
+  },
+  "Bookcase": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Bookcase"
+  },
+  "Stone fireplace": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stone fireplace"
+  },
+  "Dining cabinet": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Dining cabinet"
+  },
+  "Modern sink": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Modern sink"
+  },
+  "Cooking stove": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cooking stove"
+  },
+  "Microwave oven": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Microwave oven"
+  },
+  "Refrigerator": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Refrigerator"
+  },
+  "Fan": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Fan"
+  },
+  "Air conditioner": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Air conditioner"
+  },
+  "Printer": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Printer"
+  },
+  "Washing Machine": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Washing Machine"
+  },
+  "Toilet": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Toilet"
+  },
+  "Sink": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sink"
+  },
+  "Towel Rack": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Towel Rack"
+  },
+  "Bathtime set": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Bathtime set"
+  },
+  "Cleaning supplies": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cleaning supplies"
+  },
+  "Shower": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Shower"
+  },
+  "Bathtub": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Bathtub"
+  },
+  "Bouncy blue bathtub": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Bouncy blue bathtub"
+  },
+  "Tablet": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tablet"
+  },
+  "Cell phone": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cell phone"
+  },
+  "Laptop": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Laptop"
+  },
+  "Computer": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Computer"
+  },
+  "Gaming PC": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Gaming PC"
+  },
+  "Television": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Television"
+  },
+  "Wall monitor": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wall monitor"
+  },
+  "Arcade machine": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Arcade machine"
+  },
+  "Alarm clock": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Alarm clock"
+  },
+  "Toy blocks": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Toy blocks"
+  },
+  "Pinwheels": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pinwheels"
+  },
+  "Knitting supplies": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Knitting supplies"
+  },
+  "Game Boy system": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Game Boy system"
+  },
+  "Humidifier": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Humidifier"
+  },
+  "Funky diffuser": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Funky diffuser"
+  },
+  "First aid kit": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "First aid kit"
+  },
+  "Crystal ball": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Crystal ball"
+  },
+  "Microscope": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Microscope"
+  },
+  "Science Experiment": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Science Experiment"
+  },
+  "Jumbled cords": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Jumbled cords"
+  },
+  "CD player": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "CD player"
+  },
+  "Tabletop mic": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tabletop mic"
+  },
+  "Standing mic": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Standing mic"
+  },
+  "Big drum": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Big drum"
+  },
+  "Cool electric guitar": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cool electric guitar"
+  },
+  "Cool bass guitar": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cool bass guitar"
+  },
+  "Audio mixer": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Audio mixer"
+  },
+  "Speaker": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Speaker"
+  },
+  "Gold Teeth": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Gold Teeth"
+  },
+  "Repel": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Repel"
+  },
+  "Big Nugget": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Big Nugget"
+  },
+  "Balloons": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Balloons"
+  },
+  "Punching game": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Punching game"
+  },
+  "Boo-in-the-box": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Boo-in-the-box"
+  },
+  "Wobbuffet wobbler": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Wobbuffet wobbler"
+  },
+  "Step stool": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Step stool"
+  },
+  "Cardboard boxes": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cardboard boxes"
+  },
+  "Whiteboard": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Whiteboard"
+  },
+  "Control unit": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Control unit"
+  },
+  "Auspicious Armor": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Auspicious Armor"
+  },
+  "Malicious Armor": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Malicious Armor"
+  },
+  "Clear Bell": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Clear Bell"
+  },
+  "Tidal Bell": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tidal Bell"
+  },
+  "Ship&#x27;s wheel": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Ship&#x27;s wheel"
+  },
+  "Mysterious statue": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious statue"
+  },
+  "Fiery Magby statue": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Fiery Magby statue"
+  },
+  "Gym emblem statue": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Gym emblem statue"
+  },
+  "Spacesuit": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Spacesuit"
+  },
+  "Model space shuttle": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Model space shuttle"
+  },
+  "Spaceship": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Spaceship"
+  },
+  "Wall calendar": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wall calendar"
+  },
+  "Wreath": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wreath"
+  },
+  "Decorative bookshelf": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Decorative bookshelf"
+  },
+  "Decorative storage shelf": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Decorative storage shelf"
+  },
+  "Decorative plant shelf": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Decorative plant shelf"
+  },
+  "Antique clock": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Antique clock"
+  },
+  "Berry clock": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Berry clock"
+  },
+  "Rowlet clock": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Rowlet clock"
+  },
+  "Hanging banner": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Hanging banner"
+  },
+  "Party bunting": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Party bunting"
+  },
+  "Vine wall decoration": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Vine wall decoration"
+  },
+  "Berry wall decoration": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Berry wall decoration"
+  },
+  "Hanging scroll": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Hanging scroll"
+  },
+  "Ceiling fan": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Ceiling fan"
+  },
+  "Castform weather charm": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Castform weather charm"
+  },
+  "Eevee doll": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Eevee doll"
+  },
+  "Pikachu doll": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Pikachu doll"
+  },
+  "Clefairy doll": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Clefairy doll"
+  },
+  "Arcanine doll": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Arcanine doll"
+  },
+  "Dragonite doll": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Dragonite doll"
+  },
+  "Ditto doll": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Ditto doll"
+  },
+  "Substitute doll": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Substitute doll"
+  },
+  "Grubby letter": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Grubby letter"
+  },
+  "Grubby notepad": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Grubby notepad"
+  },
+  "Grubby book": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Grubby book"
+  },
+  "Grubby papers": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Grubby papers"
+  },
+  "Grubby newspaper": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Grubby newspaper"
+  },
+  "Grubby tablet": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Grubby tablet"
+  },
+  "Grubby cell phone": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Grubby cell phone"
+  },
+  "Flower backpack": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Flower backpack"
+  },
+  "Flower garland": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Flower garland"
+  },
+  "Flowery table setting": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Flowery table setting"
+  },
+  "Hoppip water bottle": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Hoppip water bottle"
+  },
+  "Juice trio": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Juice trio"
+  },
+  "Lunch box": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Lunch box"
+  },
+  "Campfire": {
+    "type": "recipe",
+    "category": "Outdoor",
+    "name": "Campfire"
+  },
+  "Torch": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Torch"
+  },
+  "Slender candle": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Slender candle"
+  },
+  "Eerie candle": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Eerie candle"
+  },
+  "Wall torch": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wall torch"
+  },
+  "Firepit": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Firepit"
+  },
+  "Bonfire": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Bonfire"
+  },
+  "Sandbox": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sandbox"
+  },
+  "Tire toy": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tire toy"
+  },
+  "Concrete pipe": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Concrete pipe"
+  },
+  "Punching bag": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Punching bag"
+  },
+  "Slide": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Slide"
+  },
+  "Vending machine": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Vending machine"
+  },
+  "Wall-mounted flowers": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wall-mounted flowers"
+  },
+  "Chansey plant": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Chansey plant"
+  },
+  "Garden ornament": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Garden ornament"
+  },
+  "Bike": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Bike"
+  },
+  "Planter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Planter"
+  },
+  "Garden flowers": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Garden flowers"
+  },
+  "Cart": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cart"
+  },
+  "Perch": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Perch"
+  },
+  "Wooden birdhouse": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Wooden birdhouse"
+  },
+  "Mailbox": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Mailbox"
+  },
+  "Weather vane": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Weather vane"
+  },
+  "Gravestone": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Gravestone"
+  },
+  "Blank canvas": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Blank canvas"
+  },
+  "Painting (landscape)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Painting (landscape)"
+  },
+  "Painting (portrait)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Painting (portrait)"
+  },
+  "Painting (still life)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Painting (still life)"
+  },
+  "Cannon": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cannon"
+  },
+  "Bell": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Bell"
+  },
+  "Small stage": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Small stage"
+  },
+  "Hot-spring spout": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Hot-spring spout"
+  },
+  "Water basin": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Water basin"
+  },
+  "Canoe": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Canoe"
+  },
+  "Inflatable boat": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Inflatable boat"
+  },
+  "Beach parasol": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Beach parasol"
+  },
+  "Horsea fountain": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Horsea fountain"
+  },
+  "Fishing rod": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Fishing rod"
+  },
+  "Arrow sign": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Arrow sign"
+  },
+  "Menu board": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Menu board"
+  },
+  "Sign": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sign"
+  },
+  "Signpost": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Signpost"
+  },
+  "Information board": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Information board"
+  },
+  "Raichu sign": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Raichu sign"
+  },
+  "Photo cutout board": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Photo cutout board"
+  },
+  "Worn wooden crate": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Worn wooden crate"
+  },
+  "Wooden crate": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden crate"
+  },
+  "Barrel": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Barrel"
+  },
+  "Garbage bags": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Garbage bags"
+  },
+  "Garbage bin": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Garbage bin"
+  },
+  "Recycling bin": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Recycling bin"
+  },
+  "Grubby rags": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Grubby rags"
+  },
+  "Nonburnable garbage (outdoor)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Nonburnable garbage (outdoor)"
+  },
+  "Traffic cone": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Traffic cone"
+  },
+  "Sewer-hole cover": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sewer-hole cover"
+  },
+  "Fire hydrant": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Fire hydrant"
+  },
+  "Sandbags": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sandbags"
+  },
+  "Excavation tools": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Excavation tools"
+  },
+  "Tires": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tires"
+  },
+  "Metal drum": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Metal drum"
+  },
+  "Construction supplies": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Construction supplies"
+  },
+  "Iron pipes": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipes"
+  },
+  "Wheelbarrow": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wheelbarrow"
+  },
+  "Large ventilation fan": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Large ventilation fan"
+  },
+  "Heat Rock": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Heat Rock"
+  },
+  "Icy Rock": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Icy Rock"
+  },
+  "Smooth rock": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Smooth rock"
+  },
+  "Damp Rock": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Damp Rock"
+  },
+  "Ditto flag": {
+    "type": "recipe",
+    "category": "Utilities",
+    "name": "Ditto flag"
+  },
+  "Workbench": {
+    "type": "recipe",
+    "category": "Utilities",
+    "name": "Workbench"
+  },
+  "Community box": {
+    "type": "recipe",
+    "category": "Utilities",
+    "name": "Community box"
+  },
+  "Frame": {
+    "type": "recipe",
+    "category": "Utilities",
+    "name": "Frame"
+  },
+  "Cutting board": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cutting board"
+  },
+  "Frying pan": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Frying pan"
+  },
+  "Stylish frying pan": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stylish frying pan"
+  },
+  "Cooking pot": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cooking pot"
+  },
+  "Stylish Cooking Pot": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stylish Cooking Pot"
+  },
+  "Bread oven": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Bread oven"
+  },
+  "Smelting furnace": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Smelting furnace"
+  },
+  "Metallic smelting furnace": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Metallic smelting furnace"
+  },
+  "Concrete mixer": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Concrete mixer"
+  },
+  "Railway track": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Railway track"
+  },
+  "Crossing gate": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Crossing gate"
+  },
+  "Handcar": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Handcar"
+  },
+  "Elevator platform": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Elevator platform"
+  },
+  "Lift platform": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Lift platform"
+  },
+  "Cash register": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cash register"
+  },
+  "Sprinkler": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sprinkler"
+  },
+  "Mini floodgate": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Mini floodgate"
+  },
+  "Utility pole": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Utility pole"
+  },
+  "Wireless power-transmitter switch": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wireless power-transmitter switch"
+  },
+  "Wireless power transmitter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wireless power transmitter"
+  },
+  "Mini generator": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Mini generator"
+  },
+  "Floor switch": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Floor switch"
+  },
+  "Wall switch": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wall switch"
+  },
+  "Card reader": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Card reader"
+  },
+  "Laser sensor": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Laser sensor"
+  },
+  "Security camera": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Security camera"
+  },
+  "Mushroom streetlight": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Mushroom streetlight"
+  },
+  "Town streetlight": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Town streetlight"
+  },
+  "Harbor streetlight": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Harbor streetlight"
+  },
+  "Chic streetlight": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Chic streetlight"
+  },
+  "Double streetlight": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Double streetlight"
+  },
+  "Mushroom lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Mushroom lamp"
+  },
+  "Plain lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Plain lamp"
+  },
+  "Desk light": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Desk light"
+  },
+  "Pok\u00e9 Ball light": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pok\u00e9 Ball light"
+  },
+  "Berry table lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Berry table lamp"
+  },
+  "Cute lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Cute lamp"
+  },
+  "Pok\u00e9 Ball lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pok\u00e9 Ball lamp"
+  },
+  "Model planet": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Model planet"
+  },
+  "Red meteor lamp": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Red meteor lamp"
+  },
+  "Orange meteor lamp": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Orange meteor lamp"
+  },
+  "Yellow meteor lamp": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Yellow meteor lamp"
+  },
+  "Green meteor lamp": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Green meteor lamp"
+  },
+  "Blue meteor lamp": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Blue meteor lamp"
+  },
+  "Indigo meteor lamp": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Indigo meteor lamp"
+  },
+  "Violet meteor lamp": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Violet meteor lamp"
+  },
+  "Luxury lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Luxury lamp"
+  },
+  "Garden light": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Garden light"
+  },
+  "Lantern": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Lantern"
+  },
+  "Seedot lamp": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Seedot lamp"
+  },
+  "Mirror ball": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Mirror ball"
+  },
+  "Wall light": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wall light"
+  },
+  "Shell lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Shell lamp"
+  },
+  "Fluorescent light": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Fluorescent light"
+  },
+  "Gaming light": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Gaming light"
+  },
+  "Resort light": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Resort light"
+  },
+  "String lights": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "String lights"
+  },
+  "Pop art lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pop art lamp"
+  },
+  "Berry hanging lamp": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Berry hanging lamp"
+  },
+  "Surface light": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Surface light"
+  },
+  "Spotlight": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Spotlight"
+  },
+  "Antique chandelier": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Antique chandelier"
+  },
+  "Music mat (low do)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Music mat (low do)"
+  },
+  "Music mat (Re)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Music mat (Re)"
+  },
+  "Music mat (Mi)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Music mat (Mi)"
+  },
+  "Music mat (Fa)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Music mat (Fa)"
+  },
+  "Music mat (Sol)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Music mat (Sol)"
+  },
+  "Music mat (La)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Music mat (La)"
+  },
+  "Music mat (Ti)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Music mat (Ti)"
+  },
+  "Music mat (High do)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Music mat (High do)"
+  },
+  "Wooden steps": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Wooden steps"
+  },
+  "Road": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Road"
+  },
+  "Stylish steps": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Stylish steps"
+  },
+  "Stone steps": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Stone steps"
+  },
+  "Concrete steps": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Concrete steps"
+  },
+  "Brick steps": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Brick steps"
+  },
+  "Iron steps": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Iron steps"
+  },
+  "Wooden ladder": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Wooden ladder"
+  },
+  "Iron ladder": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Iron ladder"
+  },
+  "Wire": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Wire"
+  },
+  "Metal chain": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Metal chain"
+  },
+  "Rope": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Rope"
+  },
+  "Pulley": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Pulley"
+  },
+  "Rustic door": {
+    "type": "recipe",
+    "category": "Buildings",
+    "name": "Rustic door"
+  },
+  "Simple door": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Simple door"
+  },
+  "Boat door": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Boat door"
+  },
+  "Modern door": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Modern door"
+  },
+  "Stylish door": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stylish door"
+  },
+  "Brainy door": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Brainy door"
+  },
+  "Iron door": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron door"
+  },
+  "Large wooden door": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Large wooden door"
+  },
+  "Automatic doors": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Automatic doors"
+  },
+  "Shutter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Shutter"
+  },
+  "Wooden gate": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden gate"
+  },
+  "Swinging doors": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Swinging doors"
+  },
+  "Iron gate": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron gate"
+  },
+  "Simple curtain (left)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Simple curtain (left)"
+  },
+  "Simple curtain (right)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Simple curtain (right)"
+  },
+  "Hatch window": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Hatch window"
+  },
+  "Underground hatch": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Underground hatch"
+  },
+  "Glass window": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Glass window"
+  },
+  "Window pane": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Window pane"
+  },
+  "Stained-glass window (upper)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stained-glass window (upper)"
+  },
+  "Stained-glass window (middle)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stained-glass window (middle)"
+  },
+  "Stained-glass window (lower)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stained-glass window (lower)"
+  },
+  "Sash window": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sash window"
+  },
+  "Sloped tiled roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sloped tiled roof"
+  },
+  "Tiled hipped roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tiled hipped roof"
+  },
+  "Tiled roof valley": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tiled roof valley"
+  },
+  "Flat tiled roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Flat tiled roof"
+  },
+  "Tiled roof decoration": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tiled roof decoration"
+  },
+  "Magikarp decoration": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Magikarp decoration"
+  },
+  "Stone hipped roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stone hipped roof"
+  },
+  "Sloped stone roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sloped stone roof"
+  },
+  "Skylight": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Skylight"
+  },
+  "Stone roof valley": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stone roof valley"
+  },
+  "Flat stone roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Flat stone roof"
+  },
+  "Stone roof decoration": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stone roof decoration"
+  },
+  "Pitched brick roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Pitched brick roof"
+  },
+  "Dormered brick roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Dormered brick roof"
+  },
+  "Brick hipped roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Brick hipped roof"
+  },
+  "Brick roof valley": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Brick roof valley"
+  },
+  "Flat brick roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Flat brick roof"
+  },
+  "Brick roof decoration": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Brick roof decoration"
+  },
+  "Sloped tent roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sloped tent roof"
+  },
+  "Tent hipped roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tent hipped roof"
+  },
+  "Tent roof valley": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Tent roof valley"
+  },
+  "Flat tent roof": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Flat tent roof"
+  },
+  "Glossy awning": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Glossy awning"
+  },
+  "Corrugated metal": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Corrugated metal"
+  },
+  "Protruding wall": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Protruding wall"
+  },
+  "Curved eave": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Curved eave"
+  },
+  "Wooden fencing": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden fencing"
+  },
+  "Wooden enclosure": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden enclosure"
+  },
+  "Iron enclosure": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron enclosure"
+  },
+  "Metal fencing": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Metal fencing"
+  },
+  "Stone fencing": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stone fencing"
+  },
+  "Boat railing": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Boat railing"
+  },
+  "Wooden handrail": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden handrail"
+  },
+  "Handrail": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Handrail"
+  },
+  "Harbor pole": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Harbor pole"
+  },
+  "Arched barrier": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Arched barrier"
+  },
+  "Arched barrier (leaf pattern)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Arched barrier (leaf pattern)"
+  },
+  "Wooden siding (panel)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden siding (panel)"
+  },
+  "Wooden siding (corner)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden siding (corner)"
+  },
+  "Wooden posts": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden posts"
+  },
+  "Wooden partition": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden partition"
+  },
+  "Grate fencing": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Grate fencing"
+  },
+  "Wooden path": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden path"
+  },
+  "Stepping stones": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Stepping stones"
+  },
+  "Walkway": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Walkway"
+  },
+  "Bridge planks": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Bridge planks"
+  },
+  "Grate flooring": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Grate flooring"
+  },
+  "Concrete slab": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Concrete slab"
+  },
+  "Iron-scaffold plank": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron-scaffold plank"
+  },
+  "Iron scaffold": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron scaffold"
+  },
+  "Arch bridge": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Arch bridge"
+  },
+  "Wooden border (line)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden border (line)"
+  },
+  "Wooden border (single)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden border (single)"
+  },
+  "Wooden border (corner)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Wooden border (corner)"
+  },
+  "Concrete border (line)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Concrete border (line)"
+  },
+  "Concrete border (single)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Concrete border (single)"
+  },
+  "Concrete border (corner)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Concrete border (corner)"
+  },
+  "Brick border (line)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Brick border (line)"
+  },
+  "Brick border (single)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Brick border (single)"
+  },
+  "Brick border (corner)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Brick border (corner)"
+  },
+  "Sideways log": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Sideways log"
+  },
+  "Upright log": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Upright log"
+  },
+  "Iron beam": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron beam"
+  },
+  "Iron column": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron column"
+  },
+  "Iron pillar": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pillar"
+  },
+  "Extravagant pillar (upper)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Extravagant pillar (upper)"
+  },
+  "Extravagant pillar (middle)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Extravagant pillar (middle)"
+  },
+  "Extravagant pillar (lower)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Extravagant pillar (lower)"
+  },
+  "Round pillar (upper)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Round pillar (upper)"
+  },
+  "Round pillar (middle)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Round pillar (middle)"
+  },
+  "Round pillar (lower)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Round pillar (lower)"
+  },
+  "House partition": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "House partition"
+  },
+  "Simple pillar quarter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Simple pillar quarter"
+  },
+  "Water pillar quarter": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Water pillar quarter"
+  },
+  "Roof support": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Roof support"
+  },
+  "Iron pipe (horizontal)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (horizontal)"
+  },
+  "Iron pipe (downward curve)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (downward curve)"
+  },
+  "Iron pipe (vertical cross)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (vertical cross)"
+  },
+  "Iron pipe (vertical T)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (vertical T)"
+  },
+  "Iron pipe (vertical)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (vertical)"
+  },
+  "Iron pipe (upward curve)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (upward curve)"
+  },
+  "Iron pipe (upward T)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (upward T)"
+  },
+  "Iron pipe (downward T)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (downward T)"
+  },
+  "Iron pipe (horizontal curve)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (horizontal curve)"
+  },
+  "Iron pipe (horizontal T)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (horizontal T)"
+  },
+  "Iron pipe (horizontal cross)": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Iron pipe (horizontal cross)"
+  },
+  "Wooden wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Wooden wall"
+  },
+  "Light wooden wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Light wooden wall"
+  },
+  "Painted wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Painted wall"
+  },
+  "Plaster wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Plaster wall"
+  },
+  "Cloth wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Cloth wall"
+  },
+  "Guest-room wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Guest-room wall"
+  },
+  "Starry-sky wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Starry-sky wall"
+  },
+  "Cushy wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Cushy wall"
+  },
+  "Modern wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Modern wall"
+  },
+  "Broken-tiling wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Broken-tiling wall"
+  },
+  "Cobblestone wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Cobblestone wall"
+  },
+  "Brick wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Brick wall"
+  },
+  "Stone brick wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stone brick wall"
+  },
+  "Aged-stone wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Aged-stone wall"
+  },
+  "Patterned aged-stone wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Patterned aged-stone wall"
+  },
+  "Concrete wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Concrete wall"
+  },
+  "Rough wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Rough wall"
+  },
+  "Striped wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Striped wall"
+  },
+  "Bronze wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Bronze wall"
+  },
+  "Stylish Bronze wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish Bronze wall"
+  },
+  "Iron wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Iron wall"
+  },
+  "Stylish iron wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish iron wall"
+  },
+  "Gold wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Gold wall"
+  },
+  "Stylish gold wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish gold wall"
+  },
+  "Crystal wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Crystal wall"
+  },
+  "Pok\u00e9 Ball Wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pok\u00e9 Ball Wall"
+  },
+  "Warning wall": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Warning wall"
+  },
+  "Stylish wall (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish wall (upper)"
+  },
+  "Stylish wall (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish wall (middle)"
+  },
+  "Stylish wall (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish wall (lower)"
+  },
+  "Antique wall (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Antique wall (upper)"
+  },
+  "Antique wall (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Antique wall (middle)"
+  },
+  "Antique wall (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Antique wall (lower)"
+  },
+  "Light antique wall (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Light antique wall (upper)"
+  },
+  "Light antique wall (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Light antique wall (middle)"
+  },
+  "Light antique wall (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Light antique wall (lower)"
+  },
+  "Wooden pillar (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Wooden pillar (upper)"
+  },
+  "Wooden pillar (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Wooden pillar (middle)"
+  },
+  "Wooden pillar (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Wooden pillar (lower)"
+  },
+  "Stylish brick wall (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish brick wall (upper)"
+  },
+  "Stylish brick wall (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish brick wall (middle)"
+  },
+  "Stylish brick wall (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish brick wall (lower)"
+  },
+  "Stone pillar (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stone pillar (upper)"
+  },
+  "Stone pillar (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stone pillar (middle)"
+  },
+  "Stone pillar (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stone pillar (lower)"
+  },
+  "Pop art wall (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pop art wall (upper)"
+  },
+  "Pop art wall (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pop art wall (middle)"
+  },
+  "Pop art wall (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pop art wall (lower)"
+  },
+  "Confectionery wall (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Confectionery wall (upper)"
+  },
+  "Confectionery wall (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Confectionery wall (middle)"
+  },
+  "Confectionery wall (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Confectionery wall (lower)"
+  },
+  "Pok\u00e9mon Center wall (upper)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pok\u00e9mon Center wall (upper)"
+  },
+  "Pok\u00e9mon Center wall (middle)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pok\u00e9mon Center wall (middle)"
+  },
+  "Pok\u00e9mon Center wall (lower)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pok\u00e9mon Center wall (lower)"
+  },
+  "Pok\u00e9mon Center wall (trim)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pok\u00e9mon Center wall (trim)"
+  },
+  "Wooden flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Wooden flooring"
+  },
+  "Diagonal wooden flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Diagonal wooden flooring"
+  },
+  "Crisscross wooden flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Crisscross wooden flooring"
+  },
+  "Hardwood flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Hardwood flooring"
+  },
+  "Modern carpeting": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Modern carpeting"
+  },
+  "Woven carpeting": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Woven carpeting"
+  },
+  "Fluffy flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Fluffy flooring"
+  },
+  "Soft carpeting": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Soft carpeting"
+  },
+  "Extravagant carpeting": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Extravagant carpeting"
+  },
+  "Tatami mat": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Tatami mat"
+  },
+  "Felt mat": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Felt mat"
+  },
+  "Puffy-tree pillar": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Puffy-tree pillar"
+  },
+  "Grass flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Grass flooring"
+  },
+  "Simple flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Simple flooring"
+  },
+  "Marble": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Marble"
+  },
+  "Stone flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stone flooring"
+  },
+  "Lined-stone flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Lined-stone flooring"
+  },
+  "Dark marble flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Dark marble flooring"
+  },
+  "Light marble flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Light marble flooring"
+  },
+  "Aged-stone flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Aged-stone flooring"
+  },
+  "Simple square tiling": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Simple square tiling"
+  },
+  "Stylish tiling": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish tiling"
+  },
+  "Hexagonal flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Hexagonal flooring"
+  },
+  "Shop flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Shop flooring"
+  },
+  "Triangle-design flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Triangle-design flooring"
+  },
+  "Iron-plate flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Iron-plate flooring"
+  },
+  "Iron tiling": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Iron tiling"
+  },
+  "Neon flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Neon flooring"
+  },
+  "Cyber flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Cyber flooring"
+  },
+  "Arched tiling": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Arched tiling"
+  },
+  "Stone tiling": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stone tiling"
+  },
+  "Square tiling": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Square tiling"
+  },
+  "Mosaic tiling": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Mosaic tiling"
+  },
+  "Brick flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Brick flooring"
+  },
+  "Stylish stone flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish stone flooring"
+  },
+  "Fish-scale tiling": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Fish-scale tiling"
+  },
+  "Asphalt road": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Asphalt road"
+  },
+  "Marked road (horizontal)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Marked road (horizontal)"
+  },
+  "Marked road (vertical)": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Marked road (vertical)"
+  },
+  "Gray circle flooring": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Gray circle flooring"
+  },
+  "Hay pile": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Hay pile"
+  },
+  "Iron plating": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Iron plating"
+  },
+  "Cube light": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Cube light"
+  },
+  "Foundation": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Foundation"
+  },
+  "Levee": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Levee"
+  },
+  "Scrap cube": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Scrap cube"
+  },
+  "Polka-dot print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Polka-dot print"
+  },
+  "Bubble print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Bubble print"
+  },
+  "Vertical-stripe print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Vertical-stripe print"
+  },
+  "Horizontal-stripe print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Horizontal-stripe print"
+  },
+  "Gingham print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Gingham print"
+  },
+  "Tartan print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Tartan print"
+  },
+  "Argyle print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Argyle print"
+  },
+  "Houndstooth print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Houndstooth print"
+  },
+  "Vine print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Vine print"
+  },
+  "Swirl print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Swirl print"
+  },
+  "Winter print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Winter print"
+  },
+  "Zig-zag print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Zig-zag print"
+  },
+  "Leaf print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Leaf print"
+  },
+  "Flower print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Flower print"
+  },
+  "Star print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Star print"
+  },
+  "Curry print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Curry print"
+  },
+  "Berry print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Berry print"
+  },
+  "Pok\u00e9 Ball print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Pok\u00e9 Ball print"
+  },
+  "Stylish Pok\u00e9 Ball print": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Stylish Pok\u00e9 Ball print"
+  },
+  "Field grass": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Field grass"
+  },
+  "Seashore grass": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Seashore grass"
+  },
+  "Alpine grass": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Alpine grass"
+  },
+  "Sky-high grass": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Sky-high grass"
+  },
+  "Ordinary soil": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Ordinary soil"
+  },
+  "Seashell soil": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Seashell soil"
+  },
+  "Striped soil": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Striped soil"
+  },
+  "Pure-white soil": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Pure-white soil"
+  },
+  "Clay": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Clay"
+  },
+  "Ordinary sand": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Ordinary sand"
+  },
+  "Beach sand": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Beach sand"
+  },
+  "Skyland sand": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Skyland sand"
+  },
+  "Bumpy beach sand": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Bumpy beach sand"
+  },
+  "Volcanic ash": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Volcanic ash"
+  },
+  "Sandstone": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Sandstone"
+  },
+  "Skyland sandstone": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Skyland sandstone"
+  },
+  "Cliff rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Cliff rock"
+  },
+  "Spotted cliff rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Spotted cliff rock"
+  },
+  "Red cliff rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Red cliff rock"
+  },
+  "Red spotted cliff rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Red spotted cliff rock"
+  },
+  "Black cliff rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Black cliff rock"
+  },
+  "Black spotted cliff rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Black spotted cliff rock"
+  },
+  "Skyland cliff rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Skyland cliff rock"
+  },
+  "Skyland spotted cliff rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Skyland spotted cliff rock"
+  },
+  "White rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "White rock"
+  },
+  "Coarse rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Coarse rock"
+  },
+  "Light brown rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Light brown rock"
+  },
+  "Red rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Red rock"
+  },
+  "Yellow rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Yellow rock"
+  },
+  "Black rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Black rock"
+  },
+  "Lava rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Lava rock"
+  },
+  "Cave rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Cave rock"
+  },
+  "Ocean rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Ocean rock"
+  },
+  "Reddish-brown cave rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Reddish-brown cave rock"
+  },
+  "Volcanic rock": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Volcanic rock"
+  },
+  "Carved white rock": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Carved white rock"
+  },
+  "Carved coarse rock": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Carved coarse rock"
+  },
+  "Carved light-brown rock": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Carved light-brown rock"
+  },
+  "Carved red rock": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Carved red rock"
+  },
+  "Carved yellow rock": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Carved yellow rock"
+  },
+  "Copper deposit (Wasteland)": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Copper deposit (Wasteland)"
+  },
+  "Copper deposit (Beach)": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Copper deposit (Beach)"
+  },
+  "Copper deposit (Ridge)": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Copper deposit (Ridge)"
+  },
+  "Copper deposit (Skyland)": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Copper deposit (Skyland)"
+  },
+  "Iron deposit": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Iron deposit"
+  },
+  "Gold deposit": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Gold deposit"
+  },
+  "Pok\u00e9metal deposit": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Pok\u00e9metal deposit"
+  },
+  "Mossy soil": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Mossy soil"
+  },
+  "Gravel": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Gravel"
+  },
+  "Limestone": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Limestone"
+  },
+  "Glowing stone": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Glowing stone"
+  },
+  "Mysterious stone": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Mysterious stone"
+  },
+  "Ice": {
+    "type": "item",
+    "category": "Blocks",
+    "name": "Ice"
+  },
+  "Cracked sandstone": {
+    "type": "recipe",
+    "category": "Blocks",
+    "name": "Cracked sandstone"
+  },
+  "Bouldery Badge": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Bouldery Badge"
+  },
+  "Cascade-like Badge": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Cascade-like Badge"
+  },
+  "Thunderish Badge": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Thunderish Badge"
+  },
+  "Rainbowish Badge": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Rainbowish Badge"
+  },
+  "Soul-like Badge": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Soul-like Badge"
+  },
+  "Marshy Badge": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Marshy Badge"
+  },
+  "Volcanoey Badge": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Volcanoey Badge"
+  },
+  "Earth Badge": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Earth Badge"
+  },
+  "Mysterious goggles": {
+    "type": "item",
+    "category": "Key Items",
+    "name": "Mysterious goggles"
+  },
+  "Dowsing Machine": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Dowsing Machine"
+  },
+  "Neo Dowsing Machine": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Neo Dowsing Machine"
+  },
+  "Party popper": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Party popper"
+  },
+  "Star Piece": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Star Piece"
+  },
+  "Paint balloon (white)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (white)"
+  },
+  "Paint balloon (red)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (red)"
+  },
+  "Paint balloon (yellow)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (yellow)"
+  },
+  "Paint balloon (green)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (green)"
+  },
+  "Paint balloon (rose)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (rose)"
+  },
+  "Paint balloon (pink)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (pink)"
+  },
+  "Paint balloon (orange)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (orange)"
+  },
+  "Paint balloon (purple)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (purple)"
+  },
+  "Paint balloon (brown)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (brown)"
+  },
+  "Paint balloon (beige)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (beige)"
+  },
+  "Paint balloon (black)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (black)"
+  },
+  "Paint balloon (lime)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (lime)"
+  },
+  "Paint balloon (plum)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (plum)"
+  },
+  "Paint balloon (navy)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (navy)"
+  },
+  "Paint balloon (blue)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (blue)"
+  },
+  "Paint balloon (cyan)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (cyan)"
+  },
+  "Paint balloon (gray)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (gray)"
+  },
+  "Paint balloon (aquamarine)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Paint balloon (aquamarine)"
+  },
+  "Firework (white)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Firework (white)"
+  },
+  "Firework (red)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Firework (red)"
+  },
+  "Firework (green)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Firework (green)"
+  },
+  "Firework (yellow)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Firework (yellow)"
+  },
+  "Firework (blue)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Firework (blue)"
+  },
+  "Stone tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stone tiling (interior)"
+  },
+  "Wooden wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Wooden wall (interior)"
+  },
+  "Stylish stone flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stylish stone flooring (interior)"
+  },
+  "Wooden flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Wooden flooring (interior)"
+  },
+  "Fluffy flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Fluffy flooring (interior)"
+  },
+  "Arched tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Arched tiling (interior)"
+  },
+  "Mosaic tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Mosaic tiling (interior)"
+  },
+  "Starry-sky wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Starry-sky wall (interior)"
+  },
+  "Woven carpeting (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Woven carpeting (interior)"
+  },
+  "Gold wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Gold wall (interior)"
+  },
+  "Stylish gold wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stylish gold wall (interior)"
+  },
+  "Patterned aged-stone wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Patterned aged-stone wall (interior)"
+  },
+  "Aged-stone wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Aged-stone wall (interior)"
+  },
+  "Aged-stone flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Aged-stone flooring (interior)"
+  },
+  "Warning wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Warning wall (interior)"
+  },
+  "Crystal wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Crystal wall (interior)"
+  },
+  "Modern carpeting (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Modern carpeting (interior)"
+  },
+  "Iron-plate flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Iron-plate flooring (interior)"
+  },
+  "Shop tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Shop tiling (interior)"
+  },
+  "Brick wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Brick wall (interior)"
+  },
+  "Concrete wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Concrete wall (interior)"
+  },
+  "Stone flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stone flooring (interior)"
+  },
+  "Lined-stone flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Lined-stone flooring (interior)"
+  },
+  "Plaster wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Plaster wall (interior)"
+  },
+  "Stone brick wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stone brick wall (interior)"
+  },
+  "Diagonal wooden flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Diagonal wooden flooring (interior)"
+  },
+  "Stylish tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stylish tiling (interior)"
+  },
+  "Brick flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Brick flooring (interior)"
+  },
+  "Cloth wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Cloth wall (interior)"
+  },
+  "Square tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Square tiling (interior)"
+  },
+  "Levee (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Levee (interior)"
+  },
+  "Cube light (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Cube light (interior)"
+  },
+  "Iron tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Iron tiling (interior)"
+  },
+  "Dark marble flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Dark marble flooring (interior)"
+  },
+  "Simple flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Simple flooring (interior)"
+  },
+  "Hardwood flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Hardwood flooring (interior)"
+  },
+  "Fish-scale tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Fish-scale tiling (interior)"
+  },
+  "Cobblestone wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Cobblestone wall (interior)"
+  },
+  "Hay pile (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Hay pile (interior)"
+  },
+  "Broken-tiling wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Broken-tiling wall (interior)"
+  },
+  "Painted wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Painted wall (interior)"
+  },
+  "Striped wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Striped wall (interior)"
+  },
+  "Cyber flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Cyber flooring (interior)"
+  },
+  "Neon flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Neon flooring (interior)"
+  },
+  "Rough wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Rough wall (interior)"
+  },
+  "Modern wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Modern wall (interior)"
+  },
+  "Iron plating (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Iron plating (interior)"
+  },
+  "Hexagonal flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Hexagonal flooring (interior)"
+  },
+  "Scrap cube (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Scrap cube (interior)"
+  },
+  "Simple square tiling (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Simple square tiling (interior)"
+  },
+  "Puffy-tree pillar (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Puffy-tree pillar (interior)"
+  },
+  "Felt mat (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Felt mat (interior)"
+  },
+  "Triangle-design flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Triangle-design flooring (interior)"
+  },
+  "Crisscross wooden flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Crisscross wooden flooring (interior)"
+  },
+  "Light wooden wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Light wooden wall (interior)"
+  },
+  "Light marble flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Light marble flooring (interior)"
+  },
+  "Bronze wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Bronze wall (interior)"
+  },
+  "Stylish bronze wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stylish bronze wall (interior)"
+  },
+  "Iron wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Iron wall (interior)"
+  },
+  "Stylish iron wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stylish iron wall (interior)"
+  },
+  "Grass flooring (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Grass flooring (interior)"
+  },
+  "Pok\u00e9 Ball wall (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Pok\u00e9 Ball wall (interior)"
+  },
+  "Polka-dot Print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Polka-dot Print (interior)"
+  },
+  "Vertical-stripe print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Vertical-stripe print (interior)"
+  },
+  "Horizontal-stripe print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Horizontal-stripe print (interior)"
+  },
+  "Gingham print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Gingham print (interior)"
+  },
+  "Tartan print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Tartan print (interior)"
+  },
+  "Argyle print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Argyle print (interior)"
+  },
+  "Berry print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Berry print (interior)"
+  },
+  "Pok\u00e9 Ball print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Pok\u00e9 Ball print (interior)"
+  },
+  "Stylish Pok\u00e9 Ball print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Stylish Pok\u00e9 Ball print (interior)"
+  },
+  "Marble (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Marble (interior)"
+  },
+  "Bubble print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Bubble print (interior)"
+  },
+  "Houndstooth print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Houndstooth print (interior)"
+  },
+  "Vine print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Vine print (interior)"
+  },
+  "Swirl print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Swirl print (interior)"
+  },
+  "Winter print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Winter print (interior)"
+  },
+  "Zig-zag print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Zig-zag print (interior)"
+  },
+  "Leaf print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Leaf print (interior)"
+  },
+  "Flower print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Flower print (interior)"
+  },
+  "Star print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Star print (interior)"
+  },
+  "Curry print (interior)": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Curry print (interior)"
+  },
+  "Large lost relic": {
+    "type": "item",
+    "category": "Other",
+    "name": "Large lost relic"
+  },
+  "Small lost relic": {
+    "type": "item",
+    "category": "Other",
+    "name": "Small lost relic"
+  },
+  "\u266a Title Screen": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Title Screen"
+  },
+  "\u266a Pallet Town Theme": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Pallet Town Theme"
+  },
+  "\u266a Professor Oak&#x27;s Laboratory": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Professor Oak&#x27;s Laboratory"
+  },
+  "\u266a Road to Viridian City": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Road to Viridian City"
+  },
+  "\u266a Pewter City Theme": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Pewter City Theme"
+  },
+  "\u266a Pok\u00e9mon Center": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Pok\u00e9mon Center"
+  },
+  "\u266a Caves of Mt. Moon": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Caves of Mt. Moon"
+  },
+  "\u266a Road to Cerulean City": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Road to Cerulean City"
+  },
+  "\u266a Fuchsia City Theme": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Fuchsia City Theme"
+  },
+  "\u266a Pok\u00e9mon Gym": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Pok\u00e9mon Gym"
+  },
+  "\u266a Road to Bill": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Road to Bill"
+  },
+  "\u266a Vermilion City Theme": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Vermilion City Theme"
+  },
+  "\u266a The S.S. Anne": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a The S.S. Anne"
+  },
+  "\u266a Rocket Hideout": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Rocket Hideout"
+  },
+  "\u266a Silph Co.": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Silph Co."
+  },
+  "\u266a Battle! (Gym Leader Battle)": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Battle! (Gym Leader Battle)"
+  },
+  "\u266a Union Cave": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Union Cave"
+  },
+  "\u266a Ecruteak City": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Ecruteak City"
+  },
+  "\u266a Bell Tower": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Bell Tower"
+  },
+  "\u266a Fortree City": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Fortree City"
+  },
+  "\u266a Sootopolis City": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Sootopolis City"
+  },
+  "\u266a Route 209 (Day)": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Route 209 (Day)"
+  },
+  "\u266a Mt. Coronet": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Mt. Coronet"
+  },
+  "\u266a Game Corner": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Game Corner"
+  },
+  "\u266a Driftveil City": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Driftveil City"
+  },
+  "\u266a Route 10 (Unova)": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Route 10 (Unova)"
+  },
+  "\u266a Dress Up With Props": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Dress Up With Props"
+  },
+  "\u266a Snowbelle City": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Snowbelle City"
+  },
+  "\u266a Boutique": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Boutique"
+  },
+  "\u266a Super Training!": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Super Training!"
+  },
+  "\u266a Contest Spectacular": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Contest Spectacular"
+  },
+  "\u266a Hau&#x27;oli City (Day)": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Hau&#x27;oli City (Day)"
+  },
+  "\u266a Aether Paradise": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Aether Paradise"
+  },
+  "\u266a Ultra Ruin": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Ultra Ruin"
+  },
+  "\u266a Wild Area (North)": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Wild Area (North)"
+  },
+  "\u266a Wyndon": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Wyndon"
+  },
+  "\u266a Rose Tower": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Rose Tower"
+  },
+  "\u266a Battle! (Gym Leader) 1": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Battle! (Gym Leader) 1"
+  },
+  "\u266a Jubilife Village": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Jubilife Village"
+  },
+  "\u266a South Province": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a South Province"
+  },
+  "\u266a The Academy": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a The Academy"
+  },
+  "\u266a Area Zero": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Area Zero"
+  },
+  "\u266a Battle! (Gym Leader) 2": {
+    "type": "item",
+    "category": "Other",
+    "name": "\u266a Battle! (Gym Leader) 2"
+  },
+  "Nugget": {
+    "type": "item",
+    "category": "Other",
+    "name": "Nugget"
+  },
+  "Silver Bottle Cap": {
+    "type": "item",
+    "category": "Other",
+    "name": "Silver Bottle Cap"
+  },
+  "Gold Bottle Cap": {
+    "type": "item",
+    "category": "Other",
+    "name": "Gold Bottle Cap"
+  },
+  "Rare Bone": {
+    "type": "item",
+    "category": "Other",
+    "name": "Rare Bone"
+  },
+  "Heart Scale": {
+    "type": "item",
+    "category": "Other",
+    "name": "Heart Scale"
+  },
+  "Miracle Seed": {
+    "type": "item",
+    "category": "Other",
+    "name": "Miracle Seed"
+  },
+  "Hard Stone": {
+    "type": "item",
+    "category": "Other",
+    "name": "Hard Stone"
+  },
+  "Mystic Water": {
+    "type": "item",
+    "category": "Other",
+    "name": "Mystic Water"
+  },
+  "Metal Coat": {
+    "type": "item",
+    "category": "Other",
+    "name": "Metal Coat"
+  },
+  "Twisted Spoon": {
+    "type": "item",
+    "category": "Other",
+    "name": "Twisted Spoon"
+  },
+  "Silver Powder": {
+    "type": "item",
+    "category": "Other",
+    "name": "Silver Powder"
+  },
+  "Black Glasses": {
+    "type": "item",
+    "category": "Other",
+    "name": "Black Glasses"
+  },
+  "Black Belt": {
+    "type": "item",
+    "category": "Other",
+    "name": "Black Belt"
+  },
+  "Silk Scarf": {
+    "type": "item",
+    "category": "Other",
+    "name": "Silk Scarf"
+  },
+  "Sharp Beak": {
+    "type": "item",
+    "category": "Other",
+    "name": "Sharp Beak"
+  },
+  "Poison Barb": {
+    "type": "item",
+    "category": "Other",
+    "name": "Poison Barb"
+  },
+  "Never-Melt Ice": {
+    "type": "item",
+    "category": "Other",
+    "name": "Never-Melt Ice"
+  },
+  "Spell Tag": {
+    "type": "item",
+    "category": "Other",
+    "name": "Spell Tag"
+  },
+  "Charcoal": {
+    "type": "item",
+    "category": "Other",
+    "name": "Charcoal"
+  },
+  "Soft Sand": {
+    "type": "item",
+    "category": "Other",
+    "name": "Soft Sand"
+  },
+  "Fairy Feather": {
+    "type": "item",
+    "category": "Other",
+    "name": "Fairy Feather"
+  },
+  "Dragon Fang": {
+    "type": "item",
+    "category": "Other",
+    "name": "Dragon Fang"
+  },
+  "Leftovers": {
+    "type": "item",
+    "category": "Other",
+    "name": "Leftovers"
+  },
+  "Black Sludge": {
+    "type": "item",
+    "category": "Other",
+    "name": "Black Sludge"
+  },
+  "Lucky Egg": {
+    "type": "item",
+    "category": "Other",
+    "name": "Lucky Egg"
+  },
+  "Destiny Knot": {
+    "type": "item",
+    "category": "Other",
+    "name": "Destiny Knot"
+  },
+  "Life Orb": {
+    "type": "item",
+    "category": "Other",
+    "name": "Life Orb"
+  },
+  "Iron Ball": {
+    "type": "item",
+    "category": "Other",
+    "name": "Iron Ball"
+  },
+  "Metal Powder": {
+    "type": "item",
+    "category": "Other",
+    "name": "Metal Powder"
+  },
+  "Big Root": {
+    "type": "item",
+    "category": "Other",
+    "name": "Big Root"
+  },
+  "Adrenaline Orb": {
+    "type": "item",
+    "category": "Other",
+    "name": "Adrenaline Orb"
+  },
+  "Weakness Policy": {
+    "type": "item",
+    "category": "Other",
+    "name": "Weakness Policy"
+  },
+  "Terrain Extender": {
+    "type": "item",
+    "category": "Other",
+    "name": "Terrain Extender"
+  },
+  "Wide Lens": {
+    "type": "item",
+    "category": "Other",
+    "name": "Wide Lens"
+  },
+  "Throat Spray": {
+    "type": "item",
+    "category": "Other",
+    "name": "Throat Spray"
+  },
+  "Light Clay": {
+    "type": "item",
+    "category": "Other",
+    "name": "Light Clay"
+  },
+  "Loaded Dice": {
+    "type": "item",
+    "category": "Other",
+    "name": "Loaded Dice"
+  },
+  "Sticky Barb": {
+    "type": "item",
+    "category": "Other",
+    "name": "Sticky Barb"
+  },
+  "Quick Claw": {
+    "type": "item",
+    "category": "Other",
+    "name": "Quick Claw"
+  },
+  "Lagging Tail": {
+    "type": "item",
+    "category": "Other",
+    "name": "Lagging Tail"
+  },
+  "Flame Orb": {
+    "type": "item",
+    "category": "Other",
+    "name": "Flame Orb"
+  },
+  "Ability Shield": {
+    "type": "item",
+    "category": "Other",
+    "name": "Ability Shield"
+  },
+  "Room Service": {
+    "type": "item",
+    "category": "Other",
+    "name": "Room Service"
+  },
+  "Ring Target": {
+    "type": "item",
+    "category": "Other",
+    "name": "Ring Target"
+  },
+  "Clear Amulet": {
+    "type": "item",
+    "category": "Other",
+    "name": "Clear Amulet"
+  },
+  "Zoom Lens": {
+    "type": "item",
+    "category": "Other",
+    "name": "Zoom Lens"
+  },
+  "Rainbow Feather": {
+    "type": "item",
+    "category": "Other",
+    "name": "Rainbow Feather"
+  },
+  "Silver Feather": {
+    "type": "item",
+    "category": "Other",
+    "name": "Silver Feather"
+  },
+  "Party cooking pot": {
+    "type": "item",
+    "category": "Other",
+    "name": "Party cooking pot"
+  },
+  "Small narrow rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Small narrow rug"
+  },
+  "Pok\u00e9 Ball Doormat": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Pok\u00e9 Ball Doormat"
+  },
+  "Small round rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Small round rug"
+  },
+  "Small square rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Small square rug"
+  },
+  "Ditto rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Ditto rug"
+  },
+  "Slowpoke rug": {
+    "type": "item",
+    "category": "Other",
+    "name": "Slowpoke rug"
+  },
+  "Charizard Rug": {
+    "type": "item",
+    "category": "Other",
+    "name": "Charizard Rug"
+  },
+  "Oblong rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Oblong rug"
+  },
+  "Ratan rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Ratan rug"
+  },
+  "Large round rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Large round rug"
+  },
+  "Lace rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Lace rug"
+  },
+  "Pok\u00e9 Ball Mat": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Pok\u00e9 Ball Mat"
+  },
+  "Large narrow rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Large narrow rug"
+  },
+  "Large square rug": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Large square rug"
+  },
+  "Soft mat": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Soft mat"
+  },
+  "Balloon Poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Balloon Poster"
+  },
+  "Moonlight Poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Moonlight Poster"
+  },
+  "Dance poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Dance poster"
+  },
+  "Oil painting poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Oil painting poster"
+  },
+  "Sunny Poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Sunny Poster"
+  },
+  "Ice cream poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Ice cream poster"
+  },
+  "Windmill poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Windmill poster"
+  },
+  "Townscape poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Townscape poster"
+  },
+  "Mountain poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Mountain poster"
+  },
+  "Acrylic poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Acrylic poster"
+  },
+  "Watercolor poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Watercolor poster"
+  },
+  "Passionate poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Passionate poster"
+  },
+  "Speedy poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Speedy poster"
+  },
+  "Growth poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Growth poster"
+  },
+  "Drink poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Drink poster"
+  },
+  "Food poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Food poster"
+  },
+  "Technology poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Technology poster"
+  },
+  "Golden poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Golden poster"
+  },
+  "Ocean poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Ocean poster"
+  },
+  "Meadow poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Meadow poster"
+  },
+  "Ninja poster": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Ninja poster"
+  },
+  "Town map": {
+    "type": "item",
+    "category": "Other",
+    "name": "Town map"
+  },
+  "Team Rocket Wall Hanging": {
+    "type": "item",
+    "category": "Other",
+    "name": "Team Rocket Wall Hanging"
+  },
+  "Skull Fossil": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Skull Fossil"
+  },
+  "Armor Fossil": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Armor Fossil"
+  },
+  "Jaw Fossil": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Jaw Fossil"
+  },
+  "Sail Fossil": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Sail Fossil"
+  },
+  "Wing Fossil (head)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Wing Fossil (head)"
+  },
+  "Wing Fossil (right wing)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Wing Fossil (right wing)"
+  },
+  "Wing Fossil (left wing)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Wing Fossil (left wing)"
+  },
+  "Wing Fossil (body)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Wing Fossil (body)"
+  },
+  "Wing Fossil (tail)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Wing Fossil (tail)"
+  },
+  "Headbutt Fossil (head)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Headbutt Fossil (head)"
+  },
+  "Headbutt Fossil (body)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Headbutt Fossil (body)"
+  },
+  "Headbutt Fossil (tail)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Headbutt Fossil (tail)"
+  },
+  "Shield Fossil (head)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Shield Fossil (head)"
+  },
+  "Shield Fossil (body)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Shield Fossil (body)"
+  },
+  "Shield Fossil (tail)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Shield Fossil (tail)"
+  },
+  "Despot Fossil (head)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Despot Fossil (head)"
+  },
+  "Despot Fossil (body)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Despot Fossil (body)"
+  },
+  "Despot Fossil (legs)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Despot Fossil (legs)"
+  },
+  "Despot Fossil (tail)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Despot Fossil (tail)"
+  },
+  "Tundra Fossil (head)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Tundra Fossil (head)"
+  },
+  "Tundra Fossil (body)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Tundra Fossil (body)"
+  },
+  "Tundra Fossil (tail)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Tundra Fossil (tail)"
+  },
+  "Mysterious slate (A)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious slate (A)"
+  },
+  "Mysterious Slate (B)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (B)"
+  },
+  "Mysterious Slate (C)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (C)"
+  },
+  "Mysterious Slate (D)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (D)"
+  },
+  "Mysterious Slate (E)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (E)"
+  },
+  "Mysterious Slate (F)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (F)"
+  },
+  "Mysterious Slate (G)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (G)"
+  },
+  "Mysterious Slate (H)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (H)"
+  },
+  "Mysterious Slate (I)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (I)"
+  },
+  "Mysterious Slate (J)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (J)"
+  },
+  "Mysterious Slate (K)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (K)"
+  },
+  "Mysterious Slate (L)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (L)"
+  },
+  "Mysterious Slate (M)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (M)"
+  },
+  "Mysterious Slate (N)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (N)"
+  },
+  "Mysterious Slate (O)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (O)"
+  },
+  "Mysterious Slate (P)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (P)"
+  },
+  "Mysterious Slate (Q)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (Q)"
+  },
+  "Mysterious Slate (R)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (R)"
+  },
+  "Mysterious Slate (S)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (S)"
+  },
+  "Mysterious Slate (T)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (T)"
+  },
+  "Mysterious Slate (U)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (U)"
+  },
+  "Mysterious Slate (V)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (V)"
+  },
+  "Mysterious Slate (W)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (W)"
+  },
+  "Mysterious Slate (X)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (X)"
+  },
+  "Mysterious Slate (Y)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (Y)"
+  },
+  "Mysterious Slate (Z)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (Z)"
+  },
+  "Mysterious Slate (?!)": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Mysterious Slate (?!)"
+  },
+  "Professor&#x27;s treasure trove": {
+    "type": "habitat",
+    "number": "043",
+    "name": "Professor&#x27;s treasure trove"
+  },
+  "Diploma": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Diploma"
+  },
+  "Picnic blanket": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Picnic blanket"
+  },
+  "\u00a9": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "\u00a9"
+  },
+  "2026": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "2026"
+  },
+  "Pok\u00e9mon and Nintendo are registered trademarks of Nintendo of America and we do not claim to own them.": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Pok\u00e9mon and Nintendo are registered trademarks of Nintendo of America and we do not claim to own them."
+  },
+  "About": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "About"
+  },
+  "Privacy Policy": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Privacy Policy"
+  },
+  "Contact": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Contact"
+  },
+  "requestAnimationFrame(function(){$RT=performance.now()});": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "requestAnimationFrame(function(){$RT=performance.now()});"
+  },
+  "Filters": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Filters"
+  },
+  "Items Collected": {
+    "type": "item",
+    "category": "Decoration",
+    "name": "Items Collected"
+  },
+  "Bulk": {
+    "type": "recipe",
+    "category": "Other",
+    "name": "Bulk"
+  },
+  "Dry": {
+    "type": "item",
+    "category": "Food",
+    "name": "Dry"
+  },
+  "Bitter": {
+    "type": "item",
+    "category": "Food",
+    "name": "Bitter"
+  },
+  "Sour": {
+    "type": "item",
+    "category": "Food",
+    "name": "Sour"
+  },
+  "Sweet": {
+    "type": "item",
+    "category": "Food",
+    "name": "Sweet"
+  },
+  "Spicy": {
+    "type": "item",
+    "category": "Food",
+    "name": "Spicy"
+  },
+  "Page": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Page"
+  },
+  "of": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "of"
+  },
+  "Next": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Next"
+  },
+  "Effect": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Effect"
+  },
+  "Show": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Show"
+  },
+  "Collection Items": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "Collection Items"
+  },
+  "Sort By": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Sort By"
+  },
+  "Game Sort": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Game Sort"
+  },
+  "Alphabetical": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "Alphabetical"
+  },
+  "$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "$RB=[];$RV=function(a){$RT=performance.now();for(var b=0;b"
+  },
+  "a&&2E3": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "a&&2E3"
+  },
+  "(self.__next_f=self.__next_f||[]).push([0])": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "(self.__next_f=self.__next_f||[]).push([0])"
+  },
+  "self.__next_f.push([1,\"1f:T17c9,\"])": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "self.__next_f.push([1,\"1f:T17c9,\"])"
+  },
+  "self.__next_f.push([1,\"1e:[\\\"$\\\",\\\"$L1b\\\",null,{\\\"id\\\":\\\"raptive-loader\\\",\\\"strategy\\\":\\\"afterInteractive\\\",\\\"children\\\":\\\"$1f\\\"}]\\n10:null\\n\"])": {
+    "type": "item",
+    "category": "Relaxation",
+    "name": "self.__next_f.push([1,\"1e:[\\\"$\\\",\\\"$L1b\\\",null,{\\\"id\\\":\\\"raptive-loader\\\",\\\"strategy\\\":\\\"afterInteractive\\\",\\\"children\\\":\\\"$1f\\\"}]\\n10:null\\n\"])"
+  },
+  "Tree-shaded tall grass": {
+    "type": "habitat",
+    "number": "002",
+    "name": "Tree-shaded tall grass"
+  },
+  "Boulder-shaded tall grass": {
+    "type": "habitat",
+    "number": "003",
+    "name": "Boulder-shaded tall grass"
+  },
+  "Hydrated tall grass": {
+    "type": "habitat",
+    "number": "004",
+    "name": "Hydrated tall grass"
+  },
+  "Seaside tall grass": {
+    "type": "habitat",
+    "number": "005",
+    "name": "Seaside tall grass"
+  },
+  "Elevated tall grass": {
+    "type": "habitat",
+    "number": "006",
+    "name": "Elevated tall grass"
+  },
+  "Illuminated tall grass": {
+    "type": "habitat",
+    "number": "007",
+    "name": "Illuminated tall grass"
+  },
+  "Pretty flower bed": {
+    "type": "habitat",
+    "number": "008",
+    "name": "Pretty flower bed"
+  },
+  "Tree-shaded flower bed": {
+    "type": "habitat",
+    "number": "009",
+    "name": "Tree-shaded flower bed"
+  },
+  "Hydrated flower bed": {
+    "type": "habitat",
+    "number": "010",
+    "name": "Hydrated flower bed"
+  },
+  "Field of flowers": {
+    "type": "habitat",
+    "number": "011",
+    "name": "Field of flowers"
+  },
+  "Elevated flower bed": {
+    "type": "habitat",
+    "number": "012",
+    "name": "Elevated flower bed"
+  },
+  "Grave with flowers": {
+    "type": "habitat",
+    "number": "013",
+    "name": "Grave with flowers"
+  },
+  "Flower garden": {
+    "type": "habitat",
+    "number": "014",
+    "name": "Flower garden"
+  },
+  "Fresh veggie field": {
+    "type": "habitat",
+    "number": "015",
+    "name": "Fresh veggie field"
+  },
+  "Riding warm updrafts": {
+    "type": "habitat",
+    "number": "016",
+    "name": "Riding warm updrafts"
+  },
+  "Campsite": {
+    "type": "habitat",
+    "number": "017",
+    "name": "Campsite"
+  },
+  "Training waterfall": {
+    "type": "habitat",
+    "number": "018",
+    "name": "Training waterfall"
+  },
+  "Tantalizing dining set": {
+    "type": "habitat",
+    "number": "019",
+    "name": "Tantalizing dining set"
+  },
+  "Picnic set": {
+    "type": "habitat",
+    "number": "020",
+    "name": "Picnic set"
+  },
+  "Flowery table": {
+    "type": "habitat",
+    "number": "021",
+    "name": "Flowery table"
+  },
+  "Bench with greenery": {
+    "type": "habitat",
+    "number": "022",
+    "name": "Bench with greenery"
+  },
+  "Illuminated bench": {
+    "type": "habitat",
+    "number": "023",
+    "name": "Illuminated bench"
+  },
+  "Exercise resting spot": {
+    "type": "habitat",
+    "number": "024",
+    "name": "Exercise resting spot"
+  },
+  "Urgent care": {
+    "type": "habitat",
+    "number": "025",
+    "name": "Urgent care"
+  },
+  "Gym first aid": {
+    "type": "habitat",
+    "number": "026",
+    "name": "Gym first aid"
+  },
+  "Road sign": {
+    "type": "habitat",
+    "number": "027",
+    "name": "Road sign"
+  },
+  "Large luggage carrier": {
+    "type": "habitat",
+    "number": "028",
+    "name": "Large luggage carrier"
+  },
+  "Lumberjack&#x27;s workplace": {
+    "type": "habitat",
+    "number": "029",
+    "name": "Lumberjack&#x27;s workplace"
+  },
+  "Bed with a plush": {
+    "type": "habitat",
+    "number": "030",
+    "name": "Bed with a plush"
+  },
+  "Gently lit bed": {
+    "type": "habitat",
+    "number": "031",
+    "name": "Gently lit bed"
+  },
+  "Grave offering": {
+    "type": "habitat",
+    "number": "032",
+    "name": "Grave offering"
+  },
+  "Creepy grave offering": {
+    "type": "habitat",
+    "number": "033",
+    "name": "Creepy grave offering"
+  },
+  "Chansey resting area": {
+    "type": "habitat",
+    "number": "034",
+    "name": "Chansey resting area"
+  },
+  "Irresistible scent and glow": {
+    "type": "habitat",
+    "number": "035",
+    "name": "Irresistible scent and glow"
+  },
+  "Floating in the shade": {
+    "type": "habitat",
+    "number": "036",
+    "name": "Floating in the shade"
+  },
+  "Smooth tall grass": {
+    "type": "habitat",
+    "number": "037",
+    "name": "Smooth tall grass"
+  },
+  "Factory Storage": {
+    "type": "habitat",
+    "number": "038",
+    "name": "Factory Storage"
+  },
+  "Luxury chirp-chirp meal": {
+    "type": "habitat",
+    "number": "039",
+    "name": "Luxury chirp-chirp meal"
+  },
+  "Berry-feast campsite": {
+    "type": "habitat",
+    "number": "040",
+    "name": "Berry-feast campsite"
+  },
+  "Rain dance site": {
+    "type": "habitat",
+    "number": "041",
+    "name": "Rain dance site"
+  },
+  "Sunny Day site": {
+    "type": "habitat",
+    "number": "042",
+    "name": "Sunny Day site"
+  },
+  "Cozy log handicrafts": {
+    "type": "habitat",
+    "number": "044",
+    "name": "Cozy log handicrafts"
+  },
+  "Very-berry space": {
+    "type": "habitat",
+    "number": "045",
+    "name": "Very-berry space"
+  },
+  "Garden terrace": {
+    "type": "habitat",
+    "number": "046",
+    "name": "Garden terrace"
+  },
+  "Tree-shaded snoozing Snorlax": {
+    "type": "habitat",
+    "number": "047",
+    "name": "Tree-shaded snoozing Snorlax"
+  },
+  "Good old-fashioned antiques": {
+    "type": "habitat",
+    "number": "048",
+    "name": "Good old-fashioned antiques"
+  },
+  "Nothin&#x27; but Poke Balls": {
+    "type": "habitat",
+    "number": "049",
+    "name": "Nothin&#x27; but Poke Balls"
+  },
+  "Tree-shaded yellow tall grass": {
+    "type": "habitat",
+    "number": "051",
+    "name": "Tree-shaded yellow tall grass"
+  },
+  "Elevated yellow tall grass": {
+    "type": "habitat",
+    "number": "052",
+    "name": "Elevated yellow tall grass"
+  },
+  "Hydrated yellow tall grass": {
+    "type": "habitat",
+    "number": "053",
+    "name": "Hydrated yellow tall grass"
+  },
+  "Marshy tall grass": {
+    "type": "habitat",
+    "number": "054",
+    "name": "Marshy tall grass"
+  },
+  "Overgrowth vending machine": {
+    "type": "habitat",
+    "number": "055",
+    "name": "Overgrowth vending machine"
+  },
+  "Breezy flower bed": {
+    "type": "habitat",
+    "number": "056",
+    "name": "Breezy flower bed"
+  },
+  "Tropical vibes": {
+    "type": "habitat",
+    "number": "057",
+    "name": "Tropical vibes"
+  },
+  "Windy flower bed": {
+    "type": "habitat",
+    "number": "058",
+    "name": "Windy flower bed"
+  },
+  "Shaded beach": {
+    "type": "habitat",
+    "number": "059",
+    "name": "Shaded beach"
+  },
+  "Tropical seaside": {
+    "type": "habitat",
+    "number": "060",
+    "name": "Tropical seaside"
+  },
+  "Resting spot": {
+    "type": "habitat",
+    "number": "061",
+    "name": "Resting spot"
+  },
+  "Perpetual mess": {
+    "type": "habitat",
+    "number": "062",
+    "name": "Perpetual mess"
+  },
+  "Trash collection site": {
+    "type": "habitat",
+    "number": "063",
+    "name": "Trash collection site"
+  },
+  "Trash can central": {
+    "type": "habitat",
+    "number": "064",
+    "name": "Trash can central"
+  },
+  "Trash disposal site": {
+    "type": "habitat",
+    "number": "065",
+    "name": "Trash disposal site"
+  },
+  "Park bench": {
+    "type": "habitat",
+    "number": "066",
+    "name": "Park bench"
+  },
+  "Tantalizing restaurant": {
+    "type": "habitat",
+    "number": "067",
+    "name": "Tantalizing restaurant"
+  },
+  "Tableside delivery cart": {
+    "type": "habitat",
+    "number": "068",
+    "name": "Tableside delivery cart"
+  },
+  "Chirp-chirp meal": {
+    "type": "habitat",
+    "number": "069",
+    "name": "Chirp-chirp meal"
+  },
+  "Caf\u00e9 space": {
+    "type": "habitat",
+    "number": "070",
+    "name": "Caf\u00e9 space"
+  },
+  "Beach set": {
+    "type": "habitat",
+    "number": "071",
+    "name": "Beach set"
+  },
+  "Light-up stage": {
+    "type": "habitat",
+    "number": "072",
+    "name": "Light-up stage"
+  },
+  "Surprise in store": {
+    "type": "habitat",
+    "number": "073",
+    "name": "Surprise in store"
+  },
+  "Night festival venue": {
+    "type": "habitat",
+    "number": "074",
+    "name": "Night festival venue"
+  },
+  "Changing area": {
+    "type": "habitat",
+    "number": "075",
+    "name": "Changing area"
+  },
+  "Private makeup stand": {
+    "type": "habitat",
+    "number": "076",
+    "name": "Private makeup stand"
+  },
+  "Knitting station": {
+    "type": "habitat",
+    "number": "077",
+    "name": "Knitting station"
+  },
+  "Hot-spring shower": {
+    "type": "habitat",
+    "number": "078",
+    "name": "Hot-spring shower"
+  },
+  "Resort meal prep": {
+    "type": "habitat",
+    "number": "079",
+    "name": "Resort meal prep"
+  },
+  "All packed up": {
+    "type": "habitat",
+    "number": "080",
+    "name": "All packed up"
+  },
+  "Full recovery": {
+    "type": "habitat",
+    "number": "081",
+    "name": "Full recovery"
+  },
+  "Alarm clock sleep zone": {
+    "type": "habitat",
+    "number": "082",
+    "name": "Alarm clock sleep zone"
+  },
+  "Vending machine break area": {
+    "type": "habitat",
+    "number": "083",
+    "name": "Vending machine break area"
+  },
+  "Vending machine set": {
+    "type": "habitat",
+    "number": "084",
+    "name": "Vending machine set"
+  },
+  "Mini Game Corner": {
+    "type": "habitat",
+    "number": "085",
+    "name": "Mini Game Corner"
+  },
+  "Waterwheel spot": {
+    "type": "habitat",
+    "number": "086",
+    "name": "Waterwheel spot"
+  },
+  "Furnace spot": {
+    "type": "habitat",
+    "number": "087",
+    "name": "Furnace spot"
+  },
+  "Dock": {
+    "type": "habitat",
+    "number": "088",
+    "name": "Dock"
+  },
+  "Spooky study": {
+    "type": "habitat",
+    "number": "089",
+    "name": "Spooky study"
+  },
+  "Playing pirate": {
+    "type": "habitat",
+    "number": "090",
+    "name": "Playing pirate"
+  },
+  "Working the register": {
+    "type": "habitat",
+    "number": "091",
+    "name": "Working the register"
+  },
+  "Tiny Atelier": {
+    "type": "habitat",
+    "number": "092",
+    "name": "Tiny Atelier"
+  },
+  "Gourmet&#x27;s altar": {
+    "type": "habitat",
+    "number": "093",
+    "name": "Gourmet&#x27;s altar"
+  },
+  "Pikachu space": {
+    "type": "habitat",
+    "number": "094",
+    "name": "Pikachu space"
+  },
+  "Cuteness overload": {
+    "type": "habitat",
+    "number": "095",
+    "name": "Cuteness overload"
+  },
+  "Welcoming resort": {
+    "type": "habitat",
+    "number": "096",
+    "name": "Welcoming resort"
+  },
+  "Plain life": {
+    "type": "habitat",
+    "number": "097",
+    "name": "Plain life"
+  },
+  "Tree-shaded red tall grass": {
+    "type": "habitat",
+    "number": "099",
+    "name": "Tree-shaded red tall grass"
+  },
+  "Pointy tree-shaded rocky tall grass": {
+    "type": "habitat",
+    "number": "100",
+    "name": "Pointy tree-shaded rocky tall grass"
+  },
+  "Hydrated red tall grass": {
+    "type": "habitat",
+    "number": "101",
+    "name": "Hydrated red tall grass"
+  },
+  "Elevated red tall grass": {
+    "type": "habitat",
+    "number": "102",
+    "name": "Elevated red tall grass"
+  },
+  "Grassy training field": {
+    "type": "habitat",
+    "number": "103",
+    "name": "Grassy training field"
+  },
+  "Graceful flower bed": {
+    "type": "habitat",
+    "number": "104",
+    "name": "Graceful flower bed"
+  },
+  "Tree-shaded graceful flower bed": {
+    "type": "habitat",
+    "number": "105",
+    "name": "Tree-shaded graceful flower bed"
+  },
+  "Hydrated graceful flower bed": {
+    "type": "habitat",
+    "number": "106",
+    "name": "Hydrated graceful flower bed"
+  },
+  "Flower garden stump stage": {
+    "type": "habitat",
+    "number": "107",
+    "name": "Flower garden stump stage"
+  },
+  "Toil in the soil": {
+    "type": "habitat",
+    "number": "108",
+    "name": "Toil in the soil"
+  },
+  "Uplifting duckweed": {
+    "type": "habitat",
+    "number": "109",
+    "name": "Uplifting duckweed"
+  },
+  "Mossy rest spot": {
+    "type": "habitat",
+    "number": "110",
+    "name": "Mossy rest spot"
+  },
+  "Mossy hot spring": {
+    "type": "habitat",
+    "number": "112",
+    "name": "Mossy hot spring"
+  },
+  "Open-air bath": {
+    "type": "habitat",
+    "number": "113",
+    "name": "Open-air bath"
+  },
+  "Harmonious hot spring": {
+    "type": "habitat",
+    "number": "114",
+    "name": "Harmonious hot spring"
+  },
+  "Piping-hot lava": {
+    "type": "habitat",
+    "number": "115",
+    "name": "Piping-hot lava"
+  },
+  "Digging and burning": {
+    "type": "habitat",
+    "number": "116",
+    "name": "Digging and burning"
+  },
+  "Clink-clang iron construction": {
+    "type": "habitat",
+    "number": "117",
+    "name": "Clink-clang iron construction"
+  },
+  "Creepy white rocks": {
+    "type": "habitat",
+    "number": "118",
+    "name": "Creepy white rocks"
+  },
+  "Container snacking": {
+    "type": "habitat",
+    "number": "119",
+    "name": "Container snacking"
+  },
+  "Dinner table surprise": {
+    "type": "habitat",
+    "number": "120",
+    "name": "Dinner table surprise"
+  },
+  "Best bread bakery": {
+    "type": "habitat",
+    "number": "121",
+    "name": "Best bread bakery"
+  },
+  "Mini kitchen": {
+    "type": "habitat",
+    "number": "122",
+    "name": "Mini kitchen"
+  },
+  "House party": {
+    "type": "habitat",
+    "number": "123",
+    "name": "House party"
+  },
+  "Lazy photo-album scrolling": {
+    "type": "habitat",
+    "number": "124",
+    "name": "Lazy photo-album scrolling"
+  },
+  "Chirping recital": {
+    "type": "habitat",
+    "number": "125",
+    "name": "Chirping recital"
+  },
+  "Recital stage": {
+    "type": "habitat",
+    "number": "126",
+    "name": "Recital stage"
+  },
+  "Box to the rhythm": {
+    "type": "habitat",
+    "number": "127",
+    "name": "Box to the rhythm"
+  },
+  "Music and magazines": {
+    "type": "habitat",
+    "number": "128",
+    "name": "Music and magazines"
+  },
+  "Mini museum": {
+    "type": "habitat",
+    "number": "129",
+    "name": "Mini museum"
+  },
+  "Refreshing locker room": {
+    "type": "habitat",
+    "number": "130",
+    "name": "Refreshing locker room"
+  },
+  "Bronze landmark": {
+    "type": "habitat",
+    "number": "131",
+    "name": "Bronze landmark"
+  },
+  "Railroad crossing": {
+    "type": "habitat",
+    "number": "132",
+    "name": "Railroad crossing"
+  },
+  "Chef&#x27;s kitchen": {
+    "type": "habitat",
+    "number": "133",
+    "name": "Chef&#x27;s kitchen"
+  },
+  "Absolute luxury": {
+    "type": "habitat",
+    "number": "134",
+    "name": "Absolute luxury"
+  },
+  "Heavy iron": {
+    "type": "habitat",
+    "number": "135",
+    "name": "Heavy iron"
+  },
+  "Modern living": {
+    "type": "habitat",
+    "number": "136",
+    "name": "Modern living"
+  },
+  "Tree-shaded pink tall grass": {
+    "type": "habitat",
+    "number": "138",
+    "name": "Tree-shaded pink tall grass"
+  },
+  "Hydrated pink tall grass": {
+    "type": "habitat",
+    "number": "139",
+    "name": "Hydrated pink tall grass"
+  },
+  "Elevated pink tall grass": {
+    "type": "habitat",
+    "number": "140",
+    "name": "Elevated pink tall grass"
+  },
+  "Concrete pipe secret base": {
+    "type": "habitat",
+    "number": "141",
+    "name": "Concrete pipe secret base"
+  },
+  "Fluffy flower bed": {
+    "type": "habitat",
+    "number": "142",
+    "name": "Fluffy flower bed"
+  },
+  "Tree-shaded fluffy flower bed": {
+    "type": "habitat",
+    "number": "143",
+    "name": "Tree-shaded fluffy flower bed"
+  },
+  "Hydrated fluffy flower bed": {
+    "type": "habitat",
+    "number": "144",
+    "name": "Hydrated fluffy flower bed"
+  },
+  "Waterside dinghy": {
+    "type": "habitat",
+    "number": "145",
+    "name": "Waterside dinghy"
+  },
+  "Illuminated waterfall": {
+    "type": "habitat",
+    "number": "146",
+    "name": "Illuminated waterfall"
+  },
+  "Birdsong garden": {
+    "type": "habitat",
+    "number": "147",
+    "name": "Birdsong garden"
+  },
+  "Simple bathroom": {
+    "type": "habitat",
+    "number": "148",
+    "name": "Simple bathroom"
+  },
+  "Cycling rest stop": {
+    "type": "habitat",
+    "number": "149",
+    "name": "Cycling rest stop"
+  },
+  "Fireplace nap spot": {
+    "type": "habitat",
+    "number": "150",
+    "name": "Fireplace nap spot"
+  },
+  "Surging psychic power": {
+    "type": "habitat",
+    "number": "151",
+    "name": "Surging psychic power"
+  },
+  "Fortune-teller&#x27;s table": {
+    "type": "habitat",
+    "number": "152",
+    "name": "Fortune-teller&#x27;s table"
+  },
+  "Trash site TV": {
+    "type": "habitat",
+    "number": "153",
+    "name": "Trash site TV"
+  },
+  "Oversized dumping ground": {
+    "type": "habitat",
+    "number": "154",
+    "name": "Oversized dumping ground"
+  },
+  "Interrogation desk": {
+    "type": "habitat",
+    "number": "155",
+    "name": "Interrogation desk"
+  },
+  "Sewer-hole inspection": {
+    "type": "habitat",
+    "number": "156",
+    "name": "Sewer-hole inspection"
+  },
+  "Spotless washing station": {
+    "type": "habitat",
+    "number": "157",
+    "name": "Spotless washing station"
+  },
+  "Home theater": {
+    "type": "habitat",
+    "number": "158",
+    "name": "Home theater"
+  },
+  "Study Area": {
+    "type": "habitat",
+    "number": "159",
+    "name": "Study Area"
+  },
+  "Rhythmic Living room": {
+    "type": "habitat",
+    "number": "160",
+    "name": "Rhythmic Living room"
+  },
+  "Squeaky clean": {
+    "type": "habitat",
+    "number": "161",
+    "name": "Squeaky clean"
+  },
+  "Moisturizing makeup stand": {
+    "type": "habitat",
+    "number": "162",
+    "name": "Moisturizing makeup stand"
+  },
+  "Mini library": {
+    "type": "habitat",
+    "number": "163",
+    "name": "Mini library"
+  },
+  "Game Corner battle zone": {
+    "type": "habitat",
+    "number": "164",
+    "name": "Game Corner battle zone"
+  },
+  "Playland": {
+    "type": "habitat",
+    "number": "165",
+    "name": "Playland"
+  },
+  "Work desk": {
+    "type": "habitat",
+    "number": "166",
+    "name": "Work desk"
+  },
+  "Office storeroom": {
+    "type": "habitat",
+    "number": "167",
+    "name": "Office storeroom"
+  },
+  "Experiment Space": {
+    "type": "habitat",
+    "number": "168",
+    "name": "Experiment Space"
+  },
+  "Professor&#x27;s apprentice program": {
+    "type": "habitat",
+    "number": "169",
+    "name": "Professor&#x27;s apprentice program"
+  },
+  "Researcher&#x27;s desk": {
+    "type": "habitat",
+    "number": "170",
+    "name": "Researcher&#x27;s desk"
+  },
+  "Public reading material": {
+    "type": "habitat",
+    "number": "171",
+    "name": "Public reading material"
+  },
+  "Heart-pounding surprise box": {
+    "type": "habitat",
+    "number": "172",
+    "name": "Heart-pounding surprise box"
+  },
+  "Prank button": {
+    "type": "habitat",
+    "number": "173",
+    "name": "Prank button"
+  },
+  "Picturesque photo cutout board": {
+    "type": "habitat",
+    "number": "174",
+    "name": "Picturesque photo cutout board"
+  },
+  "Tire park": {
+    "type": "habitat",
+    "number": "175",
+    "name": "Tire park"
+  },
+  "Nature&#x27;s market": {
+    "type": "habitat",
+    "number": "176",
+    "name": "Nature&#x27;s market"
+  },
+  "Construction-site generator": {
+    "type": "habitat",
+    "number": "177",
+    "name": "Construction-site generator"
+  },
+  "Dojo training": {
+    "type": "habitat",
+    "number": "178",
+    "name": "Dojo training"
+  },
+  "Evil organization HQ": {
+    "type": "habitat",
+    "number": "179",
+    "name": "Evil organization HQ"
+  },
+  "Nine flames": {
+    "type": "habitat",
+    "number": "180",
+    "name": "Nine flames"
+  },
+  "Plush central": {
+    "type": "habitat",
+    "number": "181",
+    "name": "Plush central"
+  },
+  "Gamer&#x27;s paradise": {
+    "type": "habitat",
+    "number": "182",
+    "name": "Gamer&#x27;s paradise"
+  },
+  "Top pop": {
+    "type": "habitat",
+    "number": "183",
+    "name": "Top pop"
+  },
+  "Fishing pond": {
+    "type": "habitat",
+    "number": "184",
+    "name": "Fishing pond"
+  },
+  "Ocean fishing spot": {
+    "type": "habitat",
+    "number": "185",
+    "name": "Ocean fishing spot"
+  },
+  "Marsh fishing spot": {
+    "type": "habitat",
+    "number": "186",
+    "name": "Marsh fishing spot"
+  },
+  "Hot-spring Fishing Spot": {
+    "type": "habitat",
+    "number": "187",
+    "name": "Hot-spring Fishing Spot"
+  },
+  "Magma fishing spot": {
+    "type": "habitat",
+    "number": "188",
+    "name": "Magma fishing spot"
+  },
+  "Amped rock stage": {
+    "type": "habitat",
+    "number": "189",
+    "name": "Amped rock stage"
+  },
+  "Low-key rock stage": {
+    "type": "habitat",
+    "number": "190",
+    "name": "Low-key rock stage"
+  },
+  "Malicious knight&#x27;s shrine": {
+    "type": "habitat",
+    "number": "191",
+    "name": "Malicious knight&#x27;s shrine"
+  },
+  "Auspicious knight&#x27;s shrine": {
+    "type": "habitat",
+    "number": "192",
+    "name": "Auspicious knight&#x27;s shrine"
+  },
+  "Wing Fossil Display": {
+    "type": "habitat",
+    "number": "193",
+    "name": "Wing Fossil Display"
+  },
+  "Skull Fossil display": {
+    "type": "habitat",
+    "number": "194",
+    "name": "Skull Fossil display"
+  },
+  "Headbutt Fossil display": {
+    "type": "habitat",
+    "number": "195",
+    "name": "Headbutt Fossil display"
+  },
+  "Armor Fossil display": {
+    "type": "habitat",
+    "number": "196",
+    "name": "Armor Fossil display"
+  },
+  "Shield Fossil display": {
+    "type": "habitat",
+    "number": "197",
+    "name": "Shield Fossil display"
+  },
+  "Jaw Fossil display": {
+    "type": "habitat",
+    "number": "198",
+    "name": "Jaw Fossil display"
+  },
+  "Despot Fossil display": {
+    "type": "habitat",
+    "number": "199",
+    "name": "Despot Fossil display"
+  },
+  "Sail Fossil display": {
+    "type": "habitat",
+    "number": "200",
+    "name": "Sail Fossil display"
+  },
+  "Tundra fossil display": {
+    "type": "habitat",
+    "number": "201",
+    "name": "Tundra fossil display"
+  },
+  "Boundless blue beverage": {
+    "type": "habitat",
+    "number": "202",
+    "name": "Boundless blue beverage"
+  },
+  "Electrifying potatoes": {
+    "type": "habitat",
+    "number": "203",
+    "name": "Electrifying potatoes"
+  },
+  "Burning-hot spice": {
+    "type": "habitat",
+    "number": "204",
+    "name": "Burning-hot spice"
+  },
+  "Elegant daytime treats": {
+    "type": "habitat",
+    "number": "205",
+    "name": "Elegant daytime treats"
+  },
+  "Dark-chocolate cookies": {
+    "type": "habitat",
+    "number": "206",
+    "name": "Dark-chocolate cookies"
+  },
+  "Leafy greens sandwich": {
+    "type": "habitat",
+    "number": "207",
+    "name": "Leafy greens sandwich"
+  },
+  "Chilly shaved ice": {
+    "type": "habitat",
+    "number": "208",
+    "name": "Chilly shaved ice"
+  },
+  "Lovely ribbon cake": {
+    "type": "habitat",
+    "number": "209",
+    "name": "Lovely ribbon cake"
+  },
+  "Uses Material": {
+    "type": "recipe",
+    "category": "Decoration",
+    "name": "Uses Material"
+  },
+  "self.__next_f.push([1,\"20:T17c9,\"])": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "self.__next_f.push([1,\"20:T17c9,\"])"
+  },
+  "self.__next_f.push([1,\"1f:[\\\"$\\\",\\\"$L1c\\\",null,{\\\"id\\\":\\\"raptive-loader\\\",\\\"strategy\\\":\\\"afterInteractive\\\",\\\"children\\\":\\\"$20\\\"}]\\n11:null\\n\"])": {
+    "type": "recipe",
+    "category": "Relaxation",
+    "name": "self.__next_f.push([1,\"1f:[\\\"$\\\",\\\"$L1c\\\",null,{\\\"id\\\":\\\"raptive-loader\\\",\\\"strategy\\\":\\\"afterInteractive\\\",\\\"children\\\":\\\"$20\\\"}]\\n11:null\\n\"])"
+  }
+}
