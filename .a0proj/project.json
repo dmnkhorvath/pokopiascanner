@@ -1,0 +1,16 @@
+{
+    "title": "Pokopia Scanner",
+    "description": "Web-based progress scanner for Pok\u00e9mon Pokopia. Upload Switch video recordings, OCR-scan items/Pok\u00e9mon/habitats/recipes, track collection progress, and export structured JSON. Deployed on GitHub Pages.",
+    "instructions": "# Pokopia Progress Scanner\n\nYou are working on the **Pokopia Progress Scanner**, a React web application that scans Nintendo Switch video recordings to track collection progress in Pok\u00e9mon Pokopia.\n\n## Project Overview\n- **Tech Stack**: Vite + React 18 + Tesseract.js v5\n- **GitHub**: https://github.com/dmnkhorvath/Pokopiascanner\n- **Live Site**: https://dmnkhorvath.github.io/Pokopiascanner/\n- **Deployment**: GitHub Actions \u2192 GitHub Pages (auto-deploy on push to main)\n\n## Architecture\n- **LandingPage** \u2014 Drag-and-drop video upload, settings config, import/export\n- **VideoScanner** \u2014 Core OCR engine with live frame preview & detection feed\n- **ScanResults** \u2014 Category tabs, search, grid/list view, export/import\n- **ocrEngine** (utils) \u2014 Frame extraction, preprocessing, Tesseract.js OCR pipeline\n- **fuzzyMatch** (utils) \u2014 Levenshtein distance fuzzy matching with pre-built lookup\n\n## OCR Pipeline\nVideo Upload \u2192 Extract Frames \u2192 Crop Region \u2192 B&W Preprocessing \u2192 Tesseract.js OCR \u2192 Exact Match \u2192 Fuzzy Match Fallback \u2192 Categorize Results\n\n## Dataset\n- **pokopiaDataset.json** \u2014 Full dataset with metadata (300 Pok\u00e9mon, 1254 Items, 209 Habitats, 743 Recipes)\n- **ocrLookup.json** \u2014 OCR lookup dictionary mapping item names to type/category\n- Data scraped from https://pokopiadex.com/\n\n## Key Features\n- Video upload with drag-and-drop\n- Configurable settings (frame skip, crop region, OCR confidence, fuzzy tolerance)\n- Real-time scanning with live preview\n- Category tabs with progress bars\n- Grid/List view with search/filter\n- JSON export/import with merge capability\n- Pokopia-themed UI (orange/green/blue color scheme)\n\n## Git Workflow\n- Always commit with conventional commit messages (feat:, fix:, style:, ci:, etc.)\n- Push to main triggers auto-deployment to GitHub Pages\n- Use GH_ACCESS_TOKEN for push authentication\n\n## Development\n```bash\nnpm run dev    # Development server\nnpm run build  # Production build\n```\n\n## Future Improvements\n- Fine-tune crop regions once actual Pokopia gameplay video is available\n- Add image recognition as alternative/complement to OCR\n- Add localStorage persistence for scan history\n- Add comparison/diff between scans",
+    "color": "#D97C20",
+    "git_url": "https://github.com/dmnkhorvath/Pokopiascanner",
+    "memory": "own",
+    "file_structure": {
+        "enabled": true,
+        "max_depth": 5,
+        "max_files": 20,
+        "max_folders": 20,
+        "max_lines": 250,
+        "gitignore": "venv/**\n**/__pycache__/**\n**/node_modules/**\n**/.npm/**\n**/.git/**\ndist/**\n"
+    }
+}

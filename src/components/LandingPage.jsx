@@ -125,18 +125,19 @@ export default function LandingPage({ onStartScan, onImportResults }) {
           <div className="settings-grid">
             <div className="setting">
               <label className="setting__label">
-                Frame Skip Interval
-                <span className="setting__hint">0 = process every frame at ~1fps</span>
+                Frame Interval (ms)
+                <span className="setting__hint">Extract a frame every N milliseconds (20ms = 50fps)</span>
               </label>
               <input
                 type="range"
-                min="0"
-                max="10"
-                value={settings.frameSkip}
-                onChange={(e) => updateSetting('frameSkip', Number(e.target.value))}
+                min="10"
+                max="500"
+                value={settings.frameIntervalMs}
+                onChange={(e) => updateSetting('frameIntervalMs', Number(e.target.value))}
+                step="10"
                 className="setting__range"
               />
-              <span className="setting__value">{settings.frameSkip}</span>
+              <span className="setting__value">{settings.frameIntervalMs}ms</span>
             </div>
 
             <div className="setting">

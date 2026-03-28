@@ -25,8 +25,8 @@ export const CROP_PRESETS = {
  * Default scanner settings
  */
 export const DEFAULT_SETTINGS = {
-  frameSkip: 0,
-  processingDelay: 10,
+  frameIntervalMs: 20,    // Extract a frame every N milliseconds (20ms = 50fps)
+  processingDelay: 0,     // Delay between OCR processing (0 for max speed)
   cropPreset: 'auto',
   customCrop: { x: 0, y: 0, w: 100, h: 100 },
   confidenceThreshold: 40,
@@ -162,8 +162,8 @@ export function matchText(text, fuzzyTolerance = 2) {
  */
 export async function scanVideo(videoFile, settings, onProgress, onMatch, signal) {
   const {
-    frameSkip = 0,
-    processingDelay = 10,
+    frameIntervalMs = 20,
+    processingDelay = 0,
     cropPreset = 'auto',
     customCrop = { x: 0, y: 0, w: 100, h: 100 },
     confidenceThreshold = 40,
@@ -198,18 +198,15 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   });
 
   const duration = video.duration;
-  const fps = 1; // Process ~1 frame per second
-  const frameInterval = 1 / fps;
-  const totalFrames = Math.floor(duration / frameInterval);
-  const skipAmount = frameSkip > 0 ? frameSkip + 1 : 1;
-  const framesToProcess = Math.ceil(totalFrames / skipAmount);
+  const frameIntervalSec = frameIntervalMs / 1000; // Convert ms to seconds
+  const framesToProcess = Math.floor(duration / frameIntervalSec);
 
   onProgress({
     phase: 'init',
     current: 0,
     total: framesToProcess,
     percent: 0,
-    message: `Initializing OCR engine... (${framesToProcess} frames to process)`,
+    message: `Initializing OCR engine... (${framesToProcess} frames to process at ${frameIntervalMs}ms intervals)`,
   });
 
   // Initialize Tesseract worker
@@ -227,7 +224,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   const previewCtx = previewCanvas.getContext('2d');
 
   try {
-    for (let time = 0; time < duration; time += frameInterval * skipAmount) {
+    for (let time = 0; time < duration; time += frameIntervalSec) {
       // Check for cancellation
       if (signal?.aborted) {
         throw new DOMException('Scan cancelled', 'AbortError');
