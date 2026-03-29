@@ -408,6 +408,11 @@ export function matchText(text, fuzzyTolerance = 2) {
  * @param {number} poolSize - Number of workers to create
  * @returns {Promise<Array>} Array of initialized Tesseract workers
  */
+/**
+ * Create a pool of Tesseract workers for parallel OCR.
+ * @param {number} poolSize
+ * @returns {Promise<Array>}
+ */
 async function createWorkerPool(poolSize) {
   const workers = await Promise.all(
     Array.from({ length: poolSize }, () =>
@@ -419,18 +424,26 @@ async function createWorkerPool(poolSize) {
 
 /**
  * Terminate all workers in the pool.
- * @param {Array} workers - Array of Tesseract workers
+ * @param {Array} workers
  */
 async function terminateWorkerPool(workers) {
   await Promise.all(workers.map(w => w.terminate()));
 }
 
 /**
- * Extract a frame from video as an ImageBitmap for later OCR processing.
+ * Detect if running on a mobile device.
+ * @returns {boolean}
+ */
+function isMobileDevice() {
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+/**
+ * Extract a preprocessed frame from video into a standalone canvas.
  * @param {HTMLVideoElement} video
  * @param {Object} cropRegion - { x, y, w, h } in percentages
- * @param {string} mode - 'standard' or 'green' preprocessing
- * @returns {Blob} JPEG blob of the processed frame
+ * @param {string} mode - 'standard' or 'green'
+ * @returns {HTMLCanvasElement}
  */
 function extractFrameToCanvas(video, cropRegion, mode = 'standard') {
   const canvas = document.createElement('canvas');
@@ -448,12 +461,11 @@ function extractFrameToCanvas(video, cropRegion, mode = 'standard') {
   ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
 
   if (mode === 'green') {
-    // Green channel extraction for white-on-purple text
     let imageData = ctx.getImageData(0, 0, sw, sh);
     imageData = extractGreenChannel(imageData, 200);
     ctx.putImageData(imageData, 0, 0);
 
-    // Upscale 3x
+    // Upscale 3x for better OCR on small text
     const upW = sw * 3;
     const upH = sh * 3;
     const tempCanvas = document.createElement('canvas');
@@ -466,7 +478,6 @@ function extractFrameToCanvas(video, cropRegion, mode = 'standard') {
     canvas.height = upH;
     ctx.drawImage(tempCanvas, 0, 0);
   } else {
-    // Standard B&W preprocessing
     let imageData = ctx.getImageData(0, 0, sw, sh);
     imageData = applyMedianFilter(imageData);
     imageData = convertToBW(imageData);
@@ -477,11 +488,24 @@ function extractFrameToCanvas(video, cropRegion, mode = 'standard') {
 }
 
 /**
+ * Free canvas memory.
+ * @param {HTMLCanvasElement} canvas
+ */
+function freeCanvas(canvas) {
+  if (canvas) {
+    canvas.width = 0;
+    canvas.height = 0;
+  }
+}
+
+/**
  * Create and run the OCR scanning pipeline with parallel worker pool.
+ * Uses batched processing to keep memory bounded (mobile-safe).
+ *
  * @param {File} videoFile - The video file to scan
  * @param {Object} settings - Scanner settings
- * @param {Function} onProgress - Progress callback ({ phase, current, total, percent, currentFrame })
- * @param {Function} onMatch - Called when new items are found ({ items, frameIndex })
+ * @param {Function} onProgress - Progress callback
+ * @param {Function} onMatch - Called when new items are found
  * @param {AbortSignal} signal - AbortController signal to cancel scanning
  * @returns {Promise<Object>} Final scan results
  */
@@ -497,12 +521,10 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     scanMode = 'all',
   } = settings;
 
-  // Determine crop region
   const cropRegion = cropPreset === 'custom'
     ? customCrop
     : CROP_PRESETS[cropPreset] || CROP_PRESETS.auto;
 
-  // Results accumulator (thread-safe via single-threaded JS)
   const results = {
     pokemon: new Map(),
     item: new Map(),
@@ -514,11 +536,9 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   const video = document.createElement('video');
   video.muted = true;
   video.playsInline = true;
-
   const videoUrl = URL.createObjectURL(videoFile);
   video.src = videoUrl;
 
-  // Wait for video metadata
   await new Promise((resolve, reject) => {
     video.onloadedmetadata = resolve;
     video.onerror = () => reject(new Error('Failed to load video'));
@@ -526,215 +546,185 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
   const duration = video.duration;
 
-  // Auto-detect FPS if enabled
+  // Auto-detect FPS
   if (autoDetectFPS && frameIntervalMs === 0) {
     onProgress({
-      phase: 'detecting',
-      current: 0,
-      total: 0,
-      percent: 0,
+      phase: 'detecting', current: 0, total: 0, percent: 0,
       message: 'Detecting video framerate...',
     });
     try {
       const fpsInfo = await detectVideoFPS(videoFile);
       frameIntervalMs = fpsInfo.frameIntervalMs;
       onProgress({
-        phase: 'detecting',
-        current: 0,
-        total: 0,
-        percent: 0,
+        phase: 'detecting', current: 0, total: 0, percent: 0,
         message: fpsInfo.detected
           ? `Detected ${fpsInfo.fps} FPS (${fpsInfo.frameIntervalMs}ms per frame)`
           : `Could not detect FPS, using fallback ${fpsInfo.fps} FPS`,
       });
     } catch {
       frameIntervalMs = 33;
-      onProgress({
-        phase: 'detecting',
-        current: 0,
-        total: 0,
-        percent: 0,
-        message: 'FPS detection failed, using 30 FPS fallback',
-      });
     }
   }
 
   const frameIntervalSec = frameIntervalMs / 1000;
   const framesToProcess = Math.floor(duration / frameIntervalSec);
 
-  // Determine worker pool size based on hardware
+  // Determine worker pool size — smaller on mobile to save memory
+  const mobile = isMobileDevice();
+  const maxWorkers = mobile ? 2 : 4;
   const poolSize = Math.min(
     navigator.hardwareConcurrency || 4,
-    4, // cap at 4 to avoid memory issues
-    Math.max(1, Math.floor(framesToProcess / 2)) // no more workers than half the frames
+    maxWorkers,
+    Math.max(1, Math.floor(framesToProcess / 2))
   );
 
+  // Batch size: how many frames to extract before OCR-ing them
+  // Keeps memory bounded — especially important on iOS Safari
+  const batchSize = poolSize * 4;
+
   onProgress({
-    phase: 'init',
-    current: 0,
-    total: framesToProcess,
-    percent: 0,
-    message: `Initializing ${poolSize} parallel OCR workers... (${framesToProcess} frames at ${frameIntervalMs}ms intervals)`,
+    phase: 'init', current: 0, total: framesToProcess, percent: 0,
+    message: `Initializing ${poolSize} parallel OCR workers${mobile ? ' (mobile mode)' : ''}... (${framesToProcess} frames at ${frameIntervalMs}ms intervals)`,
   });
 
-  // Initialize worker pool
   const workers = await createWorkerPool(poolSize);
 
-  // Preview canvas for generating frame thumbnails
   const previewCanvas = document.createElement('canvas');
   const previewCtx = previewCanvas.getContext('2d');
 
-  try {
-    // ===== PHASE 1: Extract all frames =====
-    onProgress({
-      phase: 'extracting',
-      current: 0,
-      total: framesToProcess,
-      percent: 0,
-      message: `Extracting frames from video...`,
-    });
+  let processedCount = 0;
 
-    const frameJobs = []; // Array of { index, time, canvases, previewDataUrl }
+  /**
+   * Process a single job with a given worker.
+   */
+  async function processJob(job, worker) {
+    if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
 
-    for (let time = 0, idx = 0; time < duration; time += frameIntervalSec, idx++) {
-      if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
+    if (scanMode === 'habitat') {
+      const { data: upperData } = await worker.recognize(job.canvases.upper);
+      const { data: fullData } = await worker.recognize(job.canvases.bottom);
 
-      // Seek to frame
-      video.currentTime = time;
-      await new Promise((resolve) => { video.onseeked = resolve; });
-
-      // Generate preview
-      previewCanvas.width = video.videoWidth;
-      previewCanvas.height = video.videoHeight;
-      previewCtx.drawImage(video, 0, 0);
-      const previewDataUrl = previewCanvas.toDataURL('image/jpeg', 0.5);
-
-      // Extract processed frame canvases based on scan mode
-      const job = { index: idx, time, previewDataUrl, canvases: {} };
-
-      if (scanMode === 'habitat') {
-        // Upper 15% with green channel preprocessing
-        const upperCrop = { x: cropRegion.x, y: cropRegion.y, w: cropRegion.w, h: Math.min(15, cropRegion.h) };
-        job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'green');
-        // Bottom 50% with standard B&W
-        const bottomCrop = { x: cropRegion.x, y: 50, w: cropRegion.w, h: 50 };
-        job.canvases.bottom = extractFrameToCanvas(video, bottomCrop, 'standard');
-      } else {
-        // Standard full crop
-        job.canvases.full = extractFrameToCanvas(video, cropRegion, 'standard');
+      if (upperData.confidence >= confidenceThreshold && upperData.text.trim()) {
+        const habitat = matchHabitatFrame(fullData.text, upperData.text, fuzzyTolerance);
+        if (habitat && !results.habitat.has(habitat.name)) {
+          results.habitat.set(habitat.name, habitat);
+          onMatch({ items: [habitat], frameIndex: job.index });
+        } else if (habitat && results.habitat.has(habitat.name)) {
+          const existing = results.habitat.get(habitat.name);
+          if (!existing.built && habitat.built) {
+            results.habitat.set(habitat.name, habitat);
+          }
+        }
       }
+    } else {
+      const { data } = await worker.recognize(job.canvases.full);
 
-      frameJobs.push(job);
-
-      // Report extraction progress every 10 frames
-      if (idx % 10 === 0 || idx === framesToProcess - 1) {
-        onProgress({
-          phase: 'extracting',
-          current: idx + 1,
-          total: framesToProcess,
-          percent: Math.round(((idx + 1) / framesToProcess) * 50), // extraction is 0-50%
-          message: `Extracting frames: ${idx + 1}/${framesToProcess}`,
-          currentFrame: previewDataUrl,
-          timePosition: time,
-          duration,
-        });
+      if (data.confidence >= confidenceThreshold && data.text.trim()) {
+        const matches = matchText(data.text, fuzzyTolerance);
+        const newItems = [];
+        for (const match of matches) {
+          const type = match.type;
+          if (scanMode !== 'all' && type !== scanMode) continue;
+          if (results[type] && !results[type].has(match.name)) {
+            results[type].set(match.name, match);
+            newItems.push(match);
+          }
+        }
+        if (newItems.length > 0) {
+          onMatch({ items: newItems, frameIndex: job.index });
+        }
       }
     }
 
-    // ===== PHASE 2: Parallel OCR processing =====
+    // Free canvas memory immediately
+    Object.values(job.canvases).forEach(freeCanvas);
+    job.canvases = null;
+
+    processedCount++;
     onProgress({
       phase: 'scanning',
-      current: 0,
+      current: processedCount,
       total: framesToProcess,
-      percent: 50,
-      message: `Processing ${framesToProcess} frames with ${poolSize} parallel workers...`,
+      percent: Math.round((processedCount / framesToProcess) * 100),
+      message: `Scanning: ${processedCount}/${framesToProcess} (${poolSize} workers${mobile ? ', mobile' : ''})`,
+      currentFrame: job.previewDataUrl,
+      timePosition: job.time,
+      duration,
     });
+  }
 
-    let processedCount = 0;
+  /**
+   * Process a batch of jobs in parallel across the worker pool.
+   */
+  async function processBatch(batch) {
+    // Distribute jobs round-robin across workers
+    const queues = workers.map(() => []);
+    batch.forEach((job, i) => queues[i % poolSize].push(job));
 
-    // Process frames in parallel batches using the worker pool
-    async function processJob(job, worker) {
-      if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
-
-      if (scanMode === 'habitat') {
-        // OCR upper region (green channel preprocessed)
-        const { data: upperData } = await worker.recognize(job.canvases.upper);
-        // OCR bottom region (standard B&W)
-        const { data: fullData } = await worker.recognize(job.canvases.bottom);
-
-        if (upperData.confidence >= confidenceThreshold && upperData.text.trim()) {
-          const habitat = matchHabitatFrame(fullData.text, upperData.text, fuzzyTolerance);
-          if (habitat && !results.habitat.has(habitat.name)) {
-            results.habitat.set(habitat.name, habitat);
-            onMatch({ items: [habitat], frameIndex: job.index });
-          } else if (habitat && results.habitat.has(habitat.name)) {
-            const existing = results.habitat.get(habitat.name);
-            if (!existing.built && habitat.built) {
-              results.habitat.set(habitat.name, habitat);
-            }
-          }
-        }
-      } else {
-        // Generic mode
-        const { data } = await worker.recognize(job.canvases.full);
-
-        if (data.confidence >= confidenceThreshold && data.text.trim()) {
-          const matches = matchText(data.text, fuzzyTolerance);
-          const newItems = [];
-          for (const match of matches) {
-            const type = match.type;
-            if (scanMode !== 'all' && type !== scanMode) continue;
-            if (results[type] && !results[type].has(match.name)) {
-              results[type].set(match.name, match);
-              newItems.push(match);
-            }
-          }
-          if (newItems.length > 0) {
-            onMatch({ items: newItems, frameIndex: job.index });
-          }
-        }
-      }
-
-      // Clean up canvases to free memory
-      Object.values(job.canvases).forEach(c => { c.width = 0; c.height = 0; });
-      job.canvases = null;
-
-      processedCount++;
-      onProgress({
-        phase: 'scanning',
-        current: processedCount,
-        total: framesToProcess,
-        percent: 50 + Math.round((processedCount / framesToProcess) * 50), // OCR is 50-100%
-        message: `OCR processing: ${processedCount}/${framesToProcess} (${poolSize} workers)`,
-        currentFrame: job.previewDataUrl,
-        timePosition: job.time,
-        duration,
-      });
-    }
-
-    // Distribute jobs across workers using a simple round-robin queue
-    // Each worker processes jobs sequentially, but all workers run in parallel
-    const workerQueues = workers.map(() => []);
-    frameJobs.forEach((job, i) => {
-      workerQueues[i % poolSize].push(job);
-    });
-
-    // Run all worker queues in parallel
     await Promise.all(
-      workerQueues.map(async (queue, workerIdx) => {
+      queues.map(async (queue, wIdx) => {
         for (const job of queue) {
           if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
-          await processJob(job, workers[workerIdx]);
+          await processJob(job, workers[wIdx]);
           if (processingDelay > 0) {
             await new Promise(r => setTimeout(r, processingDelay));
           }
         }
       })
     );
+  }
+
+  try {
+    // Process frames in memory-bounded batches:
+    // Extract a batch of frames → OCR them in parallel → free memory → repeat
+    let batch = [];
+    let frameIdx = 0;
+
+    for (let time = 0; time < duration; time += frameIntervalSec) {
+      if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
+
+      // Seek
+      video.currentTime = time;
+      await new Promise((resolve) => { video.onseeked = resolve; });
+
+      // Preview
+      previewCanvas.width = video.videoWidth;
+      previewCanvas.height = video.videoHeight;
+      previewCtx.drawImage(video, 0, 0);
+      const previewDataUrl = previewCanvas.toDataURL('image/jpeg', 0.5);
+
+      // Extract preprocessed canvases
+      const job = { index: frameIdx, time, previewDataUrl, canvases: {} };
+
+      if (scanMode === 'habitat') {
+        const upperCrop = { x: cropRegion.x, y: cropRegion.y, w: cropRegion.w, h: Math.min(15, cropRegion.h) };
+        job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'green');
+        const bottomCrop = { x: cropRegion.x, y: 50, w: cropRegion.w, h: 50 };
+        job.canvases.bottom = extractFrameToCanvas(video, bottomCrop, 'standard');
+      } else {
+        job.canvases.full = extractFrameToCanvas(video, cropRegion, 'standard');
+      }
+
+      batch.push(job);
+      frameIdx++;
+
+      // When batch is full, process it and free memory
+      if (batch.length >= batchSize) {
+        await processBatch(batch);
+        batch = [];
+      }
+    }
+
+    // Process remaining frames
+    if (batch.length > 0) {
+      await processBatch(batch);
+      batch = [];
+    }
 
   } finally {
     await terminateWorkerPool(workers);
     URL.revokeObjectURL(videoUrl);
+    freeCanvas(previewCanvas);
   }
 
   // Build final results
@@ -775,8 +765,8 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     total: framesToProcess,
     percent: 100,
     message: scanMode === 'habitat'
-      ? `Scan complete! Found ${finalResults.habitats.found} habitats (${finalResults.habitats.items.filter(h => h.built).length} built, ${finalResults.habitats.items.filter(h => !h.built).length} not built). Used ${poolSize} parallel workers.`
-      : `Scan complete! Found ${finalResults.totalFound} items. Used ${poolSize} parallel workers.`,
+      ? `Scan complete! Found ${finalResults.habitats.found} habitats (${finalResults.habitats.items.filter(h => h.built).length} built, ${finalResults.habitats.items.filter(h => !h.built).length} not built). ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
+      : `Scan complete! Found ${finalResults.totalFound} items. ${poolSize} workers${mobile ? ' (mobile)' : ''}.`,
   });
 
   return finalResults;
