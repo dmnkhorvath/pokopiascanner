@@ -138,7 +138,7 @@ export default function PrivacyPolicy({ onBack }) {
           </p>
           <p className="legal-page__contact">
             <strong>Pokopia Progress Scanner</strong><br />
-            Email: <a href="mailto:contact@example.com">contact@example.com</a>
+            Email: <a href="mailto:hello@dominikh.com">hello@dominikh.com</a>
           </p>
         </section>
 
