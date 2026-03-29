@@ -499,6 +499,15 @@ function freeCanvas(canvas) {
 }
 
 /**
+ * Yield to the browser's event loop so React can flush state updates and repaint.
+ * Without this, rapid async callbacks inside Promise.all starve the render loop.
+ */
+function yieldToBrowser() {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+
+/**
  * Create and run the OCR scanning pipeline with parallel worker pool.
  * Uses batched processing to keep memory bounded (mobile-safe).
  *
@@ -609,6 +618,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
         if (habitat && !results.habitat.has(habitat.name)) {
           results.habitat.set(habitat.name, habitat);
           onMatch({ items: [habitat], frameIndex: job.index });
+          await yieldToBrowser();
         } else if (habitat && results.habitat.has(habitat.name)) {
           const existing = results.habitat.get(habitat.name);
           if (!existing.built && habitat.built) {
@@ -632,6 +642,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
         }
         if (newItems.length > 0) {
           onMatch({ items: newItems, frameIndex: job.index });
+          await yieldToBrowser();
         }
       }
     }
@@ -651,6 +662,8 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       timePosition: job.time,
       duration,
     });
+    // Yield to browser so React can repaint progress/matches
+    await yieldToBrowser();
   }
 
   /**
@@ -707,6 +720,9 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
       batch.push(job);
       frameIdx++;
+
+      // Yield periodically during extraction so UI stays responsive
+      if (frameIdx % 4 === 0) await yieldToBrowser();
 
       // When batch is full, process it and free memory
       if (batch.length >= batchSize) {
