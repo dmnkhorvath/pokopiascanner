@@ -179,6 +179,76 @@ function convertToBW(imageData, threshold = 128) {
 }
 
 /**
+ * Extract green channel from image data and threshold.
+ * Optimized for reading white text on purple/colored backgrounds.
+ * Purple has low green (~130), white has high green (~253).
+ * @param {ImageData} imageData
+ * @param {number} threshold - Green channel threshold (default 200)
+ * @returns {ImageData}
+ */
+function extractGreenChannel(imageData, threshold = 200) {
+  const { data, width, height } = imageData;
+  const output = new Uint8ClampedArray(data.length);
+
+  for (let i = 0; i < data.length; i += 4) {
+    const green = data[i + 1];
+    const bw = green > threshold ? 255 : 0;
+    output[i] = bw;
+    output[i + 1] = bw;
+    output[i + 2] = bw;
+    output[i + 3] = 255;
+  }
+
+  return new ImageData(output, width, height);
+}
+
+/**
+ * Extract and preprocess a frame optimized for white-on-colored-background text.
+ * Uses green channel isolation + 3x upscale for better OCR accuracy.
+ * @param {HTMLVideoElement} video
+ * @param {HTMLCanvasElement} canvas
+ * @param {Object} cropRegion - { x, y, w, h } in percentages
+ * @returns {HTMLCanvasElement}
+ */
+function extractFrameGreenChannel(video, canvas, cropRegion) {
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const vw = video.videoWidth;
+  const vh = video.videoHeight;
+
+  const sx = Math.floor((cropRegion.x / 100) * vw);
+  const sy = Math.floor((cropRegion.y / 100) * vh);
+  const sw = Math.floor((cropRegion.w / 100) * vw);
+  const sh = Math.floor((cropRegion.h / 100) * vh);
+
+  // Draw at original size first to extract pixels
+  canvas.width = sw;
+  canvas.height = sh;
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh);
+
+  // Extract green channel
+  let imageData = ctx.getImageData(0, 0, sw, sh);
+  imageData = extractGreenChannel(imageData, 200);
+  ctx.putImageData(imageData, 0, 0);
+
+  // Upscale 3x for better OCR on small text
+  const upW = sw * 3;
+  const upH = sh * 3;
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = upW;
+  tempCanvas.height = upH;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.imageSmoothingEnabled = false;
+  tempCtx.drawImage(canvas, 0, 0, sw, sh, 0, 0, upW, upH);
+
+  // Copy back to main canvas
+  canvas.width = upW;
+  canvas.height = upH;
+  ctx.drawImage(tempCanvas, 0, 0);
+
+  return canvas;
+}
+
+/**
  * Extract and preprocess a frame from video at given time.
  * @param {HTMLVideoElement} video
  * @param {HTMLCanvasElement} canvas
@@ -458,8 +528,9 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       // Run OCR based on scan mode
       if (scanMode === 'habitat') {
         // Habitat mode: OCR upper quarter for No./name, full frame for built status
-        const upperCrop = { x: cropRegion.x, y: cropRegion.y, w: cropRegion.w, h: Math.min(25, cropRegion.h) };
-        extractFrame(video, canvas, upperCrop);
+        // OCR upper quarter using green-channel preprocessing (white text on purple banner)
+        const upperCrop = { x: cropRegion.x, y: cropRegion.y, w: cropRegion.w, h: Math.min(15, cropRegion.h) };
+        extractFrameGreenChannel(video, canvas, upperCrop);
         const { data: upperData } = await worker.recognize(canvas);
 
         // OCR the bottom half of the frame for the "haven't discovered" text
