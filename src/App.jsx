@@ -1,7 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import LandingPage from './components/LandingPage';
 import VideoScanner from './components/VideoScanner';
 import ScanResults from './components/ScanResults';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsConditions from './components/TermsConditions';
+import CookieConsent from './components/CookieConsent';
 import { mergeResults } from './utils/ocrEngine.js';
 import AdBanner from './components/AdBanner';
 import './App.css';
@@ -10,6 +13,8 @@ const PAGES = {
   LANDING: 'landing',
   SCANNING: 'scanning',
   RESULTS: 'results',
+  PRIVACY: 'privacy',
+  TERMS: 'terms',
 };
 
 export default function App() {
@@ -17,6 +22,9 @@ export default function App() {
   const [videoFile, setVideoFile] = useState(null);
   const [settings, setSettings] = useState(null);
   const [scanResults, setScanResults] = useState(null);
+
+  // Ref to allow footer "Cookie Settings" link to re-open the consent banner
+  const cookieSettingsRef = useRef(null);
 
   const handleStartScan = useCallback((file, scanSettings) => {
     setVideoFile(file);
@@ -26,7 +34,6 @@ export default function App() {
 
   const handleScanComplete = useCallback((results) => {
     if (scanResults) {
-      // Merge with existing results
       setScanResults(mergeResults(scanResults, results));
     } else {
       setScanResults(results);
@@ -55,9 +62,19 @@ export default function App() {
     setPage(PAGES.LANDING);
   }, []);
 
+  const handleBackToScanner = useCallback(() => {
+    setPage(PAGES.LANDING);
+  }, []);
+
+  const handleOpenCookieSettings = useCallback(() => {
+    if (cookieSettingsRef.current) {
+      cookieSettingsRef.current();
+    }
+  }, []);
+
   return (
     <div className="app">
-      {/* Header - shown on scanning and results pages */}
+      {/* Header - shown on scanning, results, and legal pages */}
       {page !== PAGES.LANDING && (
         <header className="app__header">
           <div className="app__header-inner">
@@ -106,12 +123,30 @@ export default function App() {
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />
           </>
         )}
+
+        {page === PAGES.PRIVACY && (
+          <PrivacyPolicy onBack={handleBackToScanner} />
+        )}
+
+        {page === PAGES.TERMS && (
+          <TermsConditions onBack={handleBackToScanner} />
+        )}
       </main>
 
       {/* Footer */}
       <footer className="app__footer">
         <p>Pokopia Progress Scanner &mdash; Track your Pok\u00e9mon Pokopia collection</p>
+        <nav className="app__footer-links">
+          <button className="app__footer-link" onClick={() => setPage(PAGES.PRIVACY)}>Privacy Policy</button>
+          <span className="app__footer-sep">|</span>
+          <button className="app__footer-link" onClick={() => setPage(PAGES.TERMS)}>Terms &amp; Conditions</button>
+          <span className="app__footer-sep">|</span>
+          <button className="app__footer-link" onClick={handleOpenCookieSettings}>Cookie Settings</button>
+        </nav>
       </footer>
+
+      {/* Cookie Consent Banner */}
+      <CookieConsent onOpenSettings={cookieSettingsRef} />
     </div>
   );
 }

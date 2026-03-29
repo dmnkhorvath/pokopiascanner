@@ -1,12 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { hasConsent } from './CookieConsent';
 import './AdBanner.css';
 
 export default function AdBanner({ adSlot, position = 'top', format = 'horizontal' }) {
   const adRef = useRef(null);
   const adClient = import.meta.env.VITE_ADSENSE_CLIENT;
+  const [consentGiven, setConsentGiven] = useState(hasConsent());
+
+  // Listen for consent changes so ads appear/disappear without page reload
+  useEffect(() => {
+    const handler = () => setConsentGiven(hasConsent());
+    window.addEventListener('cookie-consent-changed', handler);
+    return () => window.removeEventListener('cookie-consent-changed', handler);
+  }, []);
 
   useEffect(() => {
-    if (!adClient || !adSlot) return;
+    if (!consentGiven || !adClient || !adSlot) return;
     try {
       if (adRef.current && adRef.current.childNodes.length === 0) {
         const ins = document.createElement('ins');
@@ -22,9 +31,9 @@ export default function AdBanner({ adSlot, position = 'top', format = 'horizonta
     } catch (e) {
       console.warn('AdSense error:', e);
     }
-  }, [adClient, adSlot, format]);
+  }, [consentGiven, adClient, adSlot, format]);
 
-  if (!adClient || !adSlot) return null;
+  if (!consentGiven || !adClient || !adSlot) return null;
 
   return (
     <div className={`ad-banner ad-banner--${position}`} ref={adRef} />
