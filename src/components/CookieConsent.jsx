@@ -16,25 +16,19 @@ export function hasConsent() {
 }
 
 /**
- * Dynamically injects the Google Analytics gtag.js script and
- * initialises the default dataLayer + config call.
+ * Updates Google Consent Mode v2 to grant all storage types.
+ * GA script is already loaded in index.html with defaults set to 'denied'.
+ * This function flips consent to 'granted' so GA starts collecting data.
  */
-function loadGoogleAnalytics() {
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
-  if (!measurementId) return;
-
-  // Prevent double-loading
-  if (document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${measurementId}"]`)) return;
-
-  const script = document.createElement('script');
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-  document.head.appendChild(script);
-
-  window.dataLayer = window.dataLayer || [];
-  function gtag() { window.dataLayer.push(arguments); }
-  gtag('js', new Date());
-  gtag('config', measurementId);
+function grantConsent() {
+  if (typeof gtag === 'function') {
+    gtag('consent', 'update', {
+      'analytics_storage': 'granted',
+      'ad_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted',
+    });
+  }
 }
 
 export default function CookieConsent({ onOpenSettings }) {
@@ -47,8 +41,8 @@ export default function CookieConsent({ onOpenSettings }) {
       if (!pref) {
         setVisible(true);
       } else if (pref === 'accepted') {
-        // Returning visitor who already accepted — load analytics
-        loadGoogleAnalytics();
+        // Returning visitor who already accepted - grant consent
+        grantConsent();
       }
     } catch {
       setVisible(true);
@@ -58,14 +52,13 @@ export default function CookieConsent({ onOpenSettings }) {
   // Allow parent (footer link) to re-open the banner
   useEffect(() => {
     if (onOpenSettings) {
-      // Expose a way to re-show
       onOpenSettings.current = () => setVisible(true);
     }
   }, [onOpenSettings]);
 
   const handleAccept = useCallback(() => {
     try { localStorage.setItem(STORAGE_KEY, 'accepted'); } catch { /* noop */ }
-    loadGoogleAnalytics();
+    grantConsent();
     setVisible(false);
     // Force re-render of ad components by dispatching a custom event
     window.dispatchEvent(new Event('cookie-consent-changed'));
