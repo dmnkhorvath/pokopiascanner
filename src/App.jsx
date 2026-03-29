@@ -4,6 +4,7 @@ import VideoScanner from './components/VideoScanner';
 import ScanResults from './components/ScanResults';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsConditions from './components/TermsConditions';
+import HowToGuide from './components/HowToGuide';
 import CookieConsent from './components/CookieConsent';
 import { mergeResults } from './utils/ocrEngine.js';
 import AdBanner from './components/AdBanner';
@@ -15,17 +16,20 @@ const PAGES = {
   RESULTS: 'results',
   PRIVACY: 'privacy',
   TERMS: 'terms',
+  HOWTO: 'howto',
 };
 
 // Map hash routes to pages
 const HASH_TO_PAGE = {
   '#/privacy': PAGES.PRIVACY,
   '#/terms': PAGES.TERMS,
+  '#/how-to': PAGES.HOWTO,
 };
 
 const PAGE_TO_HASH = {
   [PAGES.PRIVACY]: '#/privacy',
   [PAGES.TERMS]: '#/terms',
+  [PAGES.HOWTO]: '#/how-to',
 };
 
 function getPageFromHash() {
@@ -137,6 +141,7 @@ export default function App() {
             <LandingPage
               onStartScan={handleStartScan}
               onImportResults={handleImportResults}
+              onShowHowTo={() => navigateTo(PAGES.HOWTO)}
             />
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_LANDING_BOTTOM} position="bottom" />
           </>
@@ -167,6 +172,10 @@ export default function App() {
           </>
         )}
 
+        {page === PAGES.HOWTO && (
+          <HowToGuide onBack={handleBackToScanner} />
+        )}
+
         {page === PAGES.PRIVACY && (
           <PrivacyPolicy onBack={handleBackToScanner} />
         )}
@@ -180,6 +189,8 @@ export default function App() {
       <footer className="app__footer">
         <p>Pokopia Progress Scanner &mdash; Track your Pok\u00e9mon Pokopia collection</p>
         <nav className="app__footer-links">
+          <button className="app__footer-link" onClick={() => navigateTo(PAGES.HOWTO)}>How to Use</button>
+          <span className="app__footer-sep">|</span>
           <button className="app__footer-link" onClick={() => navigateTo(PAGES.PRIVACY)}>Privacy Policy</button>
           <span className="app__footer-sep">|</span>
           <button className="app__footer-link" onClick={() => navigateTo(PAGES.TERMS)}>Terms &amp; Conditions</button>

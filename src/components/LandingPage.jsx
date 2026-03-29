@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { DEFAULT_SETTINGS, CROP_PRESETS, SCAN_MODES, detectVideoFPS } from '../utils/ocrEngine.js';
 import './LandingPage.css';
 
-export default function LandingPage({ onStartScan, onImportResults }) {
+export default function LandingPage({ onStartScan, onImportResults, onShowHowTo }) {
   const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS });
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
@@ -347,30 +347,19 @@ export default function LandingPage({ onStartScan, onImportResults }) {
           />
         </div>
 
-        {/* Instructions */}
-        <section className="landing__section landing__instructions">
-          <h2 className="section__title">{"\uD83D\uDCD6"} How It Works</h2>
-          <div className="instructions-grid">
-            <div className="instruction">
-              <span className="instruction__number">1</span>
-              <h3>Record Your Screen</h3>
-              <p>Use the Nintendo Switch capture button to record a video while scrolling through your Pokopia inventory, Pok\u00e9dex, habitats, or recipe list.</p>
+        {/* How To Guide Teaser */}
+        <section className="landing__section landing__howto-teaser">
+          <div className="howto-teaser">
+            <span className="howto-teaser__icon">{"\uD83D\uDCD6"}</span>
+            <div className="howto-teaser__text">
+              <h2 className="howto-teaser__title">New here? Learn how to scan in 5 easy steps</h2>
+              <p className="howto-teaser__desc">
+                Record a video on your Nintendo Switch, transfer it to your device, and let the scanner do the rest.
+              </p>
             </div>
-            <div className="instruction">
-              <span className="instruction__number">2</span>
-              <h3>Upload the Video</h3>
-              <p>Transfer the video to your device and upload it here. Supports MP4, MOV, WebM, and other common formats.</p>
-            </div>
-            <div className="instruction">
-              <span className="instruction__number">3</span>
-              <h3>Scan & Detect</h3>
-              <p>The scanner extracts frames, processes them with OCR, and matches detected text against the complete Pokopia database.</p>
-            </div>
-            <div className="instruction">
-              <span className="instruction__number">4</span>
-              <h3>Track Progress</h3>
-              <p>View your collection progress across all categories. Export results as JSON to save or share your progress.</p>
-            </div>
+            <button className="btn btn--outline howto-teaser__btn" onClick={onShowHowTo}>
+              {"\uD83D\uDC49"} How to Use
+            </button>
           </div>
         </section>
       </div>

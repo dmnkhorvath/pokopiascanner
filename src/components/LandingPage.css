@@ -436,3 +436,77 @@
     font-size: 0.75rem;
   }
 }
+
+/* How-To Guide Teaser */
+.howto-teaser {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: linear-gradient(135deg, #1e2a3a, #243447);
+  border: 1px solid rgba(232, 119, 46, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.howto-teaser:hover {
+  border-color: rgba(232, 119, 46, 0.6);
+  box-shadow: 0 4px 20px rgba(232, 119, 46, 0.1);
+}
+
+.howto-teaser__icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.howto-teaser__text {
+  flex: 1;
+}
+
+.howto-teaser__title {
+  font-size: 1.15rem;
+  color: #fff;
+  margin: 0 0 0.35rem;
+}
+
+.howto-teaser__desc {
+  color: #b0b8c8;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.howto-teaser__btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.btn--outline {
+  background: transparent;
+  color: #e8772e;
+  border: 2px solid #e8772e;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.btn--outline:hover {
+  background: #e8772e;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .howto-teaser {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .howto-teaser__btn {
+    width: 100%;
+  }
+}
