@@ -21,6 +21,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          VITE_ADSENSE_CLIENT: ${{ secrets.VITE_ADSENSE_CLIENT }}
+          VITE_AD_SLOT_LANDING_TOP: ${{ secrets.VITE_AD_SLOT_LANDING_TOP }}
+          VITE_AD_SLOT_LANDING_BOTTOM: ${{ secrets.VITE_AD_SLOT_LANDING_BOTTOM }}
+          VITE_AD_SLOT_SCANNER_TOP: ${{ secrets.VITE_AD_SLOT_SCANNER_TOP }}
+          VITE_AD_SLOT_SCANNER_BOTTOM: ${{ secrets.VITE_AD_SLOT_SCANNER_BOTTOM }}
+          VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
