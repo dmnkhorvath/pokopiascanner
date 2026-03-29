@@ -23,7 +23,7 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [builtFilter, setBuiltFilter] = useState('all'); // 'all', 'built', 'notbuilt'
-  const [capturedFilter, setCapturedFilter] = useState('all'); // 'all', 'captured', 'uncaptured'
+  const [capturedFilter, setCapturedFilter] = useState('all'); // 'all', 'captured', 'sensed'
   const [copySuccess, setCopySuccess] = useState(false);
 
   const categories = useMemo(() => ({
@@ -276,9 +276,9 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
                 onClick={() => setCapturedFilter('captured')}
               >✅ Captured</button>
               <button
-                className={`results__built-btn ${capturedFilter === 'uncaptured' ? 'results__built-btn--active' : ''}`}
-                onClick={() => setCapturedFilter('uncaptured')}
-              >❌ Uncaptured</button>
+                className={`results__built-btn ${capturedFilter === 'sensed' ? 'results__built-btn--active' : ''}`}
+                onClick={() => setCapturedFilter('sensed')}
+              >👁️ Sensed</button>
             </div>
           )}
 
@@ -324,7 +324,7 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               )}
               {item._category === 'pokemon' && item.captured != null && (
                 <span className={`results__item-built ${item.captured ? 'results__item-built--yes' : 'results__item-built--no'}`}>
-                  {item.captured ? '✅ Captured' : '❌ Uncaptured'}
+                  {item.captured ? '✅ Captured' : '👁️ Sensed'}
                 </span>
               )}
               <span

@@ -361,9 +361,9 @@ export function matchHabitatFrame(fullText, upperText, fuzzyTolerance = 2) {
  * look up the Pokémon by number. Works across all banner colors because
  * the brightness threshold (grayscale >200) isolates white text universally.
  *
- * Captured vs uncaptured: "???" in the game OCRs as "PPP", repeated chars,
+ * Captured vs sensed: "???" in the game OCRs as "PPP", repeated chars,
  * or question marks. If the name line matches such a pattern, the Pokémon
- * is marked as uncaptured.
+ * is marked as sensed.
  *
  * @param {string} bannerText - Banner OCR text (number + name area)
  * @param {number} fuzzyTolerance - Max Levenshtein distance (fallback only)
@@ -379,7 +379,7 @@ export function matchPokemonFrame(bannerText, fuzzyTolerance = 2) {
     const entry = pokemonByNumber[pokemonNumber];
     if (entry) {
       // Determine captured status from the name portion of the banner
-      const captured = !isUncapturedPokemon(bannerText, noMatch[0]);
+      const captured = !isSensedPokemon(bannerText, noMatch[0]);
       return {
         name: entry.name,
         number: entry.number,
@@ -406,19 +406,19 @@ export function matchPokemonFrame(bannerText, fuzzyTolerance = 2) {
 }
 
 /**
- * Check if the banner text indicates an uncaptured Pokémon.
- * In-game, uncaptured Pokémon show "???" as their name, which Tesseract
+ * Check if the banner text indicates a sensed Pokémon.
+ * In-game, sensed Pokémon show "???" as their name, which Tesseract
  * reads as "PPP", "???", "PRP", or similar repeated-character patterns.
  * @param {string} bannerText - Full banner OCR text
  * @param {string} numberMatch - The matched "No. XXX" string to exclude
  * @returns {boolean}
  */
-function isUncapturedPokemon(bannerText, numberMatch) {
+function isSensedPokemon(bannerText, numberMatch) {
   // Get the text after the number line (the name portion)
   const lines = bannerText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
   const nameLines = lines.filter(l => !l.includes(numberMatch) && !/^No\.?\s*\d/i.test(l));
 
-  if (nameLines.length === 0) return true; // no name visible = uncaptured
+  if (nameLines.length === 0) return true; // no name visible = sensed
 
   for (const line of nameLines) {
     const cleaned = line.replace(/[\s.,:;!]/g, '');
@@ -924,7 +924,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     message: scanMode === 'habitat'
       ? `Scan complete! Found ${finalResults.habitats.found} habitats (${finalResults.habitats.items.filter(h => h.built).length} built, ${finalResults.habitats.items.filter(h => !h.built).length} not built). ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
       : scanMode === 'pokemon'
-      ? `Scan complete! Found ${finalResults.pokemon.found} Pokémon (${finalResults.pokemon.items.filter(p => p.captured).length} captured, ${finalResults.pokemon.items.filter(p => !p.captured).length} uncaptured). ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
+      ? `Scan complete! Found ${finalResults.pokemon.found} Pokémon (${finalResults.pokemon.items.filter(p => p.captured).length} captured, ${finalResults.pokemon.items.filter(p => !p.captured).length} sensed). ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
       : `Scan complete! Found ${finalResults.totalFound} items. ${poolSize} workers${mobile ? ' (mobile)' : ''}.`,
   });
 

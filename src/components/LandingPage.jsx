@@ -166,7 +166,7 @@ export default function LandingPage({ onStartScan, onImportResults }) {
               )}
               {settings.scanMode === 'pokemon' && (
                 <div className="setting__fps-info">
-                  <span className="setting__fps-hint">🔴 Pokémon mode scans the banner for "No. XXX" and detects captured vs uncaptured status. Works with all banner colors.</span>
+                  <span className="setting__fps-hint">🔴 Pokémon mode scans the banner for "No. XXX" and detects captured vs sensed status. Works with all banner colors.</span>
                 </div>
               )}
             </div>
