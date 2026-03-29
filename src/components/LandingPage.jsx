@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { DEFAULT_SETTINGS, CROP_PRESETS } from '../utils/ocrEngine.js';
+import { DEFAULT_SETTINGS, CROP_PRESETS, detectVideoFPS } from '../utils/ocrEngine.js';
 import './LandingPage.css';
 
 export default function LandingPage({ onStartScan, onImportResults }) {
@@ -7,13 +7,29 @@ export default function LandingPage({ onStartScan, onImportResults }) {
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+  const [detectedFPS, setDetectedFPS] = useState(null);
+  const [detectingFPS, setDetectingFPS] = useState(false);
   const fileInputRef = useRef(null);
   const importInputRef = useRef(null);
 
-  const handleFileSelect = (file) => {
+  const handleFileSelect = async (file) => {
     if (file && file.type.startsWith('video/')) {
       setVideoFile(file);
       setVideoPreview(URL.createObjectURL(file));
+      setDetectedFPS(null);
+
+      // Auto-detect FPS if enabled
+      if (settings.autoDetectFPS) {
+        setDetectingFPS(true);
+        try {
+          const fpsInfo = await detectVideoFPS(file);
+          setDetectedFPS(fpsInfo);
+        } catch {
+          setDetectedFPS({ fps: 30, frameIntervalMs: 33, detected: false });
+        } finally {
+          setDetectingFPS(false);
+        }
+      }
     }
   };
 
@@ -123,21 +139,69 @@ export default function LandingPage({ onStartScan, onImportResults }) {
         <section className="landing__section">
           <h2 className="section__title">{"\u2699\uFE0F"} Scanner Settings</h2>
           <div className="settings-grid">
-            <div className="setting">
+            <div className="setting setting--full">
               <label className="setting__label">
-                Frame Interval (ms)
-                <span className="setting__hint">Extract a frame every N milliseconds (20ms = 50fps)</span>
+                Frame Rate
+                <span className="setting__hint">How frames are extracted from the video</span>
               </label>
-              <input
-                type="range"
-                min="10"
-                max="500"
-                value={settings.frameIntervalMs}
-                onChange={(e) => updateSetting('frameIntervalMs', Number(e.target.value))}
-                step="10"
-                className="setting__range"
-              />
-              <span className="setting__value">{settings.frameIntervalMs}ms</span>
+              <div className="setting__toggle-row">
+                <button
+                  className={`setting__preset-btn ${settings.autoDetectFPS ? 'setting__preset-btn--active' : ''}`}
+                  onClick={() => {
+                    updateSetting('autoDetectFPS', true);
+                    updateSetting('frameIntervalMs', 0);
+                    if (videoFile && !detectedFPS) {
+                      setDetectingFPS(true);
+                      detectVideoFPS(videoFile)
+                        .then(info => setDetectedFPS(info))
+                        .catch(() => setDetectedFPS({ fps: 30, frameIntervalMs: 33, detected: false }))
+                        .finally(() => setDetectingFPS(false));
+                    }
+                  }}
+                >
+                  🎬 Auto-detect FPS
+                </button>
+                <button
+                  className={`setting__preset-btn ${!settings.autoDetectFPS ? 'setting__preset-btn--active' : ''}`}
+                  onClick={() => {
+                    updateSetting('autoDetectFPS', false);
+                    updateSetting('frameIntervalMs', detectedFPS?.frameIntervalMs || 33);
+                  }}
+                >
+                  ✏️ Manual
+                </button>
+              </div>
+              {settings.autoDetectFPS && (
+                <div className="setting__fps-info">
+                  {detectingFPS ? (
+                    <span className="setting__fps-detecting">⏳ Detecting video framerate...</span>
+                  ) : detectedFPS ? (
+                    <span className={`setting__fps-result ${detectedFPS.detected ? 'setting__fps-result--ok' : 'setting__fps-result--fallback'}`}>
+                      {detectedFPS.detected
+                        ? `✅ Detected: ${detectedFPS.fps} FPS (${detectedFPS.frameIntervalMs}ms per frame)`
+                        : `⚠️ Browser doesn’t support detection — will use ${detectedFPS.fps} FPS fallback`}
+                    </span>
+                  ) : (
+                    <span className="setting__fps-hint">📎 Upload a video to detect its framerate</span>
+                  )}
+                </div>
+              )}
+              {!settings.autoDetectFPS && (
+                <div className="setting__manual-fps">
+                  <input
+                    type="range"
+                    min="10"
+                    max="500"
+                    value={settings.frameIntervalMs || 33}
+                    onChange={(e) => updateSetting('frameIntervalMs', Number(e.target.value))}
+                    step="10"
+                    className="setting__range"
+                  />
+                  <span className="setting__value">
+                    {settings.frameIntervalMs || 33}ms ({Math.round(1000 / (settings.frameIntervalMs || 33))} FPS)
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="setting">

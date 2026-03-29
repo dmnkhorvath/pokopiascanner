@@ -345,3 +345,54 @@
     justify-content: center;
   }
 }
+
+/* FPS Detection UI */
+.setting__toggle-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.setting__fps-info {
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.setting__fps-detecting {
+  color: #f0a030;
+  font-size: 0.9rem;
+}
+
+.setting__fps-result {
+  font-size: 0.9rem;
+}
+
+.setting__fps-result--ok {
+  color: #4caf50;
+}
+
+.setting__fps-result--fallback {
+  color: #f0a030;
+}
+
+.setting__fps-hint {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.setting__manual-fps {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.setting__manual-fps .setting__range {
+  flex: 1;
+}
+
+.setting__manual-fps .setting__value {
+  min-width: 120px;
+  text-align: right;
+}

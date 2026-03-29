@@ -25,13 +25,96 @@ export const CROP_PRESETS = {
  * Default scanner settings
  */
 export const DEFAULT_SETTINGS = {
-  frameIntervalMs: 20,    // Extract a frame every N milliseconds (20ms = 50fps)
+  frameIntervalMs: 0,     // 0 = auto-detect from video FPS
+  autoDetectFPS: true,    // Automatically detect video framerate
   processingDelay: 0,     // Delay between OCR processing (0 for max speed)
   cropPreset: 'auto',
   customCrop: { x: 0, y: 0, w: 100, h: 100 },
   confidenceThreshold: 40,
   fuzzyTolerance: 2,
 };
+
+/**
+ * Detect the native framerate of a video file using requestVideoFrameCallback.
+ * Plays a short segment and measures frame intervals.
+ * @param {File} videoFile - The video file to analyze
+ * @param {number} sampleDurationMs - How long to sample (default 2000ms)
+ * @returns {Promise<{fps: number, frameIntervalMs: number}>}
+ */
+export async function detectVideoFPS(videoFile, sampleDurationMs = 2000) {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.playsInline = true;
+    const url = URL.createObjectURL(videoFile);
+    video.src = url;
+
+    video.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Failed to load video for FPS detection'));
+    };
+
+    video.onloadedmetadata = () => {
+      // Fallback if requestVideoFrameCallback is not supported
+      if (!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) {
+        URL.revokeObjectURL(url);
+        // Default assumption: 30fps
+        resolve({ fps: 30, frameIntervalMs: 33, detected: false });
+        return;
+      }
+
+      const frameTimes = [];
+      let startTime = null;
+      let callbackId = null;
+
+      const onFrame = (now, metadata) => {
+        if (startTime === null) startTime = now;
+        frameTimes.push(metadata.mediaTime);
+
+        if (now - startTime < sampleDurationMs) {
+          callbackId = video.requestVideoFrameCallback(onFrame);
+        } else {
+          video.pause();
+          URL.revokeObjectURL(url);
+
+          if (frameTimes.length < 3) {
+            // Not enough frames sampled, fallback
+            resolve({ fps: 30, frameIntervalMs: 33, detected: false });
+            return;
+          }
+
+          // Calculate intervals between consecutive frames
+          const intervals = [];
+          for (let i = 1; i < frameTimes.length; i++) {
+            const diff = frameTimes[i] - frameTimes[i - 1];
+            if (diff > 0) intervals.push(diff);
+          }
+
+          if (intervals.length === 0) {
+            resolve({ fps: 30, frameIntervalMs: 33, detected: false });
+            return;
+          }
+
+          // Use median interval for robustness
+          intervals.sort((a, b) => a - b);
+          const medianInterval = intervals[Math.floor(intervals.length / 2)];
+          const fps = Math.round(1 / medianInterval);
+          const frameIntervalMs = Math.round(medianInterval * 1000);
+
+          resolve({ fps, frameIntervalMs, detected: true });
+        }
+      };
+
+      video.oncanplay = () => {
+        callbackId = video.requestVideoFrameCallback(onFrame);
+        video.play().catch(() => {
+          URL.revokeObjectURL(url);
+          resolve({ fps: 30, frameIntervalMs: 33, detected: false });
+        });
+      };
+    };
+  });
+}
 
 /**
  * Apply median filter to remove artifacts from image data.
@@ -161,8 +244,9 @@ export function matchText(text, fuzzyTolerance = 2) {
  * @returns {Promise<Object>} Final scan results
  */
 export async function scanVideo(videoFile, settings, onProgress, onMatch, signal) {
-  const {
-    frameIntervalMs = 20,
+  let {
+    frameIntervalMs = 0,
+    autoDetectFPS = true,
     processingDelay = 0,
     cropPreset = 'auto',
     customCrop = { x: 0, y: 0, w: 100, h: 100 },
@@ -198,7 +282,42 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   });
 
   const duration = video.duration;
-  const frameIntervalSec = frameIntervalMs / 1000; // Convert ms to seconds
+
+  // Auto-detect FPS if enabled
+  if (autoDetectFPS && frameIntervalMs === 0) {
+    onProgress({
+      phase: 'detecting',
+      current: 0,
+      total: 0,
+      percent: 0,
+      message: 'Detecting video framerate...',
+    });
+    try {
+      const fpsInfo = await detectVideoFPS(videoFile);
+      frameIntervalMs = fpsInfo.frameIntervalMs;
+      onProgress({
+        phase: 'detecting',
+        current: 0,
+        total: 0,
+        percent: 0,
+        message: fpsInfo.detected
+          ? `Detected ${fpsInfo.fps} FPS (${fpsInfo.frameIntervalMs}ms per frame)`
+          : `Could not detect FPS, using fallback ${fpsInfo.fps} FPS`,
+      });
+    } catch {
+      // Fallback to 30fps
+      frameIntervalMs = 33;
+      onProgress({
+        phase: 'detecting',
+        current: 0,
+        total: 0,
+        percent: 0,
+        message: 'FPS detection failed, using 30 FPS fallback',
+      });
+    }
+  }
+
+  const frameIntervalSec = frameIntervalMs / 1000;
   const framesToProcess = Math.floor(duration / frameIntervalSec);
 
   onProgress({
