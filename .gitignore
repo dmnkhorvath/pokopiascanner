@@ -25,3 +25,4 @@ dist-ssr
 .a0proj/
 test_ocr/
 tmp_pokedex_frames/
+.env

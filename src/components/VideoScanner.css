@@ -212,3 +212,27 @@
     text-align: center;
   }
 }
+
+@media (max-width: 480px) {
+  .scanner {
+    padding: 0.5rem;
+  }
+
+  .scanner__header h2 {
+    font-size: 1.1rem;
+  }
+
+  .scanner__preview canvas,
+  .scanner__preview video {
+    max-height: 200px;
+  }
+
+  .scanner__stats {
+    font-size: 0.75rem;
+  }
+
+  .scanner__detection-item {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.5rem;
+  }
+}

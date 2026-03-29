@@ -396,3 +396,43 @@
   min-width: 120px;
   text-align: right;
 }
+
+@media (max-width: 480px) {
+  .landing__hero {
+    padding: 1.5rem 0.75rem 1rem;
+  }
+
+  .landing__title {
+    font-size: 1.3rem;
+  }
+
+  .landing__subtitle {
+    font-size: 0.85rem;
+  }
+
+  .landing__drop-zone {
+    padding: 1.5rem 1rem;
+  }
+
+  .setting__label {
+    font-size: 0.8rem;
+  }
+
+  .setting__preset-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .btn {
+    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .setting__scan-modes {
+    flex-wrap: wrap;
+  }
+
+  .setting__fps-hint {
+    font-size: 0.75rem;
+  }
+}

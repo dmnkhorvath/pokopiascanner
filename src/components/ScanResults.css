@@ -353,3 +353,22 @@
 .setting__scan-modes {
   flex-wrap: wrap;
 }
+
+@media (max-width: 360px) {
+  .results {
+    padding: 0.25rem;
+  }
+
+  .results__header h2 {
+    font-size: 1rem;
+  }
+
+  .results__search {
+    font-size: 0.8rem;
+  }
+
+  .results__tab {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.5rem;
+  }
+}

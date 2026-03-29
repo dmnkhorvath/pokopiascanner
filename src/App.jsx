@@ -3,6 +3,7 @@ import LandingPage from './components/LandingPage';
 import VideoScanner from './components/VideoScanner';
 import ScanResults from './components/ScanResults';
 import { mergeResults } from './utils/ocrEngine.js';
+import AdBanner from './components/AdBanner';
 import './App.css';
 
 const PAGES = {
@@ -71,27 +72,39 @@ export default function App() {
       {/* Main Content */}
       <main className="app__main">
         {page === PAGES.LANDING && (
-          <LandingPage
-            onStartScan={handleStartScan}
-            onImportResults={handleImportResults}
-          />
+          <>
+            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_LANDING_TOP} position="top" />
+            <LandingPage
+              onStartScan={handleStartScan}
+              onImportResults={handleImportResults}
+            />
+            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_LANDING_BOTTOM} position="bottom" />
+          </>
         )}
 
         {page === PAGES.SCANNING && videoFile && settings && (
-          <VideoScanner
-            videoFile={videoFile}
-            settings={settings}
-            onScanComplete={handleScanComplete}
-            onCancel={handleCancelScan}
-          />
+          <>
+            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_TOP} position="top" />
+            <VideoScanner
+              videoFile={videoFile}
+              settings={settings}
+              onScanComplete={handleScanComplete}
+              onCancel={handleCancelScan}
+            />
+            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />
+          </>
         )}
 
         {page === PAGES.RESULTS && (
-          <ScanResults
-            results={scanResults}
-            onNewScan={handleNewScan}
-            onImportResults={handleImportResults}
-          />
+          <>
+            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_TOP} position="top" />
+            <ScanResults
+              results={scanResults}
+              onNewScan={handleNewScan}
+              onImportResults={handleImportResults}
+            />
+            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />
+          </>
         )}
       </main>
 
