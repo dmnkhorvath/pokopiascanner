@@ -18,6 +18,16 @@ for (const [name, entry] of Object.entries(ocrLookup)) {
   }
 }
 
+// Pre-build Pokémon number → entry lookup for reliable number-based matching.
+// ocrLookup stores Pokémon numbers as '#001' format; we strip the '#' for lookup.
+const pokemonByNumber = {};
+for (const [name, entry] of Object.entries(ocrLookup)) {
+  if (entry.type === 'pokemon' && entry.number) {
+    const num = entry.number.replace('#', '');
+    pokemonByNumber[num] = { ...entry, name };
+  }
+}
+
 /**
  * Crop presets for different UI layouts
  */
@@ -345,6 +355,87 @@ export function matchHabitatFrame(fullText, upperText, fuzzyTolerance = 2) {
 }
 
 /**
+ * Pokémon-specific frame analysis using number-based matching.
+ *
+ * Primary strategy: extract "No. XXX" from the banner OCR text and
+ * look up the Pokémon by number. Works across all banner colors because
+ * the brightness threshold (grayscale >200) isolates white text universally.
+ *
+ * Captured vs uncaptured: "???" in the game OCRs as "PPP", repeated chars,
+ * or question marks. If the name line matches such a pattern, the Pokémon
+ * is marked as uncaptured.
+ *
+ * @param {string} bannerText - Banner OCR text (number + name area)
+ * @param {number} fuzzyTolerance - Max Levenshtein distance (fallback only)
+ * @returns {Object|null} { name, number, type, captured } or null
+ */
+export function matchPokemonFrame(bannerText, fuzzyTolerance = 2) {
+  const flatText = bannerText.replace(/\n/g, ' ');
+
+  // Primary: extract "No. XXX" and look up by number
+  const noMatch = flatText.match(/No\.?\s*(\d{1,3})/i);
+  if (noMatch) {
+    const pokemonNumber = noMatch[1].padStart(3, '0');
+    const entry = pokemonByNumber[pokemonNumber];
+    if (entry) {
+      // Determine captured status from the name portion of the banner
+      const captured = !isUncapturedPokemon(bannerText, noMatch[0]);
+      return {
+        name: entry.name,
+        number: entry.number,
+        type: 'pokemon',
+        captured,
+      };
+    }
+  }
+
+  // Fallback: try fuzzy name matching on individual lines
+  const lines = bannerText.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+  for (const line of lines) {
+    if (/No\.?\s*\d/i.test(line)) continue; // skip number lines
+    const result = matcher.findMatch(line, fuzzyTolerance);
+    if (result && result.type === 'pokemon') {
+      return {
+        ...result,
+        captured: true, // if fuzzy matched a real name, it's captured
+      };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Check if the banner text indicates an uncaptured Pokémon.
+ * In-game, uncaptured Pokémon show "???" as their name, which Tesseract
+ * reads as "PPP", "???", "PRP", or similar repeated-character patterns.
+ * @param {string} bannerText - Full banner OCR text
+ * @param {string} numberMatch - The matched "No. XXX" string to exclude
+ * @returns {boolean}
+ */
+function isUncapturedPokemon(bannerText, numberMatch) {
+  // Get the text after the number line (the name portion)
+  const lines = bannerText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const nameLines = lines.filter(l => !l.includes(numberMatch) && !/^No\.?\s*\d/i.test(l));
+
+  if (nameLines.length === 0) return true; // no name visible = uncaptured
+
+  for (const line of nameLines) {
+    const cleaned = line.replace(/[\s.,:;!]/g, '');
+    if (cleaned.length === 0) continue;
+
+    // Check for ??? patterns (direct or OCR variants)
+    if (/^[?]{2,}$/.test(cleaned)) return true;
+    // PPP, PRP, and similar repeated-char OCR artifacts from ???
+    if (/^[P?Rr]{2,}$/.test(cleaned)) return true;
+    // Very short gibberish that doesn't match any real name
+    if (cleaned.length <= 3 && /^[^a-zA-Z]*$/.test(cleaned)) return true;
+  }
+
+  return false;
+}
+
+/**
  * Check if the frame text indicates an undiscovered habitat.
  * @param {string} text - Full frame OCR text
  * @returns {boolean}
@@ -463,6 +554,34 @@ function extractFrameToCanvas(video, cropRegion, mode = 'standard') {
     let imageData = ctx.getImageData(0, 0, sw, sh);
     imageData = extractGreenChannel(imageData, 200);
     ctx.putImageData(imageData, 0, 0);
+
+    // Upscale 3x for better OCR on small text
+    const upW = sw * 3;
+    const upH = sh * 3;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = upW;
+    tempCanvas.height = upH;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.imageSmoothingEnabled = false;
+    tempCtx.drawImage(canvas, 0, 0, sw, sh, 0, 0, upW, upH);
+    canvas.width = upW;
+    canvas.height = upH;
+    ctx.drawImage(tempCanvas, 0, 0);
+  } else if (mode === 'brightness') {
+    // Grayscale threshold >200 — works for white text on ANY colored banner.
+    // Used for Pokémon banners where colors vary per type.
+    let imageData = ctx.getImageData(0, 0, sw, sh);
+    const { data, width, height } = imageData;
+    const output = new Uint8ClampedArray(data.length);
+    for (let i = 0; i < data.length; i += 4) {
+      const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+      const bw = gray > 200 ? 255 : 0;
+      output[i] = bw;
+      output[i + 1] = bw;
+      output[i + 2] = bw;
+      output[i + 3] = 255;
+    }
+    ctx.putImageData(new ImageData(output, width, height), 0, 0);
 
     // Upscale 3x for better OCR on small text
     const upW = sw * 3;
@@ -625,6 +744,23 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
           }
         }
       }
+    } else if (scanMode === 'pokemon') {
+      const { data: bannerData } = await worker.recognize(job.canvases.banner);
+
+      if (bannerData.confidence >= confidenceThreshold && bannerData.text.trim()) {
+        const pokemon = matchPokemonFrame(bannerData.text, fuzzyTolerance);
+        if (pokemon && !results.pokemon.has(pokemon.name)) {
+          results.pokemon.set(pokemon.name, pokemon);
+          onMatch({ items: [pokemon], frameIndex: job.index });
+          await yieldToBrowser();
+        } else if (pokemon && results.pokemon.has(pokemon.name)) {
+          // Update captured status if we see a captured version later
+          const existing = results.pokemon.get(pokemon.name);
+          if (!existing.captured && pokemon.captured) {
+            results.pokemon.set(pokemon.name, pokemon);
+          }
+        }
+      }
     } else {
       const { data } = await worker.recognize(job.canvases.full);
 
@@ -714,6 +850,11 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
         job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'green');
         const bottomCrop = { x: cropRegion.x, y: 50, w: cropRegion.w, h: 50 };
         job.canvases.bottom = extractFrameToCanvas(video, bottomCrop, 'standard');
+      } else if (scanMode === 'pokemon') {
+        // Crop center banner: 20-55% width, 0-12% height
+        // Uses brightness threshold (grayscale >200) — works for all banner colors
+        const bannerCrop = { x: 20, y: 0, w: 35, h: 12 };
+        job.canvases.banner = extractFrameToCanvas(video, bannerCrop, 'brightness');
       } else {
         job.canvases.full = extractFrameToCanvas(video, cropRegion, 'standard');
       }
@@ -782,6 +923,8 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     percent: 100,
     message: scanMode === 'habitat'
       ? `Scan complete! Found ${finalResults.habitats.found} habitats (${finalResults.habitats.items.filter(h => h.built).length} built, ${finalResults.habitats.items.filter(h => !h.built).length} not built). ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
+      : scanMode === 'pokemon'
+      ? `Scan complete! Found ${finalResults.pokemon.found} Pokémon (${finalResults.pokemon.items.filter(p => p.captured).length} captured, ${finalResults.pokemon.items.filter(p => !p.captured).length} uncaptured). ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
       : `Scan complete! Found ${finalResults.totalFound} items. ${poolSize} workers${mobile ? ' (mobile)' : ''}.`,
   });
 

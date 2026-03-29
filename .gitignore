@@ -24,3 +24,4 @@ dist-ssr
 *.sw?
 .a0proj/
 test_ocr/
+tmp_pokedex_frames/

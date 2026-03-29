@@ -23,6 +23,7 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [builtFilter, setBuiltFilter] = useState('all'); // 'all', 'built', 'notbuilt'
+  const [capturedFilter, setCapturedFilter] = useState('all'); // 'all', 'captured', 'uncaptured'
   const [copySuccess, setCopySuccess] = useState(false);
 
   const categories = useMemo(() => ({
@@ -65,8 +66,16 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       });
     }
 
+    // Apply captured filter for pokemon
+    if (capturedFilter !== 'all') {
+      items = items.filter(item => {
+        if (item._category !== 'pokemon') return true;
+        return capturedFilter === 'captured' ? item.captured === true : item.captured === false;
+      });
+    }
+
     return items;
-  }, [activeTab, categories, searchQuery, builtFilter]);
+  }, [activeTab, categories, searchQuery, builtFilter, capturedFilter]);
 
   const handleExport = () => {
     const exportData = {
@@ -75,7 +84,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       pokemon: {
         found: categories.pokemon.found,
         total: categories.pokemon.total,
-        items: categories.pokemon.items.map(i => i.name || i),
+        items: categories.pokemon.items.map(i => ({
+          name: i.name || i,
+          number: i.number || null,
+          captured: i.captured != null ? i.captured : null,
+        })),
       },
       items: {
         found: categories.items.found,
@@ -200,6 +213,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               {tab.key !== 'all' && (
                 <span className="results__tab-count">
                   {categories[tab.key]?.found || 0}
+                  {tab.key === 'pokemon' && categories.pokemon.items.some(p => p.captured != null) && (
+                    <span className="results__tab-built-count">
+                      {' '}({categories.pokemon.items.filter(p => p.captured).length}✅)
+                    </span>
+                  )}
                   {tab.key === 'habitats' && categories.habitats.items.some(h => h.built != null) && (
                     <span className="results__tab-built-count">
                       {' '}({categories.habitats.items.filter(h => h.built).length}✅)
@@ -247,6 +265,23 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
             </div>
           )}
 
+          {(activeTab === 'pokemon' || activeTab === 'all') && (
+            <div className="results__built-filter">
+              <button
+                className={`results__built-btn ${capturedFilter === 'all' ? 'results__built-btn--active' : ''}`}
+                onClick={() => setCapturedFilter('all')}
+              >All</button>
+              <button
+                className={`results__built-btn ${capturedFilter === 'captured' ? 'results__built-btn--active' : ''}`}
+                onClick={() => setCapturedFilter('captured')}
+              >✅ Captured</button>
+              <button
+                className={`results__built-btn ${capturedFilter === 'uncaptured' ? 'results__built-btn--active' : ''}`}
+                onClick={() => setCapturedFilter('uncaptured')}
+              >❌ Uncaptured</button>
+            </div>
+          )}
+
                     <div className="results__view-toggle">
             <button
               className={`results__view-btn ${viewMode === 'grid' ? 'results__view-btn--active' : ''}`}
@@ -285,6 +320,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               {item._category === 'habitats' && item.built != null && (
                 <span className={`results__item-built ${item.built ? 'results__item-built--yes' : 'results__item-built--no'}`}>
                   {item.built ? '✅ Built' : '❌ Not Built'}
+                </span>
+              )}
+              {item._category === 'pokemon' && item.captured != null && (
+                <span className={`results__item-built ${item.captured ? 'results__item-built--yes' : 'results__item-built--no'}`}>
+                  {item.captured ? '✅ Captured' : '❌ Uncaptured'}
                 </span>
               )}
               <span

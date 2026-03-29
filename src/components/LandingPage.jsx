@@ -161,7 +161,12 @@ export default function LandingPage({ onStartScan, onImportResults }) {
               </div>
               {settings.scanMode === 'habitat' && (
                 <div className="setting__fps-info">
-                  <span className="setting__fps-hint">🏡 Habitat mode scans the upper quarter for "No. XXX" + name, and detects built status from the full frame text.</span>
+                  <span className="setting__fps-hint">🏡 Habitat mode scans the upper banner for "No. XXX" + name, and detects built status from the bottom text.</span>
+                </div>
+              )}
+              {settings.scanMode === 'pokemon' && (
+                <div className="setting__fps-info">
+                  <span className="setting__fps-hint">🔴 Pokémon mode scans the banner for "No. XXX" and detects captured vs uncaptured status. Works with all banner colors.</span>
                 </div>
               )}
             </div>
