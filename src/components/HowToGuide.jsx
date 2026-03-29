@@ -4,23 +4,25 @@ const steps = [
   {
     number: 1,
     icon: '🎮',
-    title: 'Open Your Collection in Pokopia',
-    description: 'Navigate to the section you want to scan in Pokémon Pokopia.',
+    title: 'Open & Browse Your Collection',
+    description: 'Navigate to the section you want to scan and step through every entry.',
     tips: [
-      'Go to your Pokédex, Habitat list, Item bag, or Recipe book',
-      'Make sure you\'re on the list/scroll view — the scanner reads entries as you scroll',
+      'Open your Pokédex, Habitat list, Item bag, or Recipe book',
+      'Select the first entry in the list to open its detail view',
+      'Keep pressing the ZR button to step through entries one by one until you reach the end',
+      'The scanner reads each detail page as it appears — no need to scroll manually',
     ],
   },
   {
     number: 2,
     icon: '🔴',
     title: 'Record a Video on Your Switch',
-    description: 'Use the Nintendo Switch capture feature to record yourself scrolling through entries.',
+    description: 'Use the Nintendo Switch capture feature to record your browsing session.',
     tips: [
       'Hold the Capture button (square button on the left Joy-Con) to save the last 30 seconds of gameplay',
-      'Scroll slowly and steadily through the list before or while holding the button',
       'The video is saved to your Album automatically',
-      'For longer lists, record multiple 30-second clips',
+      'If stepping through all entries takes longer than 30 seconds, split it into multiple recordings — just pick up where you left off',
+      'You can upload multiple video chunks to the scanner and merge the results',
     ],
   },
   {
