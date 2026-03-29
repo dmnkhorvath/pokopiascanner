@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
 import VideoScanner from './components/VideoScanner';
 import ScanResults from './components/ScanResults';
@@ -17,20 +17,63 @@ const PAGES = {
   TERMS: 'terms',
 };
 
+// Map hash routes to pages
+const HASH_TO_PAGE = {
+  '#/privacy': PAGES.PRIVACY,
+  '#/terms': PAGES.TERMS,
+};
+
+const PAGE_TO_HASH = {
+  [PAGES.PRIVACY]: '#/privacy',
+  [PAGES.TERMS]: '#/terms',
+};
+
+function getPageFromHash() {
+  const hash = window.location.hash;
+  return HASH_TO_PAGE[hash] || null;
+}
+
 export default function App() {
-  const [page, setPage] = useState(PAGES.LANDING);
+  const [page, setPage] = useState(() => getPageFromHash() || PAGES.LANDING);
   const [videoFile, setVideoFile] = useState(null);
   const [settings, setSettings] = useState(null);
   const [scanResults, setScanResults] = useState(null);
 
-  // Ref to allow footer "Cookie Settings" link to re-open the consent banner
   const cookieSettingsRef = useRef(null);
+
+  // Sync hash -> page on browser back/forward
+  useEffect(() => {
+    const onHashChange = () => {
+      const hashPage = getPageFromHash();
+      if (hashPage) {
+        setPage(hashPage);
+      } else if (!window.location.hash || window.location.hash === '#' || window.location.hash === '#/') {
+        setPage(PAGES.LANDING);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
+
+  // Navigate with hash update for routable pages
+  const navigateTo = useCallback((targetPage) => {
+    setPage(targetPage);
+    if (PAGE_TO_HASH[targetPage]) {
+      window.location.hash = PAGE_TO_HASH[targetPage];
+    } else {
+      // Clear hash for non-routable pages (landing, scanning, results)
+      if (window.location.hash) {
+        history.pushState(null, '', window.location.pathname);
+      }
+    }
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleStartScan = useCallback((file, scanSettings) => {
     setVideoFile(file);
     setSettings(scanSettings);
-    setPage(PAGES.SCANNING);
-  }, []);
+    navigateTo(PAGES.SCANNING);
+  }, [navigateTo]);
 
   const handleScanComplete = useCallback((results) => {
     if (scanResults) {
@@ -38,8 +81,8 @@ export default function App() {
     } else {
       setScanResults(results);
     }
-    setPage(PAGES.RESULTS);
-  }, [scanResults]);
+    navigateTo(PAGES.RESULTS);
+  }, [scanResults, navigateTo]);
 
   const handleImportResults = useCallback((imported) => {
     if (scanResults) {
@@ -47,24 +90,24 @@ export default function App() {
     } else {
       setScanResults(imported);
     }
-    setPage(PAGES.RESULTS);
-  }, [scanResults]);
+    navigateTo(PAGES.RESULTS);
+  }, [scanResults, navigateTo]);
 
   const handleNewScan = useCallback(() => {
     setVideoFile(null);
     setSettings(null);
-    setPage(PAGES.LANDING);
-  }, []);
+    navigateTo(PAGES.LANDING);
+  }, [navigateTo]);
 
   const handleCancelScan = useCallback(() => {
     setVideoFile(null);
     setSettings(null);
-    setPage(PAGES.LANDING);
-  }, []);
+    navigateTo(PAGES.LANDING);
+  }, [navigateTo]);
 
   const handleBackToScanner = useCallback(() => {
-    setPage(PAGES.LANDING);
-  }, []);
+    navigateTo(PAGES.LANDING);
+  }, [navigateTo]);
 
   const handleOpenCookieSettings = useCallback(() => {
     if (cookieSettingsRef.current) {
@@ -137,9 +180,9 @@ export default function App() {
       <footer className="app__footer">
         <p>Pokopia Progress Scanner &mdash; Track your Pok\u00e9mon Pokopia collection</p>
         <nav className="app__footer-links">
-          <button className="app__footer-link" onClick={() => setPage(PAGES.PRIVACY)}>Privacy Policy</button>
+          <button className="app__footer-link" onClick={() => navigateTo(PAGES.PRIVACY)}>Privacy Policy</button>
           <span className="app__footer-sep">|</span>
-          <button className="app__footer-link" onClick={() => setPage(PAGES.TERMS)}>Terms &amp; Conditions</button>
+          <button className="app__footer-link" onClick={() => navigateTo(PAGES.TERMS)}>Terms &amp; Conditions</button>
           <span className="app__footer-sep">|</span>
           <button className="app__footer-link" onClick={handleOpenCookieSettings}>Cookie Settings</button>
         </nav>
