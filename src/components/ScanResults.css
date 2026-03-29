@@ -292,3 +292,64 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Built Status Filter */
+.results__built-filter {
+  display: flex;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.2rem;
+}
+
+.results__built-btn {
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.results__built-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.results__built-btn--active {
+  background: var(--teal, #26a69a);
+  color: #fff;
+}
+
+/* Built Status Badge on Items */
+.results__item-built {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.results__item-built--yes {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+.results__item-built--no {
+  background: rgba(244, 67, 54, 0.15);
+  color: #f44336;
+}
+
+/* Built count in tab */
+.results__tab-built-count {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+/* Scan mode buttons in landing */
+.setting__scan-modes {
+  flex-wrap: wrap;
+}

@@ -22,6 +22,7 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
+  const [builtFilter, setBuiltFilter] = useState('all'); // 'all', 'built', 'notbuilt'
   const [copySuccess, setCopySuccess] = useState(false);
 
   const categories = useMemo(() => ({
@@ -56,8 +57,16 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       });
     }
 
+    // Apply built filter for habitats
+    if (builtFilter !== 'all') {
+      items = items.filter(item => {
+        if (item._category !== 'habitats') return true;
+        return builtFilter === 'built' ? item.built === true : item.built === false;
+      });
+    }
+
     return items;
-  }, [activeTab, categories, searchQuery]);
+  }, [activeTab, categories, searchQuery, builtFilter]);
 
   const handleExport = () => {
     const exportData = {
@@ -76,7 +85,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       habitats: {
         found: categories.habitats.found,
         total: categories.habitats.total,
-        items: categories.habitats.items.map(i => i.name || i),
+        items: categories.habitats.items.map(i => ({
+          name: i.name || i,
+          number: i.number || null,
+          built: i.built != null ? i.built : null,
+        })),
       },
       recipes: {
         found: categories.recipes.found,
@@ -187,6 +200,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               {tab.key !== 'all' && (
                 <span className="results__tab-count">
                   {categories[tab.key]?.found || 0}
+                  {tab.key === 'habitats' && categories.habitats.items.some(h => h.built != null) && (
+                    <span className="results__tab-built-count">
+                      {' '}({categories.habitats.items.filter(h => h.built).length}✅)
+                    </span>
+                  )}
                 </span>
               )}
             </button>
@@ -212,7 +230,24 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
             )}
           </div>
 
-          <div className="results__view-toggle">
+          {(activeTab === 'habitats' || activeTab === 'all') && (
+            <div className="results__built-filter">
+              <button
+                className={`results__built-btn ${builtFilter === 'all' ? 'results__built-btn--active' : ''}`}
+                onClick={() => setBuiltFilter('all')}
+              >All</button>
+              <button
+                className={`results__built-btn ${builtFilter === 'built' ? 'results__built-btn--active' : ''}`}
+                onClick={() => setBuiltFilter('built')}
+              >✅ Built</button>
+              <button
+                className={`results__built-btn ${builtFilter === 'notbuilt' ? 'results__built-btn--active' : ''}`}
+                onClick={() => setBuiltFilter('notbuilt')}
+              >❌ Not Built</button>
+            </div>
+          )}
+
+                    <div className="results__view-toggle">
             <button
               className={`results__view-btn ${viewMode === 'grid' ? 'results__view-btn--active' : ''}`}
               onClick={() => setViewMode('grid')}
@@ -247,6 +282,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               <span className="results__item-name">{item.name}</span>
               {item.number && <span className="results__item-number">{item.number}</span>}
               {item.category && <span className="results__item-category">{item.category}</span>}
+              {item._category === 'habitats' && item.built != null && (
+                <span className={`results__item-built ${item.built ? 'results__item-built--yes' : 'results__item-built--no'}`}>
+                  {item.built ? '✅ Built' : '❌ Not Built'}
+                </span>
+              )}
               <span
                 className="results__item-type"
                 style={{ color: CATEGORY_COLORS[item._category] }}

@@ -21,6 +21,18 @@ export const CROP_PRESETS = {
   custom: { x: 0, y: 0, w: 100, h: 100, label: 'Custom' },
 };
 
+
+/**
+ * Available scan modes - user picks what to scan
+ */
+export const SCAN_MODES = {
+  all: { label: 'All Categories', description: 'Scan for everything' },
+  habitat: { label: 'Habitats', description: 'Scan habitat pages (detects built status)' },
+  pokemon: { label: 'Pokémon', description: 'Scan Pokémon entries' },
+  item: { label: 'Items', description: 'Scan item entries' },
+  recipe: { label: 'Recipes', description: 'Scan recipe entries' },
+};
+
 /**
  * Default scanner settings
  */
@@ -32,6 +44,7 @@ export const DEFAULT_SETTINGS = {
   customCrop: { x: 0, y: 0, w: 100, h: 100 },
   confidenceThreshold: 40,
   fuzzyTolerance: 2,
+  scanMode: 'all',          // 'all', 'habitat', 'pokemon', 'item', 'recipe'
 };
 
 /**
@@ -200,6 +213,83 @@ function extractFrame(video, canvas, cropRegion) {
   return canvas;
 }
 
+
+/**
+ * Habitat-specific frame analysis.
+ * Looks for 'No. {xxx}' pattern and habitat name in the upper region,
+ * then checks for "You haven't discovered this habitat yet." to determine built status.
+ * @param {string} fullText - Full frame OCR text
+ * @param {string} upperText - Upper quarter OCR text  
+ * @param {number} fuzzyTolerance - Max Levenshtein distance
+ * @returns {Object|null} { name, number, type, built } or null
+ */
+export function matchHabitatFrame(fullText, upperText, fuzzyTolerance = 2) {
+  const lines = upperText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+  let habitatNumber = null;
+  let habitatName = null;
+  let nameLineIdx = -1;
+
+  // Look for 'No. XXX' pattern in upper text
+  for (let i = 0; i < lines.length; i++) {
+    const noMatch = lines[i].match(/No\.?\s*(\d{1,3})/i);
+    if (noMatch) {
+      habitatNumber = noMatch[1].padStart(3, '0');
+      // The habitat name should be on the next line
+      if (i + 1 < lines.length) {
+        nameLineIdx = i + 1;
+        habitatName = lines[nameLineIdx];
+      }
+      break;
+    }
+  }
+
+  if (!habitatName) return null;
+
+  // Try to match the habitat name against our lookup
+  const result = matcher.findMatch(habitatName, fuzzyTolerance);
+  if (!result || result.type !== 'habitat') {
+    // If fuzzy match didn't find a habitat, try other lines near the number
+    for (let offset = -1; offset <= 2; offset++) {
+      if (offset === 1) continue; // already tried i+1
+      const idx = (nameLineIdx - 1) + offset;
+      if (idx >= 0 && idx < lines.length) {
+        const altResult = matcher.findMatch(lines[idx], fuzzyTolerance);
+        if (altResult && altResult.type === 'habitat') {
+          habitatName = lines[idx];
+          return {
+            ...altResult,
+            number: habitatNumber || altResult.number,
+            built: !isUndiscovered(fullText),
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  return {
+    ...result,
+    number: habitatNumber || result.number,
+    built: !isUndiscovered(fullText),
+  };
+}
+
+/**
+ * Check if the frame text indicates an undiscovered habitat.
+ * @param {string} text - Full frame OCR text
+ * @returns {boolean}
+ */
+function isUndiscovered(text) {
+  const lower = text.toLowerCase();
+  // Check for the exact phrase and common OCR variations
+  return lower.includes("haven't discovered this habitat") ||
+         lower.includes("havent discovered this habitat") ||
+         lower.includes("haven't discovered this habitat") ||
+         lower.includes("not discovered this habitat") ||
+         lower.includes("haven’t discovered this habitat");
+}
+
 /**
  * Match OCR text lines against the lookup dictionary.
  * @param {string} text - Raw OCR output text
@@ -252,6 +342,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     customCrop = { x: 0, y: 0, w: 100, h: 100 },
     confidenceThreshold = 40,
     fuzzyTolerance = 2,
+    scanMode = 'all',
   } = settings;
 
   // Determine crop region
@@ -364,24 +455,52 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       previewCtx.drawImage(video, 0, 0);
       const previewDataUrl = previewCanvas.toDataURL('image/jpeg', 0.5);
 
-      // Run OCR
-      const { data } = await worker.recognize(canvas);
+      // Run OCR based on scan mode
+      if (scanMode === 'habitat') {
+        // Habitat mode: OCR upper quarter for No./name, full frame for built status
+        const upperCrop = { x: cropRegion.x, y: cropRegion.y, w: cropRegion.w, h: Math.min(25, cropRegion.h) };
+        extractFrame(video, canvas, upperCrop);
+        const { data: upperData } = await worker.recognize(canvas);
 
-      if (data.confidence >= confidenceThreshold && data.text.trim()) {
-        // Match against lookup
-        const matches = matchText(data.text, fuzzyTolerance);
+        // OCR the bottom half of the frame for the "haven't discovered" text
+        const bottomCrop = { x: cropRegion.x, y: 50, w: cropRegion.w, h: 50 };
+        extractFrame(video, canvas, bottomCrop);
+        const { data: fullData } = await worker.recognize(canvas);
 
-        const newItems = [];
-        for (const match of matches) {
-          const type = match.type;
-          if (results[type] && !results[type].has(match.name)) {
-            results[type].set(match.name, match);
-            newItems.push(match);
+        if (upperData.confidence >= confidenceThreshold && upperData.text.trim()) {
+          const habitat = matchHabitatFrame(fullData.text, upperData.text, fuzzyTolerance);
+          if (habitat && !results.habitat.has(habitat.name)) {
+            results.habitat.set(habitat.name, habitat);
+            onMatch({ items: [habitat], frameIndex });
+          } else if (habitat && results.habitat.has(habitat.name)) {
+            // Update built status if we see it again with different status
+            const existing = results.habitat.get(habitat.name);
+            if (!existing.built && habitat.built) {
+              results.habitat.set(habitat.name, habitat);
+            }
           }
         }
+      } else {
+        // Generic mode (all / pokemon / item / recipe)
+        const { data } = await worker.recognize(canvas);
 
-        if (newItems.length > 0) {
-          onMatch({ items: newItems, frameIndex });
+        if (data.confidence >= confidenceThreshold && data.text.trim()) {
+          const matches = matchText(data.text, fuzzyTolerance);
+
+          const newItems = [];
+          for (const match of matches) {
+            const type = match.type;
+            // Filter by scanMode if not 'all'
+            if (scanMode !== 'all' && type !== scanMode) continue;
+            if (results[type] && !results[type].has(match.name)) {
+              results[type].set(match.name, match);
+              newItems.push(match);
+            }
+          }
+
+          if (newItems.length > 0) {
+            onMatch({ items: newItems, frameIndex });
+          }
         }
       }
 
@@ -446,7 +565,9 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     current: framesToProcess,
     total: framesToProcess,
     percent: 100,
-    message: `Scan complete! Found ${finalResults.totalFound} items.`,
+    message: scanMode === 'habitat'
+      ? `Scan complete! Found ${finalResults.habitats.found} habitats (${finalResults.habitats.items.filter(h => h.built).length} built, ${finalResults.habitats.items.filter(h => !h.built).length} not built).`
+      : `Scan complete! Found ${finalResults.totalFound} items.`,
   });
 
   return finalResults;

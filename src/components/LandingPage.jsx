@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { DEFAULT_SETTINGS, CROP_PRESETS, detectVideoFPS } from '../utils/ocrEngine.js';
+import { DEFAULT_SETTINGS, CROP_PRESETS, SCAN_MODES, detectVideoFPS } from '../utils/ocrEngine.js';
 import './LandingPage.css';
 
 export default function LandingPage({ onStartScan, onImportResults }) {
@@ -139,6 +139,33 @@ export default function LandingPage({ onStartScan, onImportResults }) {
         <section className="landing__section">
           <h2 className="section__title">{"\u2699\uFE0F"} Scanner Settings</h2>
           <div className="settings-grid">
+            <div className="setting setting--full">
+              <label className="setting__label">
+                Scan Mode
+                <span className="setting__hint">Choose what to scan from your video</span>
+              </label>
+              <div className="setting__toggle-row setting__scan-modes">
+                {Object.entries(SCAN_MODES).map(([key, mode]) => (
+                  <button
+                    key={key}
+                    className={`setting__preset-btn ${settings.scanMode === key ? 'setting__preset-btn--active' : ''}`}
+                    onClick={() => updateSetting('scanMode', key)}
+                    title={mode.description}
+                  >
+                    {key === 'all' ? '📦' :
+                     key === 'habitat' ? '🏡' :
+                     key === 'pokemon' ? '🐾' :
+                     key === 'item' ? '🎒' : '🍳'} {mode.label}
+                  </button>
+                ))}
+              </div>
+              {settings.scanMode === 'habitat' && (
+                <div className="setting__fps-info">
+                  <span className="setting__fps-hint">🏡 Habitat mode scans the upper quarter for "No. XXX" + name, and detects built status from the full frame text.</span>
+                </div>
+              )}
+            </div>
+
             <div className="setting setting--full">
               <label className="setting__label">
                 Frame Rate
