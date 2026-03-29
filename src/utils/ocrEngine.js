@@ -9,6 +9,15 @@ import ocrLookup from '../assets/ocrLookup.json';
 // Pre-build the fuzzy matcher once
 const matcher = buildFuzzyMatcher(ocrLookup);
 
+// Pre-build habitat number → entry lookup for reliable number-based matching.
+// OCR reliably reads "No. XXX" even when the habitat name is garbled.
+const habitatByNumber = {};
+for (const [name, entry] of Object.entries(ocrLookup)) {
+  if (entry.type === 'habitat' && entry.number) {
+    habitatByNumber[entry.number] = { ...entry, name };
+  }
+}
+
 /**
  * Crop presets for different UI layouts
  */
@@ -285,64 +294,54 @@ function extractFrame(video, canvas, cropRegion) {
 
 
 /**
- * Habitat-specific frame analysis.
- * Looks for 'No. {xxx}' pattern and habitat name in the upper region,
- * then checks for "You haven't discovered this habitat yet." to determine built status.
- * @param {string} fullText - Full frame OCR text
- * @param {string} upperText - Upper quarter OCR text  
- * @param {number} fuzzyTolerance - Max Levenshtein distance
+ * Habitat-specific frame analysis using number-based matching.
+ *
+ * Primary strategy: extract "No. XXX" from the upper banner OCR text and
+ * look up the habitat by number. This is far more reliable than fuzzy name
+ * matching because Tesseract consistently reads digits even when the white-
+ * on-purple habitat name is garbled.
+ *
+ * Fallback: if no number is found, try fuzzy name matching on individual lines.
+ *
+ * @param {string} fullText - Bottom-half OCR text (for discovery status check)
+ * @param {string} upperText - Upper banner OCR text (for number extraction)
+ * @param {number} fuzzyTolerance - Max Levenshtein distance (fallback only)
  * @returns {Object|null} { name, number, type, built } or null
  */
 export function matchHabitatFrame(fullText, upperText, fuzzyTolerance = 2) {
-  const lines = upperText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  // Flatten upper text into one string for regex search
+  const flatUpper = upperText.replace(/\n/g, ' ');
 
-  let habitatNumber = null;
-  let habitatName = null;
-  let nameLineIdx = -1;
-
-  // Look for 'No. XXX' pattern in upper text
-  for (let i = 0; i < lines.length; i++) {
-    const noMatch = lines[i].match(/No\.?\s*(\d{1,3})/i);
-    if (noMatch) {
-      habitatNumber = noMatch[1].padStart(3, '0');
-      // The habitat name should be on the next line
-      if (i + 1 < lines.length) {
-        nameLineIdx = i + 1;
-        habitatName = lines[nameLineIdx];
-      }
-      break;
+  // Primary: extract "No. XXX" and look up by number
+  const noMatch = flatUpper.match(/No\.?\s*(\d{1,3})/i);
+  if (noMatch) {
+    const habitatNumber = noMatch[1].padStart(3, '0');
+    const entry = habitatByNumber[habitatNumber];
+    if (entry) {
+      return {
+        name: entry.name,
+        number: entry.number,
+        type: 'habitat',
+        category: entry.category || null,
+        built: !isUndiscovered(fullText),
+      };
     }
   }
 
-  if (!habitatName) return null;
-
-  // Try to match the habitat name against our lookup
-  const result = matcher.findMatch(habitatName, fuzzyTolerance);
-  if (!result || result.type !== 'habitat') {
-    // If fuzzy match didn't find a habitat, try other lines near the number
-    for (let offset = -1; offset <= 2; offset++) {
-      if (offset === 1) continue; // already tried i+1
-      const idx = (nameLineIdx - 1) + offset;
-      if (idx >= 0 && idx < lines.length) {
-        const altResult = matcher.findMatch(lines[idx], fuzzyTolerance);
-        if (altResult && altResult.type === 'habitat') {
-          habitatName = lines[idx];
-          return {
-            ...altResult,
-            number: habitatNumber || altResult.number,
-            built: !isUndiscovered(fullText),
-          };
-        }
-      }
+  // Fallback: try fuzzy name matching on individual lines
+  const lines = upperText.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+  for (const line of lines) {
+    if (/No\.?\s*\d/i.test(line)) continue; // skip number lines
+    const result = matcher.findMatch(line, fuzzyTolerance);
+    if (result && result.type === 'habitat') {
+      return {
+        ...result,
+        built: !isUndiscovered(fullText),
+      };
     }
-    return null;
   }
 
-  return {
-    ...result,
-    number: habitatNumber || result.number,
-    built: !isUndiscovered(fullText),
-  };
+  return null;
 }
 
 /**
@@ -710,7 +709,8 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       const job = { index: frameIdx, time, previewDataUrl, canvases: {} };
 
       if (scanMode === 'habitat') {
-        const upperCrop = { x: cropRegion.x, y: cropRegion.y, w: cropRegion.w, h: Math.min(15, cropRegion.h) };
+        // Crop center 40% width, top 12% height for cleaner banner OCR (avoids edge decorations)
+        const upperCrop = { x: 30, y: 0, w: 40, h: 12 };
         job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'green');
         const bottomCrop = { x: cropRegion.x, y: 50, w: cropRegion.w, h: 50 };
         job.canvases.bottom = extractFrameToCanvas(video, bottomCrop, 'standard');
