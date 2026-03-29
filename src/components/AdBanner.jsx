@@ -36,6 +36,11 @@ export default function AdBanner({ adSlot, position = 'top', format = 'horizonta
   if (!consentGiven || !adClient || !adSlot) return null;
 
   return (
-    <div className={`ad-banner ad-banner--${position}`} ref={adRef} />
+    <div
+      className={`w-full flex justify-center ${
+        position === 'top' ? 'mb-4' : 'mt-4'
+      }`}
+      ref={adRef}
+    />
   );
 }

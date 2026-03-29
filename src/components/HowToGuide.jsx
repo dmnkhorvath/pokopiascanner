@@ -3,36 +3,36 @@ import './HowToGuide.css';
 const steps = [
   {
     number: 1,
-    icon: '🎮',
+    icon: '\uD83C\uDFAE',
     title: 'Open & Browse Your Collection',
     description: 'Navigate to the section you want to scan and step through every entry.',
     tips: [
-      'Open your Pokédex, Habitat list, Item bag, or Recipe book',
+      'Open your Pok\u00e9dex, Habitat list, Item bag, or Recipe book',
       'Select the first entry in the list to open its detail view',
       'Keep pressing the ZR button to step through entries one by one until you reach the end',
-      'The scanner reads each detail page as it appears — no need to scroll manually',
+      'The scanner reads each detail page as it appears \u2014 no need to scroll manually',
     ],
   },
   {
     number: 2,
-    icon: '🔴',
+    icon: '\uD83D\uDD34',
     title: 'Record a Video on Your Switch',
     description: 'Use the Nintendo Switch capture feature to record your browsing session.',
     tips: [
       'Hold the Capture button (square button on the left Joy-Con) to save the last 30 seconds of gameplay',
       'The video is saved to your Album automatically',
-      'If stepping through all entries takes longer than 30 seconds, split it into multiple recordings — just pick up where you left off',
+      'If stepping through all entries takes longer than 30 seconds, split it into multiple recordings \u2014 just pick up where you left off',
       'You can upload multiple video chunks to the scanner and merge the results',
     ],
   },
   {
     number: 3,
-    icon: '📲',
+    icon: '\uD83D\uDCF2',
     title: 'Transfer the Video to Your Device',
     description: 'Use Nintendo\u2019s built-in sharing to get the video onto your phone or computer.',
     methods: [
       {
-        name: '📱 To Phone (QR Code)',
+        name: '\uD83D\uDCF1 To Phone (QR Code)',
         steps: [
           'Go to Album on your Switch',
           'Select the video and choose "Send to Smartphone"',
@@ -41,15 +41,15 @@ const steps = [
         ],
       },
       {
-        name: '💻 To Computer (USB)',
+        name: '\uD83D\uDCBB To Computer (USB)',
         steps: [
           'Connect your Switch to your PC/Mac with a USB-C cable',
-          'On the Switch, go to System Settings → Data Management → Manage Screenshots and Videos → Copy to a Computer via USB Connection',
-          'Your Switch appears as a USB drive — copy the video files',
+          'On the Switch, go to System Settings \u2192 Data Management \u2192 Manage Screenshots and Videos \u2192 Copy to a Computer via USB Connection',
+          'Your Switch appears as a USB drive \u2014 copy the video files',
         ],
       },
       {
-        name: '💾 Via microSD Card',
+        name: '\uD83D\uDCBE Via microSD Card',
         steps: [
           'If your videos are on a microSD card, power off the Switch and remove the card',
           'Insert the microSD into your computer using an adapter',
@@ -60,19 +60,19 @@ const steps = [
   },
   {
     number: 4,
-    icon: '📤',
+    icon: '\uD83D\uDCE4',
     title: 'Upload & Scan',
     description: 'Drag and drop your video into the Pokopia Scanner and let it do the work.',
     tips: [
       'Drag the video file onto the upload area, or click to browse',
-      'Choose a scan mode: Habitats, Pokémon, Items, Recipes, or All',
+      'Choose a scan mode: Habitats, Pok\u00e9mon, Items, Recipes, or All',
       'Hit "Start Scan" and watch the live detection feed',
       'The scanner extracts frames, runs OCR, and matches entries automatically',
     ],
   },
   {
     number: 5,
-    icon: '📊',
+    icon: '\uD83D\uDCCA',
     title: 'Review & Export Your Progress',
     description: 'Browse your results, check completion, and export your data.',
     tips: [
@@ -86,44 +86,52 @@ const steps = [
 
 export default function HowToGuide({ onBack }) {
   return (
-    <div className="howto">
-      <div className="howto__container">
-        <button className="howto__back" onClick={onBack}>
-          \u2190 Back to Scanner
-        </button>
+    <div className="max-w-4xl mx-auto">
+      {/* Back button */}
+      <button className="btn btn-ghost btn-sm gap-1 mb-6" onClick={onBack}>
+        \u2190 Back to Scanner
+      </button>
 
-        <div className="howto__hero">
-          <h1 className="howto__title">\uD83D\uDCD6 How to Use Pokopia Scanner</h1>
-          <p className="howto__subtitle">
-            Scan your Nintendo Switch gameplay videos to track your Pokopia collection progress.
-            Just 5 easy steps!
-          </p>
-        </div>
+      {/* Hero */}
+      <div className="text-center mb-10">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-3">How to Use Pokopia Scanner</h1>
+        <p className="text-base-content/60 max-w-2xl mx-auto">
+          Follow these simple steps to scan your Pok\u00e9mon Pokopia collection from a Nintendo Switch video recording.
+        </p>
+      </div>
 
-        <div className="howto__steps">
-          {steps.map((step) => (
-            <div key={step.number} className="howto__step">
-              <div className="howto__step-header">
-                <span className="howto__step-number">{step.number}</span>
-                <span className="howto__step-icon">{step.icon}</span>
-                <h2 className="howto__step-title">{step.title}</h2>
+      {/* Steps */}
+      <div className="flex flex-col gap-6">
+        {steps.map((step) => (
+          <div key={step.number} className="card bg-base-200 shadow-md">
+            <div className="card-body">
+              {/* Step header */}
+              <div className="flex items-center gap-3 mb-2">
+                <div className="badge badge-primary badge-lg font-bold text-lg w-10 h-10 flex items-center justify-center">
+                  {step.number}
+                </div>
+                <span className="text-2xl">{step.icon}</span>
+                <h2 className="card-title text-lg sm:text-xl">{step.title}</h2>
               </div>
-              <p className="howto__step-desc">{step.description}</p>
 
+              <p className="text-base-content/70 mb-3">{step.description}</p>
+
+              {/* Tips list */}
               {step.tips && (
-                <ul className="howto__tips">
+                <ul className="list-disc list-inside space-y-1 text-sm text-base-content/80">
                   {step.tips.map((tip, i) => (
-                    <li key={i} className="howto__tip">{tip}</li>
+                    <li key={i}>{tip}</li>
                   ))}
                 </ul>
               )}
 
+              {/* Transfer methods */}
               {step.methods && (
-                <div className="howto__methods">
+                <div className="grid gap-4 mt-2 sm:grid-cols-3">
                   {step.methods.map((method, i) => (
-                    <div key={i} className="howto__method">
-                      <h3 className="howto__method-name">{method.name}</h3>
-                      <ol className="howto__method-steps">
+                    <div key={i} className="bg-base-300 rounded-lg p-4">
+                      <h3 className="font-semibold text-sm mb-2">{method.name}</h3>
+                      <ol className="list-decimal list-inside space-y-1 text-xs text-base-content/70">
                         {method.steps.map((s, j) => (
                           <li key={j}>{s}</li>
                         ))}
@@ -133,15 +141,16 @@ export default function HowToGuide({ onBack }) {
                 </div>
               )}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
 
-        <div className="howto__cta">
-          <p>Ready to scan?</p>
-          <button className="howto__cta-btn" onClick={onBack}>
-            \uD83D\uDD0D Start Scanning
-          </button>
-        </div>
+      {/* CTA */}
+      <div className="text-center mt-10 mb-6">
+        <p className="text-base-content/60 mb-3">Ready to scan?</p>
+        <button className="btn btn-primary btn-lg gap-2" onClick={onBack}>
+          \uD83D\uDD0D Start Scanning
+        </button>
       </div>
     </div>
   );

@@ -80,27 +80,38 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
   };
 
   return (
-    <div className="landing">
-      <div className="landing__hero">
-        <div className="landing__logo">{"\uD83D\uDD0D"}</div>
-        <h1 className="landing__title">Pokopia Progress Scanner</h1>
-        <p className="landing__subtitle">
-          Upload a Nintendo Switch video recording of your Pok\u00e9mon Pokopia game
-          to scan and track your collection progress.
-        </p>
+    <div className="space-y-8">
+      {/* Hero */}
+      <div className="hero py-10">
+        <div className="hero-content text-center">
+          <div className="max-w-lg">
+            <div className="text-6xl mb-4">{"\uD83D\uDD0D"}</div>
+            <h1 className="text-4xl sm:text-5xl font-bold">Pokopia Progress Scanner</h1>
+            <p className="py-4 text-base-content/60">
+              Upload a Nintendo Switch video recording of your Pok\u00e9mon Pokopia game
+              to scan and track your collection progress.
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="landing__content">
-        {/* Upload Section */}
-        <section className="landing__section">
-          <h2 className="section__title">{"\uD83D\uDCF9"} Upload Video</h2>
-          <div
-            className={`upload-zone ${dragActive ? 'upload-zone--active' : ''} ${videoFile ? 'upload-zone--has-file' : ''}`}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onClick={() => fileInputRef.current?.click()}
-          >
+      {/* Upload Section */}
+      <section>
+        <h2 className="text-xl font-bold mb-3">{"\uD83D\uDCF9"} Upload Video</h2>
+        <div
+          className={`card border-2 border-dashed cursor-pointer transition-colors ${
+            dragActive
+              ? 'border-primary bg-primary/10'
+              : videoFile
+                ? 'border-success/50 bg-base-200'
+                : 'border-base-content/20 bg-base-200 hover:border-primary/50'
+          }`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <div className="card-body items-center text-center py-8">
             <input
               ref={fileInputRef}
               type="file"
@@ -109,138 +120,142 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
               hidden
             />
             {videoFile ? (
-              <div className="upload-zone__preview">
-                <video src={videoPreview} className="upload-zone__video" muted />
-                <div className="upload-zone__file-info">
-                  <span className="upload-zone__filename">{videoFile.name}</span>
-                  <span className="upload-zone__filesize">
+              <div className="flex flex-col items-center gap-3 w-full">
+                <video src={videoPreview} className="rounded-lg max-h-48 w-auto" muted />
+                <div className="text-center">
+                  <p className="font-medium text-sm">{videoFile.name}</p>
+                  <p className="text-xs text-base-content/50">
                     {(videoFile.size / (1024 * 1024)).toFixed(1)} MB
-                  </span>
+                  </p>
                 </div>
                 <button
-                  className="upload-zone__change"
+                  className="btn btn-ghost btn-xs"
                   onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                 >
                   Change file
                 </button>
               </div>
             ) : (
-              <div className="upload-zone__placeholder">
-                <span className="upload-zone__icon">{"\u2B06\uFE0F"}</span>
-                <p>Drag & drop your video here</p>
-                <p className="upload-zone__hint">or click to browse</p>
-                <p className="upload-zone__formats">Supports MP4, MOV, WebM, AVI</p>
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-4xl">{"\u2B06\uFE0F"}</span>
+                <p className="font-medium">Drag & drop your video here</p>
+                <p className="text-sm text-base-content/50">or click to browse</p>
+                <p className="text-xs text-base-content/40">Supports MP4, MOV, WebM, AVI</p>
               </div>
             )}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Settings Section */}
-        <section className="landing__section">
-          <h2 className="section__title">{"\u2699\uFE0F"} Scanner Settings</h2>
-          <div className="settings-grid">
-            <div className="setting setting--full">
-              <label className="setting__label">
-                Scan Mode
-                <span className="setting__hint">Choose what to scan from your video</span>
-              </label>
-              <div className="setting__toggle-row setting__scan-modes">
-                {Object.entries(SCAN_MODES).map(([key, mode]) => (
-                  <button
-                    key={key}
-                    className={`setting__preset-btn ${settings.scanMode === key ? 'setting__preset-btn--active' : ''}`}
-                    onClick={() => updateSetting('scanMode', key)}
-                    title={mode.description}
-                  >
-                    {key === 'all' ? '📦' :
-                     key === 'habitat' ? '🏡' :
-                     key === 'pokemon' ? '🐾' :
-                     key === 'item' ? '🎒' : '🍳'} {mode.label}
-                  </button>
-                ))}
-              </div>
-              {settings.scanMode === 'habitat' && (
-                <div className="setting__fps-info">
-                  <span className="setting__fps-hint">🏡 Habitat mode scans the upper banner for "No. XXX" + name, and detects built status from the bottom text.</span>
-                </div>
-              )}
-              {settings.scanMode === 'pokemon' && (
-                <div className="setting__fps-info">
-                  <span className="setting__fps-hint">🔴 Pokémon mode scans the banner for "No. XXX" and detects captured vs sensed status. Works with all banner colors.</span>
-                </div>
-              )}
+      {/* Settings Section */}
+      <section>
+        <h2 className="text-xl font-bold mb-3">{"\u2699\uFE0F"} Scanner Settings</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          {/* Scan Mode - full width */}
+          <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
+            <label className="block mb-1">
+              <span className="font-medium text-sm">Scan Mode</span>
+              <span className="block text-xs text-base-content/50">Choose what to scan from your video</span>
+            </label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {Object.entries(SCAN_MODES).map(([key, mode]) => (
+                <button
+                  key={key}
+                  className={`btn btn-sm ${
+                    settings.scanMode === key ? 'btn-primary' : 'btn-ghost bg-base-300'
+                  }`}
+                  onClick={() => updateSetting('scanMode', key)}
+                  title={mode.description}
+                >
+                  {key === 'all' ? '\uD83D\uDCE6' :
+                   key === 'habitat' ? '\uD83C\uDFE1' :
+                   key === 'pokemon' ? '\uD83D\uDC3E' :
+                   key === 'item' ? '\uD83C\uDF92' : '\uD83C\uDF73'} {mode.label}
+                </button>
+              ))}
             </div>
+            {settings.scanMode === 'habitat' && (
+              <p className="text-xs text-info mt-2">\uD83C\uDFE1 Habitat mode scans the upper banner for "No. XXX" + name, and detects built status from the bottom text.</p>
+            )}
+            {settings.scanMode === 'pokemon' && (
+              <p className="text-xs text-info mt-2">\uD83D\uDD34 Pok\u00e9mon mode scans the banner for "No. XXX" and detects captured vs sensed status. Works with all banner colors.</p>
+            )}
+          </div>
 
-            <div className="setting setting--full">
-              <label className="setting__label">
-                Frame Rate
-                <span className="setting__hint">How frames are extracted from the video</span>
-              </label>
-              <div className="setting__toggle-row">
-                <button
-                  className={`setting__preset-btn ${settings.autoDetectFPS ? 'setting__preset-btn--active' : ''}`}
-                  onClick={() => {
-                    updateSetting('autoDetectFPS', true);
-                    updateSetting('frameIntervalMs', 0);
-                    if (videoFile && !detectedFPS) {
-                      setDetectingFPS(true);
-                      detectVideoFPS(videoFile)
-                        .then(info => setDetectedFPS(info))
-                        .catch(() => setDetectedFPS({ fps: 30, frameIntervalMs: 33, detected: false }))
-                        .finally(() => setDetectingFPS(false));
-                    }
-                  }}
-                >
-                  🎬 Auto-detect FPS
-                </button>
-                <button
-                  className={`setting__preset-btn ${!settings.autoDetectFPS ? 'setting__preset-btn--active' : ''}`}
-                  onClick={() => {
-                    updateSetting('autoDetectFPS', false);
-                    updateSetting('frameIntervalMs', detectedFPS?.frameIntervalMs || 33);
-                  }}
-                >
-                  ✏️ Manual
-                </button>
-              </div>
-              {settings.autoDetectFPS && (
-                <div className="setting__fps-info">
-                  {detectingFPS ? (
-                    <span className="setting__fps-detecting">⏳ Detecting video framerate...</span>
-                  ) : detectedFPS ? (
-                    <span className={`setting__fps-result ${detectedFPS.detected ? 'setting__fps-result--ok' : 'setting__fps-result--fallback'}`}>
-                      {detectedFPS.detected
-                        ? `✅ Detected: ${detectedFPS.fps} FPS (${detectedFPS.frameIntervalMs}ms per frame)`
-                        : `⚠️ Browser doesn’t support detection — will use ${detectedFPS.fps} FPS fallback`}
-                    </span>
-                  ) : (
-                    <span className="setting__fps-hint">📎 Upload a video to detect its framerate</span>
-                  )}
-                </div>
-              )}
-              {!settings.autoDetectFPS && (
-                <div className="setting__manual-fps">
-                  <input
-                    type="range"
-                    min="10"
-                    max="500"
-                    value={settings.frameIntervalMs || 33}
-                    onChange={(e) => updateSetting('frameIntervalMs', Number(e.target.value))}
-                    step="10"
-                    className="setting__range"
-                  />
-                  <span className="setting__value">
-                    {settings.frameIntervalMs || 33}ms ({Math.round(1000 / (settings.frameIntervalMs || 33))} FPS)
+          {/* Frame Rate - full width */}
+          <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
+            <label className="block mb-1">
+              <span className="font-medium text-sm">Frame Rate</span>
+              <span className="block text-xs text-base-content/50">How frames are extracted from the video</span>
+            </label>
+            <div className="flex gap-2 mt-2">
+              <button
+                className={`btn btn-sm ${settings.autoDetectFPS ? 'btn-primary' : 'btn-ghost bg-base-300'}`}
+                onClick={() => {
+                  updateSetting('autoDetectFPS', true);
+                  updateSetting('frameIntervalMs', 0);
+                  if (videoFile && !detectedFPS) {
+                    setDetectingFPS(true);
+                    detectVideoFPS(videoFile)
+                      .then(info => setDetectedFPS(info))
+                      .catch(() => setDetectedFPS({ fps: 30, frameIntervalMs: 33, detected: false }))
+                      .finally(() => setDetectingFPS(false));
+                  }
+                }}
+              >
+                \uD83C\uDFAC Auto-detect FPS
+              </button>
+              <button
+                className={`btn btn-sm ${!settings.autoDetectFPS ? 'btn-primary' : 'btn-ghost bg-base-300'}`}
+                onClick={() => {
+                  updateSetting('autoDetectFPS', false);
+                  updateSetting('frameIntervalMs', detectedFPS?.frameIntervalMs || 33);
+                }}
+              >
+                \u270F\uFE0F Manual
+              </button>
+            </div>
+            {settings.autoDetectFPS && (
+              <div className="mt-2 text-xs">
+                {detectingFPS ? (
+                  <span className="text-warning">\u23F3 Detecting video framerate...</span>
+                ) : detectedFPS ? (
+                  <span className={detectedFPS.detected ? 'text-success' : 'text-warning'}>
+                    {detectedFPS.detected
+                      ? `\u2705 Detected: ${detectedFPS.fps} FPS (${detectedFPS.frameIntervalMs}ms per frame)`
+                      : `\u26A0\uFE0F Browser doesn't support detection \u2014 will use ${detectedFPS.fps} FPS fallback`}
                   </span>
-                </div>
-              )}
-            </div>
+                ) : (
+                  <span className="text-base-content/50">\uD83D\uDCCE Upload a video to detect its framerate</span>
+                )}
+              </div>
+            )}
+            {!settings.autoDetectFPS && (
+              <div className="mt-2 flex items-center gap-3">
+                <input
+                  type="range"
+                  min="10"
+                  max="500"
+                  value={settings.frameIntervalMs || 33}
+                  onChange={(e) => updateSetting('frameIntervalMs', Number(e.target.value))}
+                  step="10"
+                  className="range range-primary range-xs flex-1"
+                />
+                <span className="text-xs font-mono whitespace-nowrap">
+                  {settings.frameIntervalMs || 33}ms ({Math.round(1000 / (settings.frameIntervalMs || 33))} FPS)
+                </span>
+              </div>
+            )}
+          </div>
 
-            <div className="setting">
-              <label className="setting__label">
-                Processing Delay
-                <span className="setting__hint">Delay between frames (ms)</span>
-              </label>
+          {/* Processing Delay */}
+          <div className="bg-base-200 rounded-lg p-4">
+            <label className="block mb-1">
+              <span className="font-medium text-sm">Processing Delay</span>
+              <span className="block text-xs text-base-content/50">Delay between frames (ms)</span>
+            </label>
+            <div className="flex items-center gap-3 mt-2">
               <input
                 type="range"
                 min="0"
@@ -248,121 +263,137 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
                 step="10"
                 value={settings.processingDelay}
                 onChange={(e) => updateSetting('processingDelay', Number(e.target.value))}
-                className="setting__range"
+                className="range range-primary range-xs flex-1"
               />
-              <span className="setting__value">{settings.processingDelay}ms</span>
+              <span className="text-xs font-mono w-12 text-right">{settings.processingDelay}ms</span>
             </div>
+          </div>
 
-            <div className="setting">
-              <label className="setting__label">
-                OCR Confidence Threshold
-                <span className="setting__hint">Minimum confidence to accept text</span>
-              </label>
+          {/* OCR Confidence */}
+          <div className="bg-base-200 rounded-lg p-4">
+            <label className="block mb-1">
+              <span className="font-medium text-sm">OCR Confidence Threshold</span>
+              <span className="block text-xs text-base-content/50">Minimum confidence to accept text</span>
+            </label>
+            <div className="flex items-center gap-3 mt-2">
               <input
                 type="range"
                 min="0"
                 max="100"
                 value={settings.confidenceThreshold}
                 onChange={(e) => updateSetting('confidenceThreshold', Number(e.target.value))}
-                className="setting__range"
+                className="range range-primary range-xs flex-1"
               />
-              <span className="setting__value">{settings.confidenceThreshold}%</span>
+              <span className="text-xs font-mono w-10 text-right">{settings.confidenceThreshold}%</span>
             </div>
+          </div>
 
-            <div className="setting">
-              <label className="setting__label">
-                Fuzzy Match Tolerance
-                <span className="setting__hint">Max character distance for matching</span>
-              </label>
+          {/* Fuzzy Tolerance */}
+          <div className="bg-base-200 rounded-lg p-4">
+            <label className="block mb-1">
+              <span className="font-medium text-sm">Fuzzy Match Tolerance</span>
+              <span className="block text-xs text-base-content/50">Max character distance for matching</span>
+            </label>
+            <div className="flex items-center gap-3 mt-2">
               <input
                 type="range"
                 min="0"
                 max="5"
                 value={settings.fuzzyTolerance}
                 onChange={(e) => updateSetting('fuzzyTolerance', Number(e.target.value))}
-                className="setting__range"
+                className="range range-primary range-xs flex-1"
               />
-              <span className="setting__value">{settings.fuzzyTolerance}</span>
+              <span className="text-xs font-mono w-6 text-right">{settings.fuzzyTolerance}</span>
             </div>
+          </div>
 
-            <div className="setting setting--full">
-              <label className="setting__label">Crop Region</label>
-              <div className="setting__select-group">
-                {Object.entries(CROP_PRESETS).map(([key, preset]) => (
-                  <button
-                    key={key}
-                    className={`setting__preset-btn ${settings.cropPreset === key ? 'setting__preset-btn--active' : ''}`}
-                    onClick={() => updateSetting('cropPreset', key)}
-                  >
-                    {preset.label}
-                  </button>
+          {/* Crop Region - full width */}
+          <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
+            <label className="block mb-1">
+              <span className="font-medium text-sm">Crop Region</span>
+            </label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {Object.entries(CROP_PRESETS).map(([key, preset]) => (
+                <button
+                  key={key}
+                  className={`btn btn-sm ${
+                    settings.cropPreset === key ? 'btn-primary' : 'btn-ghost bg-base-300'
+                  }`}
+                  onClick={() => updateSetting('cropPreset', key)}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom Crop Sliders */}
+          {settings.cropPreset === 'custom' && (
+            <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
+              <label className="block mb-2">
+                <span className="font-medium text-sm">Custom Crop Region (%)</span>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {['x', 'y', 'w', 'h'].map((dim) => (
+                  <div key={dim} className="flex items-center gap-2">
+                    <span className="text-xs font-mono w-6">{dim.toUpperCase()}: {settings.customCrop[dim]}%</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={settings.customCrop[dim]}
+                      onChange={(e) => updateCustomCrop(dim, e.target.value)}
+                      className="range range-xs flex-1"
+                    />
+                  </div>
                 ))}
               </div>
             </div>
-
-            {settings.cropPreset === 'custom' && (
-              <div className="setting setting--full">
-                <label className="setting__label">Custom Crop Region (%)</label>
-                <div className="crop-sliders">
-                  {['x', 'y', 'w', 'h'].map((dim) => (
-                    <div key={dim} className="crop-slider">
-                      <label>{dim.toUpperCase()}: {settings.customCrop[dim]}%</label>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={settings.customCrop[dim]}
-                        onChange={(e) => updateCustomCrop(dim, e.target.value)}
-                        className="setting__range"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Actions */}
-        <div className="landing__actions">
-          <button
-            className="btn btn--primary btn--lg"
-            onClick={handleStartScan}
-            disabled={!videoFile}
-          >
-            {"\uD83D\uDD0D"} Start Scanning
-          </button>
-          <button
-            className="btn btn--secondary"
-            onClick={() => importInputRef.current?.click()}
-          >
-            {"\uD83D\uDCE5"} Import Previous Scan
-          </button>
-          <input
-            ref={importInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImport}
-            hidden
-          />
+          )}
         </div>
+      </section>
 
-        {/* How To Guide Teaser */}
-        <section className="landing__section landing__howto-teaser">
-          <div className="howto-teaser">
-            <span className="howto-teaser__icon">{"\uD83D\uDCD6"}</span>
-            <div className="howto-teaser__text">
-              <h2 className="howto-teaser__title">New here? Learn how to scan in 5 easy steps</h2>
-              <p className="howto-teaser__desc">
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <button
+          className="btn btn-primary btn-lg gap-2"
+          onClick={handleStartScan}
+          disabled={!videoFile}
+        >
+          {"\uD83D\uDD0D"} Start Scanning
+        </button>
+        <button
+          className="btn btn-secondary gap-2"
+          onClick={() => importInputRef.current?.click()}
+        >
+          {"\uD83D\uDCE5"} Import Previous Scan
+        </button>
+        <input
+          ref={importInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleImport}
+          hidden
+        />
+      </div>
+
+      {/* How To Guide Teaser */}
+      <section>
+        <div className="card bg-base-200">
+          <div className="card-body flex-row items-center gap-4">
+            <span className="text-4xl">{"\uD83D\uDCD6"}</span>
+            <div className="flex-1">
+              <h2 className="card-title text-base">New here? Learn how to scan in 5 easy steps</h2>
+              <p className="text-sm text-base-content/60">
                 Record a video on your Nintendo Switch, transfer it to your device, and let the scanner do the rest.
               </p>
             </div>
-            <button className="btn btn--outline howto-teaser__btn" onClick={onShowHowTo}>
+            <button className="btn btn-outline btn-sm" onClick={onShowHowTo}>
               {"\uD83D\uDC49"} How to Use
             </button>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

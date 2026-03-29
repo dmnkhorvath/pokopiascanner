@@ -15,14 +15,17 @@
     "tesseract.js": "^5.1.1"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
+    "daisyui": "^5.5.19",
     "eslint": "^9.17.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "tailwindcss": "^4.2.2",
     "vite": "^6.0.5"
   },
-  "description": "Pokopia Progress Scanner - OCR-based collection tracker for Pok\u00e9mon Pokopia"
+  "description": "Pokopia Progress Scanner - OCR-based collection tracker for Pokémon Pokopia"
 }

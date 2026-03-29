@@ -17,8 +17,6 @@ export function hasConsent() {
 
 /**
  * Updates Google Consent Mode v2 to grant all storage types.
- * GA script is already loaded in index.html with defaults set to 'denied'.
- * This function flips consent to 'granted' so GA starts collecting data.
  */
 function grantConsent() {
   if (typeof gtag === 'function') {
@@ -34,14 +32,12 @@ function grantConsent() {
 export default function CookieConsent({ onOpenSettings }) {
   const [visible, setVisible] = useState(false);
 
-  // Show banner only when no preference has been stored yet
   useEffect(() => {
     try {
       const pref = localStorage.getItem(STORAGE_KEY);
       if (!pref) {
         setVisible(true);
       } else if (pref === 'accepted') {
-        // Returning visitor who already accepted - grant consent
         grantConsent();
       }
     } catch {
@@ -49,7 +45,6 @@ export default function CookieConsent({ onOpenSettings }) {
     }
   }, []);
 
-  // Allow parent (footer link) to re-open the banner
   useEffect(() => {
     if (onOpenSettings) {
       onOpenSettings.current = () => setVisible(true);
@@ -60,7 +55,6 @@ export default function CookieConsent({ onOpenSettings }) {
     try { localStorage.setItem(STORAGE_KEY, 'accepted'); } catch { /* noop */ }
     grantConsent();
     setVisible(false);
-    // Force re-render of ad components by dispatching a custom event
     window.dispatchEvent(new Event('cookie-consent-changed'));
   }, []);
 
@@ -73,18 +67,20 @@ export default function CookieConsent({ onOpenSettings }) {
   if (!visible) return null;
 
   return (
-    <div className="cookie-consent" role="dialog" aria-label="Cookie consent">
-      <div className="cookie-consent__inner">
-        <p className="cookie-consent__text">
-          We use cookies for analytics (Google Analytics) and advertising (Google AdSense).
-          You can accept all cookies or reject non-essential ones.
-          See our <button className="cookie-consent__link" onClick={() => { /* handled by parent */ }}>Privacy Policy</button> for details.
-        </p>
-        <div className="cookie-consent__actions">
-          <button className="cookie-consent__btn cookie-consent__btn--accept" onClick={handleAccept}>
+    <div className="fixed bottom-0 inset-x-0 z-50 p-4" role="dialog" aria-label="Cookie consent">
+      <div className="alert shadow-lg max-w-4xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <div className="flex-1">
+          <p className="text-sm text-base-content/80">
+            We use cookies for analytics (Google Analytics) and advertising (Google AdSense).
+            You can accept all cookies or reject non-essential ones.
+            See our <button className="link link-primary text-sm" onClick={() => { /* handled by parent */ }}>Privacy Policy</button> for details.
+          </p>
+        </div>
+        <div className="flex gap-2 shrink-0">
+          <button className="btn btn-primary btn-sm" onClick={handleAccept}>
             Accept All
           </button>
-          <button className="cookie-consent__btn cookie-consent__btn--reject" onClick={handleReject}>
+          <button className="btn btn-ghost btn-sm" onClick={handleReject}>
             Reject Non-Essential
           </button>
         </div>

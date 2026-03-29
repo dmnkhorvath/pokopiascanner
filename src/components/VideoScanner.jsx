@@ -76,27 +76,28 @@ export default function VideoScanner({ videoFile, settings, onScanComplete, onCa
   const totalFound = Object.values(foundCounts).reduce((a, b) => a + b, 0);
 
   const TYPE_LABELS = {
-    pokemon: { label: 'Pokémon', icon: '🔴' },
-    item: { label: 'Items', icon: '🎒' },
-    habitat: { label: 'Habitats', icon: '🏠' },
-    recipe: { label: 'Recipes', icon: '📋' },
+    pokemon: { label: 'Pok\u00e9mon', icon: '\uD83D\uDD34' },
+    item: { label: 'Items', icon: '\uD83C\uDF92' },
+    habitat: { label: 'Habitats', icon: '\uD83C\uDFE0' },
+    recipe: { label: 'Recipes', icon: '\uD83D\uDCCB' },
   };
 
   return (
-    <div className="scanner">
-      <div className="scanner__header">
-        <h2 className="scanner__title">
-          {progress.phase === 'complete' ? '✅ Scan Complete' :
-           progress.phase === 'error' ? '❌ Scan Error' :
-           '🔍 Scanning...'}
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">
+          {progress.phase === 'complete' ? '\u2705 Scan Complete' :
+           progress.phase === 'error' ? '\u274C Scan Error' :
+           '\uD83D\uDD0D Scanning...'}
         </h2>
-        <button className="scanner__cancel" onClick={handleCancel}>
+        <button className="btn btn-outline btn-sm" onClick={handleCancel}>
           {progress.phase === 'complete' || progress.phase === 'error' ? 'Back' : 'Cancel'}
         </button>
       </div>
 
       {/* Progress */}
-      <div className="scanner__progress">
+      <div className="space-y-1">
         <ProgressBar
           value={progress.current}
           max={progress.total}
@@ -104,61 +105,64 @@ export default function VideoScanner({ videoFile, settings, onScanComplete, onCa
           size="lg"
         />
         {progress.timePosition !== undefined && (
-          <div className="scanner__time">
+          <p className="text-xs text-base-content/50 text-right">
             {Math.floor(progress.timePosition)}s / {Math.floor(progress.duration)}s
-          </div>
+          </p>
         )}
       </div>
 
-      <div className="scanner__body">
+      {/* Body: Preview + Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Frame Preview */}
-        <div className="scanner__preview">
-          <h3>Current Frame</h3>
-          <div className="scanner__frame-container">
-            {progress.currentFrame ? (
-              <img
-                src={progress.currentFrame}
-                alt="Current frame"
-                className="scanner__frame"
-              />
-            ) : (
-              <div className="scanner__frame-placeholder">
-                Waiting for first frame...
-              </div>
-            )}
+        <div className="card bg-base-200">
+          <div className="card-body p-4">
+            <h3 className="card-title text-sm">Current Frame</h3>
+            <div className="aspect-video bg-base-300 rounded-lg overflow-hidden flex items-center justify-center">
+              {progress.currentFrame ? (
+                <img
+                  src={progress.currentFrame}
+                  alt="Current frame"
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <span className="text-base-content/40 text-sm">Waiting for first frame...</span>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Live Stats */}
-        <div className="scanner__stats">
-          <h3>Found Items ({totalFound})</h3>
-          <div className="scanner__counters">
-            {Object.entries(TYPE_LABELS).map(([type, { label, icon }]) => (
-              <div key={type} className="scanner__counter">
-                <span className="scanner__counter-icon">{icon}</span>
-                <span className="scanner__counter-label">{label}</span>
-                <span className="scanner__counter-value">{foundCounts[type]}</span>
-              </div>
-            ))}
-          </div>
+        <div className="card bg-base-200">
+          <div className="card-body p-4">
+            <h3 className="card-title text-sm">Found Items ({totalFound})</h3>
 
-          {/* Recent Items Feed */}
-          <div className="scanner__feed">
-            <h4>Recent Detections</h4>
-            <div className="scanner__feed-list">
-              {recentItems.length === 0 ? (
-                <p className="scanner__feed-empty">No items detected yet...</p>
-              ) : (
-                recentItems.slice(0, 20).map((item, i) => (
-                  <div key={`${item.name}-${i}`} className="scanner__feed-item">
-                    <span className="scanner__feed-type">
-                      {TYPE_LABELS[item.type]?.icon || '📦'}
-                    </span>
-                    <span className="scanner__feed-name">{item.name}</span>
-                    <span className="scanner__feed-category">{item.type}</span>
-                  </div>
-                ))
-              )}
+            {/* Counters */}
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(TYPE_LABELS).map(([type, { label, icon }]) => (
+                <div key={type} className="flex items-center gap-2 bg-base-300 rounded-lg px-3 py-2">
+                  <span className="text-lg">{icon}</span>
+                  <span className="text-xs text-base-content/60 flex-1">{label}</span>
+                  <span className="font-bold text-sm">{foundCounts[type]}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Recent Items Feed */}
+            <div className="mt-3">
+              <h4 className="text-xs font-semibold text-base-content/50 mb-2">Recent Detections</h4>
+              <div className="max-h-48 overflow-y-auto space-y-1">
+                {recentItems.length === 0 ? (
+                  <p className="text-xs text-base-content/40 italic">No items detected yet...</p>
+                ) : (
+                  recentItems.slice(0, 20).map((item, i) => (
+                    <div key={`${item.name}-${i}`} className="flex items-center gap-2 text-xs bg-base-300/50 rounded px-2 py-1">
+                      <span>{TYPE_LABELS[item.type]?.icon || '\uD83D\uDCE6'}</span>
+                      <span className="flex-1 truncate font-medium">{item.name}</span>
+                      <span className="badge badge-ghost badge-xs">{item.type}</span>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>

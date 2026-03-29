@@ -98,14 +98,10 @@ export default function App() {
   }, [scanResults, navigateTo]);
 
   const handleNewScan = useCallback(() => {
-    setVideoFile(null);
-    setSettings(null);
     navigateTo(PAGES.LANDING);
   }, [navigateTo]);
 
   const handleCancelScan = useCallback(() => {
-    setVideoFile(null);
-    setSettings(null);
     navigateTo(PAGES.LANDING);
   }, [navigateTo]);
 
@@ -120,21 +116,21 @@ export default function App() {
   }, []);
 
   return (
-    <div className="app">
+    <div className="min-h-screen flex flex-col bg-base-100">
       {/* Header - shown on scanning, results, and legal pages */}
       {page !== PAGES.LANDING && (
-        <header className="app__header">
-          <div className="app__header-inner">
-            <button className="app__logo-btn" onClick={handleNewScan}>
-              <span className="app__logo-icon">{"\uD83D\uDD0D"}</span>
-              <span className="app__logo-text">Pokopia Scanner</span>
+        <div className="navbar bg-base-200 shadow-md sticky top-0 z-40">
+          <div className="navbar-start">
+            <button className="btn btn-ghost gap-2 text-lg" onClick={handleNewScan}>
+              <span className="text-2xl">{"\uD83D\uDD0D"}</span>
+              <span className="font-bold hidden sm:inline">Pokopia Scanner</span>
             </button>
           </div>
-        </header>
+        </div>
       )}
 
       {/* Main Content */}
-      <main className="app__main">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
         {page === PAGES.LANDING && (
           <>
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_LANDING_TOP} position="top" />
@@ -186,16 +182,16 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="app__footer">
-        <p>Pokopia Progress Scanner &mdash; Track your Pok\u00e9mon Pokopia collection</p>
-        <nav className="app__footer-links">
-          <button className="app__footer-link" onClick={() => navigateTo(PAGES.HOWTO)}>How to Use</button>
-          <span className="app__footer-sep">|</span>
-          <button className="app__footer-link" onClick={() => navigateTo(PAGES.PRIVACY)}>Privacy Policy</button>
-          <span className="app__footer-sep">|</span>
-          <button className="app__footer-link" onClick={() => navigateTo(PAGES.TERMS)}>Terms &amp; Conditions</button>
-          <span className="app__footer-sep">|</span>
-          <button className="app__footer-link" onClick={handleOpenCookieSettings}>Cookie Settings</button>
+      <footer className="footer footer-center bg-base-200 text-base-content p-6">
+        <p className="text-sm opacity-70">Pokopia Progress Scanner &mdash; Track your Pok\u00e9mon Pokopia collection</p>
+        <nav className="flex flex-wrap justify-center gap-2">
+          <button className="btn btn-ghost btn-xs" onClick={() => navigateTo(PAGES.HOWTO)}>How to Use</button>
+          <span className="opacity-30">|</span>
+          <button className="btn btn-ghost btn-xs" onClick={() => navigateTo(PAGES.PRIVACY)}>Privacy Policy</button>
+          <span className="opacity-30">|</span>
+          <button className="btn btn-ghost btn-xs" onClick={() => navigateTo(PAGES.TERMS)}>Terms &amp; Conditions</button>
+          <span className="opacity-30">|</span>
+          <button className="btn btn-ghost btn-xs" onClick={handleOpenCookieSettings}>Cookie Settings</button>
         </nav>
       </footer>
 

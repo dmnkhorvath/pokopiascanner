@@ -2,12 +2,14 @@ import './TermsConditions.css';
 
 export default function TermsConditions({ onBack }) {
   return (
-    <div className="legal-page">
-      <div className="legal-page__container">
-        <button className="legal-page__back" onClick={onBack}>&larr; Back to Scanner</button>
+    <div className="max-w-4xl mx-auto">
+      <button className="btn btn-ghost btn-sm gap-1 mb-6" onClick={onBack}>
+        &larr; Back to Scanner
+      </button>
 
+      <div className="prose prose-sm sm:prose-base max-w-none">
         <h1>Terms &amp; Conditions</h1>
-        <p className="legal-page__updated">Last updated: March 29, 2026</p>
+        <p className="text-base-content/50 text-sm">Last updated: March 29, 2026</p>
 
         <section>
           <h2>1. Service Description</h2>
@@ -36,8 +38,8 @@ export default function TermsConditions({ onBack }) {
           <p>
             Pok&eacute;mon, Pok&eacute;mon Pokopia, and all related names, characters, and imagery are
             trademarks and copyrights of Nintendo, The Pok&eacute;mon Company, and Game Freak.
-            This application is an <strong>unofficial fan tool</strong> and is not affiliated with,
-            endorsed by, or sponsored by Nintendo, The Pok&eacute;mon Company, or Game Freak.
+            This application is an independent fan project and is not affiliated with,
+            endorsed by, or sponsored by any of these companies.
           </p>
           <p>
             The source code of Pokopia Progress Scanner is available under its respective open-source
@@ -60,8 +62,8 @@ export default function TermsConditions({ onBack }) {
           <p>
             This service is provided <strong>&ldquo;as is&rdquo;</strong> and{' '}
             <strong>&ldquo;as available&rdquo;</strong> without warranties of any kind, either express
-            or implied, including but not limited to implied warranties of merchantability, fitness
-            for a particular purpose, or non-infringement.
+            or implied, including but not limited to the implied warranties of merchantability,
+            fitness for a particular purpose, or non-infringement.
           </p>
           <p>
             We do not guarantee that:
@@ -76,11 +78,9 @@ export default function TermsConditions({ onBack }) {
         <section>
           <h2>6. Limitation of Liability</h2>
           <p>
-            To the fullest extent permitted by applicable law, the maintainers of Pokopia Progress
-            Scanner shall not be liable for any indirect, incidental, special, consequential, or
-            punitive damages, or any loss of profits or revenues, whether incurred directly or
-            indirectly, or any loss of data, use, goodwill, or other intangible losses resulting
-            from your use of the service.
+            In no event shall the developers or maintainers of Pokopia Progress Scanner be liable
+            for any indirect, incidental, special, consequential, or punitive damages arising out
+            of or related to your use of the service.
           </p>
         </section>
 
@@ -140,14 +140,16 @@ export default function TermsConditions({ onBack }) {
           <p>
             If you have any questions about these Terms &amp; Conditions, please contact us at:
           </p>
-          <p className="legal-page__contact">
+          <p>
             <strong>Pokopia Progress Scanner</strong><br />
             Email: <a href="mailto:hello@dominikh.com">hello@dominikh.com</a>
           </p>
         </section>
-
-        <button className="legal-page__back legal-page__back--bottom" onClick={onBack}>&larr; Back to Scanner</button>
       </div>
+
+      <button className="btn btn-ghost btn-sm gap-1 mt-8 mb-4" onClick={onBack}>
+        &larr; Back to Scanner
+      </button>
     </div>
   );
 }
