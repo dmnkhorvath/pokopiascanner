@@ -16,13 +16,15 @@ const steps = [
   {
     number: 2,
     icon: '🔴',
-    title: 'Record a Video on Your Switch',
-    description: 'Use the Nintendo Switch capture feature to record your browsing session.',
+    title: 'Record Video Clips on Your Switch',
+    description: 'The Switch saves the last 30 seconds when you press Capture — this is a hardware limit and cannot be changed. Record multiple short clips to cover your full collection.',
     tips: [
       'Hold the Capture button (square button on the left Joy-Con) to save the last 30 seconds of gameplay',
-      'The video is saved to your Album automatically',
-      'If stepping through all entries takes longer than 30 seconds, split it into multiple recordings — just pick up where you left off',
-      'You can upload multiple video chunks to the scanner and merge the results',
+      'The 30-second limit is built into the Switch hardware — there is no setting to increase it',
+      'To cover a long list: press Capture every ~25 seconds while scrolling, so each clip overlaps slightly',
+      `Don't worry about overlap — the scanner deduplicates automatically, so the same entry won't be counted twice`,
+      'Each clip is saved to your Album — you can upload all of them one after another',
+      'For longer uninterrupted recordings, use a capture card (e.g. Elgato HD60) connected to the Switch dock',
     ],
   },
   {
