@@ -181,6 +181,12 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
             {settings.scanMode === 'pokemon' && (
               <p className="text-xs text-info mt-2">🔴 Pokémon mode scans the banner for "No. XXX" and detects captured vs sensed status. Works with all banner colors.</p>
             )}
+            {settings.scanMode === 'item' && (
+              <p className="text-xs text-info mt-2">🎒 Item mode uses grid detection to identify discovered vs undiscovered items. Record a video scrolling through your item collection grid.</p>
+            )}
+            {settings.scanMode === 'recipe' && (
+              <p className="text-xs text-info mt-2">📋 Recipe mode uses grid detection to identify discovered vs undiscovered recipes. Record a video scrolling through your recipe collection grid.</p>
+            )}
           </div>
 
           {/* Frame Rate - full width */}

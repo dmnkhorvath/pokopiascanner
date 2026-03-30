@@ -4,6 +4,7 @@
  */
 import { createWorker } from 'tesseract.js';
 import { buildFuzzyMatcher } from './fuzzyMatch.js';
+import { scanGridVideo, getGridDataList } from './gridEngine.js';
 import ocrLookup from '../assets/ocrLookup.json';
 
 // Pre-build the fuzzy matcher once
@@ -658,6 +659,69 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     habitat: new Map(),
     recipe: new Map(),
   };
+
+  // ─── Grid-based scanning for item/recipe modes ───────────────────────────
+  // Items and recipes appear in a scrolling grid without text labels.
+  // Instead of OCR, we use canvas pixel analysis to detect the grid layout,
+  // classify tiles as discovered/undiscovered, and track scroll position.
+  if (scanMode === 'item' || scanMode === 'recipe') {
+    // Auto-detect FPS first
+    if (autoDetectFPS && frameIntervalMs === 0) {
+      onProgress({
+        phase: 'detecting', current: 0, total: 0, percent: 0,
+        message: 'Detecting video framerate...',
+      });
+      try {
+        const fpsInfo = await detectVideoFPS(videoFile);
+        frameIntervalMs = fpsInfo.frameIntervalMs;
+      } catch {
+        frameIntervalMs = 33;
+      }
+    }
+
+    onProgress({
+      phase: 'init', current: 0, total: 0, percent: 0,
+      message: `Starting grid-based ${scanMode} scan...`,
+    });
+
+    const gridResults = await scanGridVideo(video, {
+      ...settings,
+      frameIntervalMs,
+      scanMode,
+    }, onProgress, onMatch, signal);
+
+    // Convert grid results to standard format
+    const dataList = getGridDataList(scanMode);
+    const categoryKey = scanMode === 'recipe' ? 'recipe' : 'item';
+    for (const [name, entry] of gridResults) {
+      results[categoryKey].set(name, entry);
+    }
+
+    // Build final results and return
+    URL.revokeObjectURL(videoUrl);
+    const mobile = isMobileDevice();
+    const discovered = [...gridResults.values()].filter(r => r.discovered).length;
+    const undiscovered = [...gridResults.values()].filter(r => !r.discovered).length;
+
+    const finalResults = {
+      scanDate: new Date().toISOString(),
+      totalFound: gridResults.size,
+      pokemon: { found: results.pokemon.size, total: 300, items: Array.from(results.pokemon.values()) },
+      items: { found: results.item.size, total: 1254, items: Array.from(results.item.values()) },
+      habitats: { found: results.habitat.size, total: 209, items: Array.from(results.habitat.values()) },
+      recipes: { found: results.recipe.size, total: 743, items: Array.from(results.recipe.values()) },
+    };
+    finalResults.totalFound = finalResults.pokemon.found + finalResults.items.found + finalResults.habitats.found + finalResults.recipes.found;
+
+    onProgress({
+      phase: 'complete',
+      current: 1, total: 1, percent: 100,
+      message: `Grid scan complete! Mapped ${gridResults.size} ${scanMode}s (${discovered} discovered, ${undiscovered} undiscovered).`,
+    });
+
+    return finalResults;
+  }
+
 
   // Create video element
   const video = document.createElement('video');

@@ -31,6 +31,7 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [builtFilter, setBuiltFilter] = useState('all');
   const [capturedFilter, setCapturedFilter] = useState('all');
+  const [discoveredFilter, setDiscoveredFilter] = useState('all');
   const [copySuccess, setCopySuccess] = useState(false);
 
   const categories = useMemo(() => ({
@@ -79,8 +80,16 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       });
     }
 
+    if (discoveredFilter !== 'all') {
+      items = items.filter(item => {
+        if (item._category !== 'items' && item._category !== 'recipes') return true;
+        if (item.discovered == null) return true;
+        return discoveredFilter === 'discovered' ? item.discovered === true : item.discovered === false;
+      });
+    }
+
     return items;
-  }, [activeTab, categories, searchQuery, builtFilter, capturedFilter]);
+  }, [activeTab, categories, searchQuery, builtFilter, capturedFilter, discoveredFilter]);
 
   const handleExport = () => {
     const exportData = {
@@ -98,7 +107,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       items: {
         found: categories.items.found,
         total: categories.items.total,
-        items: categories.items.items.map(i => i.name || i),
+        items: categories.items.items.map(i => ({
+          name: i.name || i,
+          category: i.category || null,
+          discovered: i.discovered != null ? i.discovered : null,
+        })),
       },
       habitats: {
         found: categories.habitats.found,
@@ -112,7 +125,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       recipes: {
         found: categories.recipes.found,
         total: categories.recipes.total,
-        items: categories.recipes.items.map(i => i.name || i),
+        items: categories.recipes.items.map(i => ({
+          name: i.name || i,
+          category: i.category || null,
+          discovered: i.discovered != null ? i.discovered : null,
+        })),
       },
     };
 
@@ -219,6 +236,12 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
                   {tab.key === 'habitats' && categories.habitats.items.some(h => h.built != null) && (
                     <span className="ml-0.5">({categories.habitats.items.filter(h => h.built).length}✅)</span>
                   )}
+                  {tab.key === 'items' && categories.items.items.some(i => i.discovered != null) && (
+                    <span className="ml-0.5">({categories.items.items.filter(i => i.discovered).length}✅)</span>
+                  )}
+                  {tab.key === 'recipes' && categories.recipes.items.some(r => r.discovered != null) && (
+                    <span className="ml-0.5">({categories.recipes.items.filter(r => r.discovered).length}✅)</span>
+                  )}
                 </span>
               )}
             </button>
@@ -282,6 +305,24 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
             </div>
           )}
 
+          {/* Discovered filter */}
+          {(activeTab === 'items' || activeTab === 'recipes' || activeTab === 'all') && (
+            <div className="join">
+              <button
+                className={`btn btn-xs join-item ${discoveredFilter === 'all' ? 'btn-active' : ''}`}
+                onClick={() => setDiscoveredFilter('all')}
+              >All</button>
+              <button
+                className={`btn btn-xs join-item ${discoveredFilter === 'discovered' ? 'btn-active' : ''}`}
+                onClick={() => setDiscoveredFilter('discovered')}
+              >✅ Discovered</button>
+              <button
+                className={`btn btn-xs join-item ${discoveredFilter === 'undiscovered' ? 'btn-active' : ''}`}
+                onClick={() => setDiscoveredFilter('undiscovered')}
+              >❓ Undiscovered</button>
+            </div>
+          )}
+
           {/* View toggle */}
           <div className="join">
             <button
@@ -324,6 +365,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
                       {item.captured ? '✅ Captured' : '👁️ Sensed'}
                     </span>
                   )}
+                  {(item._category === 'items' || item._category === 'recipes') && item.discovered != null && (
+                    <span className={`badge badge-xs ${item.discovered ? 'badge-success' : 'badge-ghost'}`}>
+                      {item.discovered ? '✅ Discovered' : '❓ Undiscovered'}
+                    </span>
+                  )}
                 </div>
                 <span className={`text-xs ${CATEGORY_TEXT[item._category] || ''}`}>{item._category}</span>
               </div>
@@ -348,6 +394,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               {item._category === 'pokemon' && item.captured != null && (
                 <span className={`badge badge-xs ${item.captured ? 'badge-success' : 'badge-warning'}`}>
                   {item.captured ? '✅ Captured' : '👁️ Sensed'}
+                </span>
+              )}
+              {(item._category === 'items' || item._category === 'recipes') && item.discovered != null && (
+                <span className={`badge badge-xs ${item.discovered ? 'badge-success' : 'badge-ghost'}`}>
+                  {item.discovered ? '✅ Discovered' : '❓ Undiscovered'}
                 </span>
               )}
               <span className={`text-xs ${CATEGORY_TEXT[item._category] || ''}`}>{item._category}</span>
