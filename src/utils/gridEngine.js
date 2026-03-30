@@ -1,18 +1,19 @@
 /**
- * Grid-based Scanner Engine for Pokopia Progress Scanner
+ * Grid-based Scanner Engine with Icon Fingerprint Matching
  *
  * Detects item/recipe grids in video frames, classifies tiles as
- * discovered vs undiscovered using saturation analysis, tracks scroll
- * position via D/U row-pattern matching between consecutive frames,
- * and maps grid positions to dataset entries.
+ * discovered vs undiscovered using saturation analysis, and identifies
+ * discovered items via normalized cross-correlation (NCC) against
+ * pre-computed 16×16 grayscale fingerprints.
+ *
+ * No scroll tracking needed for identification — each tile is matched
+ * independently against the full reference database.
  *
  * Works entirely with canvas pixel operations — no ML dependencies.
- *
- * Proven against real gameplay video: 93/105 rows detected (89% coverage)
- * from a 24-second scrolling capture at 10fps.
  */
 
 import pokopiaDataset from '../assets/pokopiaDataset.json';
+import fingerprintData from '../assets/iconFingerprints.json';
 
 // ─── Reference layout (1920×1080) ────────────────────────────────────────────
 
@@ -23,21 +24,49 @@ const REF_COL0_X = 201;   // first column center x
 const REF_ROW0_Y = 298;   // first row center y
 const REF_COLS   = 12;
 const REF_VISIBLE_ROWS = 5;
-const REF_TILE_HALF = 47; // half-tile crop radius
+const REF_TILE_HALF = 55; // half-tile crop radius (slightly larger for full icon)
 
 // Tile classification
 const SAT_THRESHOLD = 15; // mean saturation above this → discovered
+
+// Fingerprint matching
+const FP_SIZE  = fingerprintData.size;   // 16
+const FP_SCALE = fingerprintData.scale;  // 10000
+const MIN_MATCH_SCORE = 0.65; // minimum NCC to accept a match
 
 // ─── Dataset ordering ────────────────────────────────────────────────────────
 
 const itemList   = pokopiaDataset.items   || [];
 const recipeList = pokopiaDataset.recipes || [];
 
+// ─── Pre-process fingerprint database ────────────────────────────────────────
+
+// Convert quantized int16 arrays to normalized Float32Arrays for fast NCC
+const fpNames = Object.keys(fingerprintData.fingerprints);
+const fpVectors = new Float32Array(fpNames.length * FP_SIZE * FP_SIZE);
+
+(function initFingerprints() {
+  const dim = FP_SIZE * FP_SIZE; // 256
+  for (let i = 0; i < fpNames.length; i++) {
+    const quantized = fingerprintData.fingerprints[fpNames[i]];
+    const offset = i * dim;
+    for (let j = 0; j < dim; j++) {
+      fpVectors[offset + j] = quantized[j] / FP_SCALE;
+    }
+  }
+})();
+
+// Build a lookup from item name → type info from the dataset
+const itemTypeMap = new Map();
+for (const entry of itemList) {
+  itemTypeMap.set(entry.name, { type: 'item', category: entry.category || 'Unknown' });
+}
+for (const entry of recipeList) {
+  itemTypeMap.set(entry.name, { type: 'recipe', category: entry.category || 'Unknown' });
+}
+
 // ─── Scaled grid parameters ─────────────────────────────────────────────────
 
-/**
- * Compute grid geometry scaled to actual video resolution.
- */
 export function detectGridParams(videoWidth, videoHeight) {
   const sx = videoWidth  / REF_WIDTH;
   const sy = videoHeight / REF_HEIGHT;
@@ -63,12 +92,10 @@ function meanSaturation(imageData, x, y, w, h) {
   const { data, width } = imageData;
   let totalSat = 0;
   let count    = 0;
-
   for (let py = y; py < y + h; py += 2) {
     for (let px = x; px < x + w; px += 2) {
       const idx = (py * width + px) * 4;
       const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-      // Fast saturation: 1 - min/max
       const max = Math.max(r, g, b);
       const min = Math.min(r, g, b);
       const sat = max === 0 ? 0 : ((max - min) / max) * 100;
@@ -79,18 +106,149 @@ function meanSaturation(imageData, x, y, w, h) {
   return count > 0 ? totalSat / count : 0;
 }
 
-// ─── Tile classification ─────────────────────────────────────────────────────
+// ─── Icon fingerprint extraction ─────────────────────────────────────────────
 
 /**
- * Classify all visible tiles in a frame.
- * Returns array of 5 rows, each row is array of 12 booleans (true = discovered).
+ * Extract a 16×16 normalized grayscale fingerprint from a tile canvas region.
+ *
+ * Pipeline (mirrors the Python build-time process):
+ *  1. Read tile pixels from ImageData
+ *  2. Classify each pixel as background (low saturation, high value) or icon
+ *  3. Find bounding box of icon pixels
+ *  4. Crop to content, pad to square
+ *  5. Resize to 16×16 using area averaging
+ *  6. Convert to grayscale, normalize (subtract mean, divide by L2 norm)
+ *
+ * @param {ImageData} imageData - Full frame image data
+ * @param {number} tx - Tile top-left x
+ * @param {number} ty - Tile top-left y
+ * @param {number} tw - Tile width
+ * @param {number} th - Tile height
+ * @returns {Float32Array|null} - Normalized 256-element fingerprint or null
  */
+function extractTileFingerprint(imageData, tx, ty, tw, th) {
+  const { data, width } = imageData;
+
+  // Step 1: Find icon bounding box by excluding low-sat high-value background
+  let minX = tw, maxX = 0, minY = th, maxY = 0;
+  let hasIcon = false;
+
+  for (let py = 0; py < th; py++) {
+    for (let px = 0; px < tw; px++) {
+      const idx = ((ty + py) * width + (tx + px)) * 4;
+      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      const sat = max === 0 ? 0 : (max - min) / max;
+      const val = max / 255;
+      // Background: low saturation AND high value (lavender/white)
+      if (sat < 0.10 && val > 0.70) continue;
+      if (px < minX) minX = px;
+      if (px > maxX) maxX = px;
+      if (py < minY) minY = py;
+      if (py > maxY) maxY = py;
+      hasIcon = true;
+    }
+  }
+
+  if (!hasIcon || maxX - minX < 3 || maxY - minY < 3) return null;
+
+  // Step 2: Extract cropped icon as RGB array
+  const cw = maxX - minX + 1;
+  const ch = maxY - minY + 1;
+  const sq = Math.max(cw, ch);
+  const ox = Math.floor((sq - cw) / 2);
+  const oy = Math.floor((sq - ch) / 2);
+
+  // Create square canvas with white background
+  const squarePixels = new Uint8Array(sq * sq * 3);
+  squarePixels.fill(255);
+
+  for (let py = 0; py < ch; py++) {
+    for (let px = 0; px < cw; px++) {
+      const srcIdx = ((ty + minY + py) * width + (tx + minX + px)) * 4;
+      const dstIdx = ((oy + py) * sq + (ox + px)) * 3;
+      squarePixels[dstIdx]     = data[srcIdx];
+      squarePixels[dstIdx + 1] = data[srcIdx + 1];
+      squarePixels[dstIdx + 2] = data[srcIdx + 2];
+    }
+  }
+
+  // Step 3: Resize to FP_SIZE×FP_SIZE using area averaging
+  const fp = new Float32Array(FP_SIZE * FP_SIZE);
+  const blockW = sq / FP_SIZE;
+  const blockH = sq / FP_SIZE;
+
+  for (let fy = 0; fy < FP_SIZE; fy++) {
+    for (let fx = 0; fx < FP_SIZE; fx++) {
+      const srcY0 = Math.floor(fy * blockH);
+      const srcY1 = Math.min(Math.floor((fy + 1) * blockH), sq);
+      const srcX0 = Math.floor(fx * blockW);
+      const srcX1 = Math.min(Math.floor((fx + 1) * blockW), sq);
+      let sum = 0;
+      let cnt = 0;
+      for (let sy = srcY0; sy < srcY1; sy++) {
+        for (let sx = srcX0; sx < srcX1; sx++) {
+          const idx = (sy * sq + sx) * 3;
+          // Grayscale: 0.299R + 0.587G + 0.114B
+          sum += 0.299 * squarePixels[idx] + 0.587 * squarePixels[idx + 1] + 0.114 * squarePixels[idx + 2];
+          cnt++;
+        }
+      }
+      fp[fy * FP_SIZE + fx] = cnt > 0 ? sum / cnt : 255;
+    }
+  }
+
+  // Step 4: Normalize (subtract mean, divide by L2 norm)
+  let mean = 0;
+  for (let i = 0; i < fp.length; i++) mean += fp[i];
+  mean /= fp.length;
+  for (let i = 0; i < fp.length; i++) fp[i] -= mean;
+
+  let norm = 0;
+  for (let i = 0; i < fp.length; i++) norm += fp[i] * fp[i];
+  norm = Math.sqrt(norm);
+  if (norm > 0) {
+    for (let i = 0; i < fp.length; i++) fp[i] /= norm;
+  }
+
+  return fp;
+}
+
+/**
+ * Match a tile fingerprint against the reference database.
+ * Returns { name, score } or null if no match above threshold.
+ */
+function matchFingerprint(tileFp) {
+  const dim = FP_SIZE * FP_SIZE;
+  let bestIdx   = -1;
+  let bestScore = -Infinity;
+
+  for (let i = 0; i < fpNames.length; i++) {
+    const offset = i * dim;
+    let dot = 0;
+    for (let j = 0; j < dim; j++) {
+      dot += tileFp[j] * fpVectors[offset + j];
+    }
+    if (dot > bestScore) {
+      bestScore = dot;
+      bestIdx   = i;
+    }
+  }
+
+  if (bestIdx >= 0 && bestScore >= MIN_MATCH_SCORE) {
+    return { name: fpNames[bestIdx], score: bestScore };
+  }
+  return null;
+}
+
+// ─── Tile classification ─────────────────────────────────────────────────────
+
 export function classifyFrame(imageData, gp) {
   const rows = [];
   for (let r = 0; r < gp.visibleRows; r++) {
     const cy = gp.row0Y + r * gp.cell;
     const ty = cy - gp.tileHalf;
-    // Skip rows that fall outside the frame
     if (ty < 0 || cy + gp.tileHalf >= gp.height) {
       rows.push(null);
       continue;
@@ -112,19 +270,13 @@ export function classifyFrame(imageData, gp) {
   return rows;
 }
 
-// ─── Row-pattern scroll tracking ─────────────────────────────────────────────
+// ─── Row-pattern scroll tracking (for undiscovered counting) ─────────────────
 
-/**
- * Convert a row of booleans to a compact string key for comparison.
- */
 function rowKey(row) {
   if (!row) return null;
   return row.map(v => v ? '1' : '0').join('');
 }
 
-/**
- * Check if two row patterns match (allow tolerance for transition frames).
- */
 function rowsMatch(a, b, tolerance = 1) {
   if (!a || !b || a.length !== b.length) return false;
   let diff = 0;
@@ -134,25 +286,13 @@ function rowsMatch(a, b, tolerance = 1) {
   return diff <= tolerance;
 }
 
-/**
- * Determine how many rows the grid scrolled between two consecutive frames.
- *
- * Compares the D/U pattern of each row: if prev rows [shift..N] match
- * curr rows [0..N-shift], the grid scrolled down by `shift` rows.
- *
- * @param {boolean[][]} prevRows – previous frame's classified rows
- * @param {boolean[][]} currRows – current  frame's classified rows
- * @returns {number} row shift (0 = no scroll, 1 = scrolled 1 row, …)
- */
 export function findRowShift(prevRows, currRows) {
   const n = Math.min(prevRows.length, currRows.length);
   if (n === 0) return 0;
-
-  let bestShift  = 0;
-  let bestScore  = -1;
-
+  let bestShift = 0;
+  let bestScore = -1;
   for (let shift = 0; shift <= n; shift++) {
-    let matches     = 0;
+    let matches = 0;
     let comparisons = 0;
     for (let i = 0; i < n - shift; i++) {
       const pi = shift + i;
@@ -162,7 +302,6 @@ export function findRowShift(prevRows, currRows) {
         comparisons++;
       }
     }
-    // Prefer smaller shifts when tied; require ≥60 % overlap match
     const score = matches * 10 + (n - shift);
     if (comparisons > 0 && matches >= comparisons * 0.6 && score > bestScore) {
       bestScore = score;
@@ -175,16 +314,15 @@ export function findRowShift(prevRows, currRows) {
 // ─── Main scanning pipeline ─────────────────────────────────────────────────
 
 /**
- * Scan a video of a scrolling item/recipe grid.
+ * Scan a video of a scrolling item/recipe grid using icon fingerprint matching.
  *
  * Algorithm:
  *  1. For each frame, classify all visible tiles as discovered / undiscovered.
- *  2. Compare the D/U row patterns with the previous frame to detect how
- *     many rows the grid scrolled (0, 1, 2, …).
- *  3. Accumulate an absolute row offset and map each tile to its dataset
- *     index  (absRow × 12 + col).
- *  4. Track unique items; update discovered status if a tile is seen as
- *     discovered in any frame.
+ *  2. For each discovered tile, extract a 16×16 fingerprint and match it
+ *     against the pre-computed reference database via NCC.
+ *  3. Track scroll position via D/U row patterns to count total rows
+ *     (for undiscovered tile counting).
+ *  4. Deduplicate: each unique item name is recorded once with best score.
  *
  * @param {HTMLVideoElement} video
  * @param {object}   settings
@@ -197,7 +335,7 @@ export async function scanGridVideo(
   video, settings, onProgress, onMatch, signal,
 ) {
   const {
-    frameIntervalMs = 100,   // default ~10 fps
+    frameIntervalMs = 100,
     scanMode        = 'item',
   } = settings;
 
@@ -215,9 +353,11 @@ export async function scanGridVideo(
   const frameCtx = frameCanvas.getContext('2d', { willReadFrequently: true });
 
   const results       = new Map();   // name → result object
-  let absRowOffset    = 0;           // absolute row of the top visible row
-  let prevRows        = null;        // previous frame's classified rows
+  let absRowOffset    = 0;
+  let prevRows        = null;
   let processedFrames = 0;
+  let totalUndiscovered = 0;         // count of unique undiscovered positions
+  const seenPositions = new Set();   // track grid positions we've seen
 
   const yieldToBrowser = () => new Promise(r => setTimeout(r, 0));
 
@@ -236,39 +376,56 @@ export async function scanGridVideo(
     // Classify tiles
     const currRows = classifyFrame(imageData, gp);
 
-    // Detect scroll shift
+    // Detect scroll shift for position tracking
     if (prevRows) {
       const shift = findRowShift(prevRows, currRows);
       absRowOffset += shift;
     }
 
-    // Map tiles to dataset entries
+    // Process each tile
     const newItems = [];
     for (let r = 0; r < currRows.length; r++) {
       if (!currRows[r]) continue;
       const absRow = absRowOffset + r;
       for (let c = 0; c < gp.cols; c++) {
-        const absIndex = absRow * gp.cols + c;
-        if (absIndex < 0 || absIndex >= totalItems) continue;
-
-        const entry      = dataList[absIndex];
-        const name       = entry.name;
+        const posKey = `${absRow}:${c}`;
         const discovered = currRows[r][c];
 
-        if (!results.has(name)) {
-          const result = {
-            name,
-            type:       scanMode,
-            category:   entry.category || 'Unknown',
-            discovered,
-            gridIndex:  absIndex,
-          };
-          results.set(name, result);
-          if (discovered) newItems.push(result);
-        } else if (discovered && !results.get(name).discovered) {
-          // Upgrade undiscovered → discovered
-          results.get(name).discovered = true;
-          newItems.push(results.get(name));
+        if (discovered) {
+          // Extract fingerprint and match
+          const cx = gp.col0X + c * gp.cell;
+          const cy = gp.row0Y + r * gp.cell;
+          const tx = cx - gp.tileHalf;
+          const ty = cy - gp.tileHalf;
+          const tw = gp.tileHalf * 2;
+          const th = gp.tileHalf * 2;
+
+          const tileFp = extractTileFingerprint(imageData, tx, ty, tw, th);
+          if (tileFp) {
+            const match = matchFingerprint(tileFp);
+            if (match) {
+              const { name, score } = match;
+              if (!results.has(name) || score > results.get(name).matchScore) {
+                const typeInfo = itemTypeMap.get(name) || { type: scanMode, category: 'Unknown' };
+                const result = {
+                  name,
+                  type:       typeInfo.type,
+                  category:   typeInfo.category,
+                  discovered: true,
+                  matchScore: score,
+                };
+                const isNew = !results.has(name);
+                results.set(name, result);
+                if (isNew) newItems.push(result);
+              }
+            }
+          }
+        } else {
+          // Track undiscovered positions
+          if (!seenPositions.has(posKey)) {
+            seenPositions.add(posKey);
+            totalUndiscovered++;
+          }
         }
       }
     }
@@ -282,7 +439,7 @@ export async function scanGridVideo(
     processedFrames++;
 
     // Progress
-    const discoveredCount = [...results.values()].filter(r => r.discovered).length;
+    const discoveredCount = results.size;
     const previewDataUrl  = frameCanvas.toDataURL('image/jpeg', 0.4);
     onProgress({
       phase:        'scanning',
@@ -290,8 +447,7 @@ export async function scanGridVideo(
       total:        totalFrames,
       percent:      Math.round((processedFrames / totalFrames) * 100),
       message:      `Grid scan: ${processedFrames}/${totalFrames} frames | `
-                  + `${results.size} entries mapped `
-                  + `(${discoveredCount} discovered)`,
+                  + `${discoveredCount} items identified`,
       currentFrame: previewDataUrl,
       timePosition: time,
       duration,
@@ -299,6 +455,20 @@ export async function scanGridVideo(
     await yieldToBrowser();
 
     if (processedFrames % 5 === 0) await yieldToBrowser();
+  }
+
+  // Add undiscovered entries from the dataset for items NOT matched
+  // This gives a complete picture of what's missing
+  for (const entry of dataList) {
+    if (!results.has(entry.name)) {
+      results.set(entry.name, {
+        name:       entry.name,
+        type:       scanMode,
+        category:   entry.category || 'Unknown',
+        discovered: false,
+        matchScore: 0,
+      });
+    }
   }
 
   // Cleanup
