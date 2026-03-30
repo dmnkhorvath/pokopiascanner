@@ -27,5 +27,3 @@ test_ocr/
 tmp_pokedex_frames/
 .env
 
-# Scraped icon assets (not used by grid scanner)
-public/icons/
