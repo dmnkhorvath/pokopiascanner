@@ -660,6 +660,20 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     recipe: new Map(),
   };
 
+  // Create video element
+  const video = document.createElement('video');
+  video.muted = true;
+  video.playsInline = true;
+  const videoUrl = URL.createObjectURL(videoFile);
+  video.src = videoUrl;
+
+  await new Promise((resolve, reject) => {
+    video.onloadedmetadata = resolve;
+    video.onerror = () => reject(new Error('Failed to load video'));
+  });
+
+  const duration = video.duration;
+
   // ─── Grid-based scanning for item/recipe modes ───────────────────────────
   // Items and recipes appear in a scrolling grid without text labels.
   // Instead of OCR, we use canvas pixel analysis to detect the grid layout,
@@ -723,19 +737,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   }
 
 
-  // Create video element
-  const video = document.createElement('video');
-  video.muted = true;
-  video.playsInline = true;
-  const videoUrl = URL.createObjectURL(videoFile);
-  video.src = videoUrl;
 
-  await new Promise((resolve, reject) => {
-    video.onloadedmetadata = resolve;
-    video.onerror = () => reject(new Error('Failed to load video'));
-  });
-
-  const duration = video.duration;
 
   // Auto-detect FPS
   if (autoDetectFPS && frameIntervalMs === 0) {
