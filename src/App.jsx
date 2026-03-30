@@ -42,6 +42,7 @@ export default function App() {
   const [videoFile, setVideoFile] = useState(null);
   const [settings, setSettings] = useState(null);
   const [scanResults, setScanResults] = useState(null);
+  const [scanCount, setScanCount] = useState(0);
 
   const cookieSettingsRef = useRef(null);
 
@@ -85,6 +86,7 @@ export default function App() {
     } else {
       setScanResults(results);
     }
+    setScanCount(prev => prev + 1);
     navigateTo(PAGES.RESULTS);
   }, [scanResults, navigateTo]);
 
@@ -94,16 +96,28 @@ export default function App() {
     } else {
       setScanResults(imported);
     }
+    setScanCount(prev => prev + 1);
     navigateTo(PAGES.RESULTS);
   }, [scanResults, navigateTo]);
 
-  const handleNewScan = useCallback(() => {
+  // Go back to landing to add more videos (keeps results)
+  const handleAddMore = useCallback(() => {
+    setVideoFile(null);
+    navigateTo(PAGES.LANDING);
+  }, [navigateTo]);
+
+  // Clear everything and start fresh
+  const handleStartFresh = useCallback(() => {
+    setScanResults(null);
+    setScanCount(0);
+    setVideoFile(null);
+    setSettings(null);
     navigateTo(PAGES.LANDING);
   }, [navigateTo]);
 
   const handleCancelScan = useCallback(() => {
-    navigateTo(PAGES.LANDING);
-  }, [navigateTo]);
+    navigateTo(scanResults ? PAGES.RESULTS : PAGES.LANDING);
+  }, [navigateTo, scanResults]);
 
   const handleBackToScanner = useCallback(() => {
     navigateTo(PAGES.LANDING);
@@ -121,11 +135,19 @@ export default function App() {
       {page !== PAGES.LANDING && (
         <div className="navbar bg-base-200 shadow-md sticky top-0 z-40">
           <div className="navbar-start">
-            <button className="btn btn-ghost gap-2 text-lg" onClick={handleNewScan}>
+            <button className="btn btn-ghost gap-2 text-lg" onClick={handleAddMore}>
               <span className="text-2xl">{"🔍"}</span>
               <span className="font-bold hidden sm:inline">Pokopia Scanner</span>
             </button>
           </div>
+          {scanResults && page !== PAGES.RESULTS && (
+            <div className="navbar-end">
+              <button className="btn btn-ghost btn-sm" onClick={() => navigateTo(PAGES.RESULTS)}>
+                📊 Results
+                <span className="badge badge-primary badge-sm ml-1">{scanResults.totalFound}</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -138,6 +160,10 @@ export default function App() {
               onStartScan={handleStartScan}
               onImportResults={handleImportResults}
               onShowHowTo={() => navigateTo(PAGES.HOWTO)}
+              existingResults={scanResults}
+              scanCount={scanCount}
+              onStartFresh={handleStartFresh}
+              onViewResults={() => navigateTo(PAGES.RESULTS)}
             />
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_LANDING_BOTTOM} position="bottom" />
           </>
@@ -161,7 +187,9 @@ export default function App() {
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_TOP} position="top" />
             <ScanResults
               results={scanResults}
-              onNewScan={handleNewScan}
+              scanCount={scanCount}
+              onAddMore={handleAddMore}
+              onStartFresh={handleStartFresh}
               onImportResults={handleImportResults}
             />
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />

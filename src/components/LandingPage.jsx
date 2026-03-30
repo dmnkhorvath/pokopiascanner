@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { DEFAULT_SETTINGS, CROP_PRESETS, SCAN_MODES, detectVideoFPS } from '../utils/ocrEngine.js';
 import './LandingPage.css';
 
-export default function LandingPage({ onStartScan, onImportResults, onShowHowTo }) {
+export default function LandingPage({ onStartScan, onImportResults, onShowHowTo, existingResults, scanCount = 0, onStartFresh, onViewResults }) {
   const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS });
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
@@ -88,12 +88,37 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
             <div className="text-6xl mb-4">{"🔍"}</div>
             <h1 className="text-4xl sm:text-5xl font-bold">Pokopia Progress Scanner</h1>
             <p className="py-4 text-base-content/60">
-              Upload a Nintendo Switch video recording of your Pokémon Pokopia game
-              to scan and track your collection progress.
+              {existingResults
+              ? 'Upload another video to add more entries to your current session.'
+              : 'Upload a Nintendo Switch video recording of your Pokémon Pokopia game to scan and track your collection progress.'
+            }
             </p>
           </div>
         </div>
       </div>
+
+      {/* Existing Results Banner */}
+      {existingResults && scanCount > 0 && (
+        <div className="alert alert-success shadow-md">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+            <div className="flex-1">
+              <h3 className="font-bold">📊 Session in progress</h3>
+              <p className="text-sm opacity-80">
+                You have {existingResults.totalFound} items from {scanCount} video{scanCount > 1 ? 's' : ''}.
+                Upload another video to merge more results.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn btn-sm btn-primary" onClick={onViewResults}>
+                View Results
+              </button>
+              <button className="btn btn-sm btn-ghost" onClick={onStartFresh}>
+                Start Fresh
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Upload Section */}
       <section>
@@ -366,7 +391,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
           onClick={handleStartScan}
           disabled={!videoFile}
         >
-          {"🔍"} Start Scanning
+          {existingResults ? '➕ Scan & Merge' : '🔍 Start Scanning'}
         </button>
         <button
           className="btn btn-secondary gap-2"

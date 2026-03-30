@@ -25,7 +25,7 @@ const CATEGORY_TEXT = {
   recipes: 'text-accent',
 };
 
-export default function ScanResults({ results, onNewScan, onImportResults }) {
+export default function ScanResults({ results, scanCount = 0, onAddMore, onStartFresh, onImportResults }) {
   const [activeTab, setActiveTab] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
@@ -185,13 +185,29 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
         <div>
           <h2 className="text-2xl font-bold">Scan Results</h2>
           <p className="text-sm text-base-content/50">
-            {results?.scanDate
-              ? `Scanned: ${new Date(results.scanDate).toLocaleString()}`
-              : 'No scan data'}
+            {scanCount > 0
+              ? `Accumulated from ${scanCount} video${scanCount > 1 ? 's' : ''}`
+              : results?.scanDate
+                ? `Scanned: ${new Date(results.scanDate).toLocaleString()}`
+                : 'No scan data'}
           </p>
         </div>
-        <button className="btn btn-primary btn-sm" onClick={onNewScan}>New Scan</button>
+        <div className="flex gap-2">
+          <button className="btn btn-primary btn-sm gap-1" onClick={onAddMore}>
+            ➕ Add More Videos
+          </button>
+          <button className="btn btn-ghost btn-sm gap-1" onClick={onStartFresh}>
+            🔄 Start Fresh
+          </button>
+        </div>
       </div>
+
+      {/* Session info banner */}
+      {scanCount > 1 && (
+        <div className="alert alert-info">
+          <span>📁 This session includes data merged from {scanCount} video scans. Upload more videos or export when done.</span>
+        </div>
+      )}
 
       {/* Overall Progress */}
       <div className="space-y-4">
@@ -408,20 +424,29 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       )}
 
       {/* Footer Actions */}
-      <div className="flex flex-wrap gap-2 justify-center pt-4 border-t border-base-content/10">
-        <button className="btn btn-primary btn-sm gap-1" onClick={handleExport}>
-          📥 Export JSON
-        </button>
-        <button
-          className={`btn btn-sm gap-1 ${copySuccess ? 'btn-success' : 'btn-secondary'}`}
-          onClick={handleCopyToClipboard}
-        >
-          {copySuccess ? '✅ Copied!' : '📋 Copy to Clipboard'}
-        </button>
-        <label className="btn btn-secondary btn-sm gap-1 cursor-pointer">
-          📂 Import & Merge
-          <input type="file" accept=".json" onChange={handleImport} hidden />
-        </label>
+      <div className="flex flex-col items-center gap-4 pt-6 border-t border-base-content/10">
+        {/* Primary: Export when done */}
+        <div className="flex flex-wrap gap-2 justify-center">
+          <button className="btn btn-success btn-md gap-1" onClick={handleExport}>
+            📥 Export All Data
+          </button>
+          <button
+            className={`btn btn-md gap-1 ${copySuccess ? 'btn-success' : 'btn-secondary'}`}
+            onClick={handleCopyToClipboard}
+          >
+            {copySuccess ? '✅ Copied!' : '📋 Copy Names'}
+          </button>
+        </div>
+        {/* Secondary: Continue session */}
+        <div className="flex flex-wrap gap-2 justify-center">
+          <button className="btn btn-primary btn-sm gap-1" onClick={onAddMore}>
+            ➕ Add More Videos
+          </button>
+          <label className="btn btn-ghost btn-sm gap-1 cursor-pointer">
+            📂 Import & Merge JSON
+            <input type="file" accept=".json" onChange={handleImport} hidden />
+          </label>
+        </div>
       </div>
     </div>
   );

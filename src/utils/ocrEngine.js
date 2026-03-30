@@ -1032,16 +1032,30 @@ export function mergeResults(existing, incoming) {
 }
 
 function mergeCategory(existing, incoming, total) {
-  const nameSet = new Set();
-  const items = [];
+  const itemMap = new Map();
 
   const addItems = (arr) => {
     if (!arr) return;
     for (const item of arr) {
-      const name = item.name || item;
-      if (!nameSet.has(name)) {
-        nameSet.add(name);
-        items.push(typeof item === 'string' ? { name: item } : item);
+      const obj = typeof item === 'string' ? { name: item } : item;
+      const name = obj.name;
+      if (!name) continue;
+
+      if (itemMap.has(name)) {
+        // Merge: upgrade statuses (true wins over false/null)
+        const prev = itemMap.get(name);
+        if (obj.built === true) prev.built = true;
+        if (obj.captured === true) prev.captured = true;
+        if (obj.discovered === true) prev.discovered = true;
+        // Keep number/category if missing
+        if (obj.number && !prev.number) prev.number = obj.number;
+        if (obj.category && !prev.category) prev.category = obj.category;
+        // Keep confidence if higher
+        if (obj.confidence != null && (prev.confidence == null || obj.confidence > prev.confidence)) {
+          prev.confidence = obj.confidence;
+        }
+      } else {
+        itemMap.set(name, { ...obj });
       }
     }
   };
@@ -1049,5 +1063,6 @@ function mergeCategory(existing, incoming, total) {
   addItems(existing?.items);
   addItems(incoming?.items);
 
+  const items = Array.from(itemMap.values());
   return { found: items.length, total, items };
 }
