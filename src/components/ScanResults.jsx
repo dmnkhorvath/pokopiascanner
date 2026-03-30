@@ -4,11 +4,11 @@ import ProgressBar from './ProgressBar';
 import './ScanResults.css';
 
 const TABS = [
-  { key: 'all', label: 'All', icon: '\uD83D\uDCCA' },
-  { key: 'pokemon', label: 'Pok\u00e9mon', icon: '\uD83D\uDD34' },
-  { key: 'items', label: 'Items', icon: '\uD83C\uDF92' },
-  { key: 'habitats', label: 'Habitats', icon: '\uD83C\uDFE0' },
-  { key: 'recipes', label: 'Recipes', icon: '\uD83D\uDCCB' },
+  { key: 'all', label: 'All', icon: '📊' },
+  { key: 'pokemon', label: 'Pokémon', icon: '🔴' },
+  { key: 'items', label: 'Items', icon: '🎒' },
+  { key: 'habitats', label: 'Habitats', icon: '🏠' },
+  { key: 'recipes', label: 'Recipes', icon: '📋' },
 ];
 
 const CATEGORY_BORDER = {
@@ -214,10 +214,10 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
                 <span className="badge badge-sm badge-ghost">
                   {categories[tab.key]?.found || 0}
                   {tab.key === 'pokemon' && categories.pokemon.items.some(p => p.captured != null) && (
-                    <span className="ml-0.5">({categories.pokemon.items.filter(p => p.captured).length}\u2705)</span>
+                    <span className="ml-0.5">({categories.pokemon.items.filter(p => p.captured).length}✅)</span>
                   )}
                   {tab.key === 'habitats' && categories.habitats.items.some(h => h.built != null) && (
-                    <span className="ml-0.5">({categories.habitats.items.filter(h => h.built).length}\u2705)</span>
+                    <span className="ml-0.5">({categories.habitats.items.filter(h => h.built).length}✅)</span>
                   )}
                 </span>
               )}
@@ -241,7 +241,7 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
                 className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle"
                 onClick={() => setSearchQuery('')}
               >
-                \u2715
+                ✕
               </button>
             )}
           </div>
@@ -256,11 +256,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               <button
                 className={`btn btn-xs join-item ${builtFilter === 'built' ? 'btn-active' : ''}`}
                 onClick={() => setBuiltFilter('built')}
-              >\u2705 Built</button>
+              >✅ Built</button>
               <button
                 className={`btn btn-xs join-item ${builtFilter === 'notbuilt' ? 'btn-active' : ''}`}
                 onClick={() => setBuiltFilter('notbuilt')}
-              >\u274C Not Built</button>
+              >❌ Not Built</button>
             </div>
           )}
 
@@ -274,11 +274,11 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               <button
                 className={`btn btn-xs join-item ${capturedFilter === 'captured' ? 'btn-active' : ''}`}
                 onClick={() => setCapturedFilter('captured')}
-              >\u2705 Captured</button>
+              >✅ Captured</button>
               <button
                 className={`btn btn-xs join-item ${capturedFilter === 'sensed' ? 'btn-active' : ''}`}
                 onClick={() => setCapturedFilter('sensed')}
-              >\uD83D\uDC41\uFE0F Sensed</button>
+              >👁️ Sensed</button>
             </div>
           )}
 
@@ -288,12 +288,12 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               className={`btn btn-xs join-item ${viewMode === 'grid' ? 'btn-active' : ''}`}
               onClick={() => setViewMode('grid')}
               title="Grid view"
-            >\u25A6</button>
+            >▦</button>
             <button
               className={`btn btn-xs join-item ${viewMode === 'list' ? 'btn-active' : ''}`}
               onClick={() => setViewMode('list')}
               title="List view"
-            >\u2630</button>
+            >☰</button>
           </div>
         </div>
       </div>
@@ -316,12 +316,12 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
                   {item.number && <span className="badge badge-ghost badge-xs">{item.number}</span>}
                   {item._category === 'habitats' && item.built != null && (
                     <span className={`badge badge-xs ${item.built ? 'badge-success' : 'badge-error'}`}>
-                      {item.built ? '\u2705 Built' : '\u274C Not Built'}
+                      {item.built ? '✅ Built' : '❌ Not Built'}
                     </span>
                   )}
                   {item._category === 'pokemon' && item.captured != null && (
                     <span className={`badge badge-xs ${item.captured ? 'badge-success' : 'badge-warning'}`}>
-                      {item.captured ? '\u2705 Captured' : '\uD83D\uDC41\uFE0F Sensed'}
+                      {item.captured ? '✅ Captured' : '👁️ Sensed'}
                     </span>
                   )}
                 </div>
@@ -342,12 +342,12 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
               {item.category && <span className="badge badge-ghost badge-xs">{item.category}</span>}
               {item._category === 'habitats' && item.built != null && (
                 <span className={`badge badge-xs ${item.built ? 'badge-success' : 'badge-error'}`}>
-                  {item.built ? '\u2705 Built' : '\u274C Not Built'}
+                  {item.built ? '✅ Built' : '❌ Not Built'}
                 </span>
               )}
               {item._category === 'pokemon' && item.captured != null && (
                 <span className={`badge badge-xs ${item.captured ? 'badge-success' : 'badge-warning'}`}>
-                  {item.captured ? '\u2705 Captured' : '\uD83D\uDC41\uFE0F Sensed'}
+                  {item.captured ? '✅ Captured' : '👁️ Sensed'}
                 </span>
               )}
               <span className={`text-xs ${CATEGORY_TEXT[item._category] || ''}`}>{item._category}</span>
@@ -359,16 +359,16 @@ export default function ScanResults({ results, onNewScan, onImportResults }) {
       {/* Footer Actions */}
       <div className="flex flex-wrap gap-2 justify-center pt-4 border-t border-base-content/10">
         <button className="btn btn-primary btn-sm gap-1" onClick={handleExport}>
-          \uD83D\uDCE5 Export JSON
+          📥 Export JSON
         </button>
         <button
           className={`btn btn-sm gap-1 ${copySuccess ? 'btn-success' : 'btn-secondary'}`}
           onClick={handleCopyToClipboard}
         >
-          {copySuccess ? '\u2705 Copied!' : '\uD83D\uDCCB Copy to Clipboard'}
+          {copySuccess ? '✅ Copied!' : '📋 Copy to Clipboard'}
         </button>
         <label className="btn btn-secondary btn-sm gap-1 cursor-pointer">
-          \uD83D\uDCC2 Import & Merge
+          📂 Import & Merge
           <input type="file" accept=".json" onChange={handleImport} hidden />
         </label>
       </div>

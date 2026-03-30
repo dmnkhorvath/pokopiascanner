@@ -85,10 +85,10 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
       <div className="hero py-10">
         <div className="hero-content text-center">
           <div className="max-w-lg">
-            <div className="text-6xl mb-4">{"\uD83D\uDD0D"}</div>
+            <div className="text-6xl mb-4">{"🔍"}</div>
             <h1 className="text-4xl sm:text-5xl font-bold">Pokopia Progress Scanner</h1>
             <p className="py-4 text-base-content/60">
-              Upload a Nintendo Switch video recording of your Pok\u00e9mon Pokopia game
+              Upload a Nintendo Switch video recording of your Pokémon Pokopia game
               to scan and track your collection progress.
             </p>
           </div>
@@ -97,7 +97,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
 
       {/* Upload Section */}
       <section>
-        <h2 className="text-xl font-bold mb-3">{"\uD83D\uDCF9"} Upload Video</h2>
+        <h2 className="text-xl font-bold mb-3">{"📹"} Upload Video</h2>
         <div
           className={`card border-2 border-dashed cursor-pointer transition-colors ${
             dragActive
@@ -137,7 +137,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <span className="text-4xl">{"\u2B06\uFE0F"}</span>
+                <span className="text-4xl">{"⬆️"}</span>
                 <p className="font-medium">Drag & drop your video here</p>
                 <p className="text-sm text-base-content/50">or click to browse</p>
                 <p className="text-xs text-base-content/40">Supports MP4, MOV, WebM, AVI</p>
@@ -149,7 +149,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
 
       {/* Settings Section */}
       <section>
-        <h2 className="text-xl font-bold mb-3">{"\u2699\uFE0F"} Scanner Settings</h2>
+        <h2 className="text-xl font-bold mb-3">{"⚙️"} Scanner Settings</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
           {/* Scan Mode - full width */}
@@ -168,18 +168,18 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
                   onClick={() => updateSetting('scanMode', key)}
                   title={mode.description}
                 >
-                  {key === 'all' ? '\uD83D\uDCE6' :
-                   key === 'habitat' ? '\uD83C\uDFE1' :
-                   key === 'pokemon' ? '\uD83D\uDC3E' :
-                   key === 'item' ? '\uD83C\uDF92' : '\uD83C\uDF73'} {mode.label}
+                  {key === 'all' ? '📦' :
+                   key === 'habitat' ? '🏡' :
+                   key === 'pokemon' ? '🐾' :
+                   key === 'item' ? '🎒' : '🍳'} {mode.label}
                 </button>
               ))}
             </div>
             {settings.scanMode === 'habitat' && (
-              <p className="text-xs text-info mt-2">\uD83C\uDFE1 Habitat mode scans the upper banner for "No. XXX" + name, and detects built status from the bottom text.</p>
+              <p className="text-xs text-info mt-2">🏡 Habitat mode scans the upper banner for "No. XXX" + name, and detects built status from the bottom text.</p>
             )}
             {settings.scanMode === 'pokemon' && (
-              <p className="text-xs text-info mt-2">\uD83D\uDD34 Pok\u00e9mon mode scans the banner for "No. XXX" and detects captured vs sensed status. Works with all banner colors.</p>
+              <p className="text-xs text-info mt-2">🔴 Pokémon mode scans the banner for "No. XXX" and detects captured vs sensed status. Works with all banner colors.</p>
             )}
           </div>
 
@@ -204,7 +204,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
                   }
                 }}
               >
-                \uD83C\uDFAC Auto-detect FPS
+                🎬 Auto-detect FPS
               </button>
               <button
                 className={`btn btn-sm ${!settings.autoDetectFPS ? 'btn-primary' : 'btn-ghost bg-base-300'}`}
@@ -213,21 +213,21 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
                   updateSetting('frameIntervalMs', detectedFPS?.frameIntervalMs || 33);
                 }}
               >
-                \u270F\uFE0F Manual
+                ✏️ Manual
               </button>
             </div>
             {settings.autoDetectFPS && (
               <div className="mt-2 text-xs">
                 {detectingFPS ? (
-                  <span className="text-warning">\u23F3 Detecting video framerate...</span>
+                  <span className="text-warning">⏳ Detecting video framerate...</span>
                 ) : detectedFPS ? (
                   <span className={detectedFPS.detected ? 'text-success' : 'text-warning'}>
                     {detectedFPS.detected
-                      ? `\u2705 Detected: ${detectedFPS.fps} FPS (${detectedFPS.frameIntervalMs}ms per frame)`
-                      : `\u26A0\uFE0F Browser doesn't support detection \u2014 will use ${detectedFPS.fps} FPS fallback`}
+                      ? `✅ Detected: ${detectedFPS.fps} FPS (${detectedFPS.frameIntervalMs}ms per frame)`
+                      : `⚠️ Browser doesn't support detection — will use ${detectedFPS.fps} FPS fallback`}
                   </span>
                 ) : (
-                  <span className="text-base-content/50">\uD83D\uDCCE Upload a video to detect its framerate</span>
+                  <span className="text-base-content/50">📎 Upload a video to detect its framerate</span>
                 )}
               </div>
             )}
@@ -360,13 +360,13 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
           onClick={handleStartScan}
           disabled={!videoFile}
         >
-          {"\uD83D\uDD0D"} Start Scanning
+          {"🔍"} Start Scanning
         </button>
         <button
           className="btn btn-secondary gap-2"
           onClick={() => importInputRef.current?.click()}
         >
-          {"\uD83D\uDCE5"} Import Previous Scan
+          {"📥"} Import Previous Scan
         </button>
         <input
           ref={importInputRef}
@@ -381,7 +381,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
       <section>
         <div className="card bg-base-200">
           <div className="card-body flex-row items-center gap-4">
-            <span className="text-4xl">{"\uD83D\uDCD6"}</span>
+            <span className="text-4xl">{"📖"}</span>
             <div className="flex-1">
               <h2 className="card-title text-base">New here? Learn how to scan in 5 easy steps</h2>
               <p className="text-sm text-base-content/60">
@@ -389,7 +389,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo 
               </p>
             </div>
             <button className="btn btn-outline btn-sm" onClick={onShowHowTo}>
-              {"\uD83D\uDC49"} How to Use
+              {"👉"} How to Use
             </button>
           </div>
         </div>

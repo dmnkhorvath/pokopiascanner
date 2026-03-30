@@ -76,10 +76,10 @@ export default function VideoScanner({ videoFile, settings, onScanComplete, onCa
   const totalFound = Object.values(foundCounts).reduce((a, b) => a + b, 0);
 
   const TYPE_LABELS = {
-    pokemon: { label: 'Pok\u00e9mon', icon: '\uD83D\uDD34' },
-    item: { label: 'Items', icon: '\uD83C\uDF92' },
-    habitat: { label: 'Habitats', icon: '\uD83C\uDFE0' },
-    recipe: { label: 'Recipes', icon: '\uD83D\uDCCB' },
+    pokemon: { label: 'Pokémon', icon: '🔴' },
+    item: { label: 'Items', icon: '🎒' },
+    habitat: { label: 'Habitats', icon: '🏠' },
+    recipe: { label: 'Recipes', icon: '📋' },
   };
 
   return (
@@ -87,9 +87,9 @@ export default function VideoScanner({ videoFile, settings, onScanComplete, onCa
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">
-          {progress.phase === 'complete' ? '\u2705 Scan Complete' :
-           progress.phase === 'error' ? '\u274C Scan Error' :
-           '\uD83D\uDD0D Scanning...'}
+          {progress.phase === 'complete' ? '✅ Scan Complete' :
+           progress.phase === 'error' ? '❌ Scan Error' :
+           '🔍 Scanning...'}
         </h2>
         <button className="btn btn-outline btn-sm" onClick={handleCancel}>
           {progress.phase === 'complete' || progress.phase === 'error' ? 'Back' : 'Cancel'}
@@ -156,7 +156,7 @@ export default function VideoScanner({ videoFile, settings, onScanComplete, onCa
                 ) : (
                   recentItems.slice(0, 20).map((item, i) => (
                     <div key={`${item.name}-${i}`} className="flex items-center gap-2 text-xs bg-base-300/50 rounded px-2 py-1">
-                      <span>{TYPE_LABELS[item.type]?.icon || '\uD83D\uDCE6'}</span>
+                      <span>{TYPE_LABELS[item.type]?.icon || '📦'}</span>
                       <span className="flex-1 truncate font-medium">{item.name}</span>
                       <span className="badge badge-ghost badge-xs">{item.type}</span>
                     </div>

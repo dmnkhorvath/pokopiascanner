@@ -3,36 +3,36 @@ import './HowToGuide.css';
 const steps = [
   {
     number: 1,
-    icon: '\uD83C\uDFAE',
+    icon: '🎮',
     title: 'Open & Browse Your Collection',
     description: 'Navigate to the section you want to scan and step through every entry.',
     tips: [
-      'Open your Pok\u00e9dex, Habitat list, Item bag, or Recipe book',
+      'Open your Pokédex, Habitat list, Item bag, or Recipe book',
       'Select the first entry in the list to open its detail view',
       'Keep pressing the ZR button to step through entries one by one until you reach the end',
-      'The scanner reads each detail page as it appears \u2014 no need to scroll manually',
+      'The scanner reads each detail page as it appears — no need to scroll manually',
     ],
   },
   {
     number: 2,
-    icon: '\uD83D\uDD34',
+    icon: '🔴',
     title: 'Record a Video on Your Switch',
     description: 'Use the Nintendo Switch capture feature to record your browsing session.',
     tips: [
       'Hold the Capture button (square button on the left Joy-Con) to save the last 30 seconds of gameplay',
       'The video is saved to your Album automatically',
-      'If stepping through all entries takes longer than 30 seconds, split it into multiple recordings \u2014 just pick up where you left off',
+      'If stepping through all entries takes longer than 30 seconds, split it into multiple recordings — just pick up where you left off',
       'You can upload multiple video chunks to the scanner and merge the results',
     ],
   },
   {
     number: 3,
-    icon: '\uD83D\uDCF2',
+    icon: '📲',
     title: 'Transfer the Video to Your Device',
-    description: 'Use Nintendo\u2019s built-in sharing to get the video onto your phone or computer.',
+    description: 'Use Nintendo’s built-in sharing to get the video onto your phone or computer.',
     methods: [
       {
-        name: '\uD83D\uDCF1 To Phone (QR Code)',
+        name: '📱 To Phone (QR Code)',
         steps: [
           'Go to Album on your Switch',
           'Select the video and choose "Send to Smartphone"',
@@ -41,15 +41,15 @@ const steps = [
         ],
       },
       {
-        name: '\uD83D\uDCBB To Computer (USB)',
+        name: '💻 To Computer (USB)',
         steps: [
           'Connect your Switch to your PC/Mac with a USB-C cable',
-          'On the Switch, go to System Settings \u2192 Data Management \u2192 Manage Screenshots and Videos \u2192 Copy to a Computer via USB Connection',
-          'Your Switch appears as a USB drive \u2014 copy the video files',
+          'On the Switch, go to System Settings → Data Management → Manage Screenshots and Videos → Copy to a Computer via USB Connection',
+          'Your Switch appears as a USB drive — copy the video files',
         ],
       },
       {
-        name: '\uD83D\uDCBE Via microSD Card',
+        name: '💾 Via microSD Card',
         steps: [
           'If your videos are on a microSD card, power off the Switch and remove the card',
           'Insert the microSD into your computer using an adapter',
@@ -60,19 +60,19 @@ const steps = [
   },
   {
     number: 4,
-    icon: '\uD83D\uDCE4',
+    icon: '📤',
     title: 'Upload & Scan',
     description: 'Drag and drop your video into the Pokopia Scanner and let it do the work.',
     tips: [
       'Drag the video file onto the upload area, or click to browse',
-      'Choose a scan mode: Habitats, Pok\u00e9mon, Items, Recipes, or All',
+      'Choose a scan mode: Habitats, Pokémon, Items, Recipes, or All',
       'Hit "Start Scan" and watch the live detection feed',
       'The scanner extracts frames, runs OCR, and matches entries automatically',
     ],
   },
   {
     number: 5,
-    icon: '\uD83D\uDCCA',
+    icon: '📊',
     title: 'Review & Export Your Progress',
     description: 'Browse your results, check completion, and export your data.',
     tips: [
@@ -89,14 +89,14 @@ export default function HowToGuide({ onBack }) {
     <div className="max-w-4xl mx-auto">
       {/* Back button */}
       <button className="btn btn-ghost btn-sm gap-1 mb-6" onClick={onBack}>
-        \u2190 Back to Scanner
+        ← Back to Scanner
       </button>
 
       {/* Hero */}
       <div className="text-center mb-10">
         <h1 className="text-3xl sm:text-4xl font-bold mb-3">How to Use Pokopia Scanner</h1>
         <p className="text-base-content/60 max-w-2xl mx-auto">
-          Follow these simple steps to scan your Pok\u00e9mon Pokopia collection from a Nintendo Switch video recording.
+          Follow these simple steps to scan your Pokémon Pokopia collection from a Nintendo Switch video recording.
         </p>
       </div>
 
@@ -149,7 +149,7 @@ export default function HowToGuide({ onBack }) {
       <div className="text-center mt-10 mb-6">
         <p className="text-base-content/60 mb-3">Ready to scan?</p>
         <button className="btn btn-primary btn-lg gap-2" onClick={onBack}>
-          \uD83D\uDD0D Start Scanning
+          🔍 Start Scanning
         </button>
       </div>
     </div>

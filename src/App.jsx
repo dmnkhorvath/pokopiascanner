@@ -122,7 +122,7 @@ export default function App() {
         <div className="navbar bg-base-200 shadow-md sticky top-0 z-40">
           <div className="navbar-start">
             <button className="btn btn-ghost gap-2 text-lg" onClick={handleNewScan}>
-              <span className="text-2xl">{"\uD83D\uDD0D"}</span>
+              <span className="text-2xl">{"🔍"}</span>
               <span className="font-bold hidden sm:inline">Pokopia Scanner</span>
             </button>
           </div>
@@ -183,7 +183,7 @@ export default function App() {
 
       {/* Footer */}
       <footer className="footer footer-center bg-base-200 text-base-content p-6">
-        <p className="text-sm opacity-70">Pokopia Progress Scanner &mdash; Track your Pok\u00e9mon Pokopia collection</p>
+        <p className="text-sm opacity-70">Pokopia Progress Scanner &mdash; Track your Pokémon Pokopia collection</p>
         <nav className="flex flex-wrap justify-center gap-2">
           <button className="btn btn-ghost btn-xs" onClick={() => navigateTo(PAGES.HOWTO)}>How to Use</button>
           <span className="opacity-30">|</span>
