@@ -12,8 +12,8 @@
  */
 
 // Sample positions as percentage of video duration
-// 5 positions for robust voting, avoiding very start/end transitions
-const SAMPLE_POSITIONS = [0.10, 0.25, 0.45, 0.65, 0.85];
+// 8 positions for robust voting, evenly spread while avoiding very start/end transitions
+const SAMPLE_POSITIONS = [0.08, 0.20, 0.32, 0.44, 0.56, 0.68, 0.80, 0.92];
 const SAMPLE_LABELS = ['10%', '25%', '45%', '65%', '85%'];
 
 // Timeouts
@@ -299,7 +299,7 @@ export async function detectVideoType(videoFile) {
           const [mode, count] = winner;
           return {
             detectedMode: mode,
-            confidence: count >= 3 ? 'high' : (count >= 2 ? 'medium' : confidences[mode]),
+            confidence: count >= 5 ? 'high' : (count >= 3 ? 'medium' : confidences[mode]),
             detectedAt: firstDetection,
           };
         }
