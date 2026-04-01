@@ -504,7 +504,7 @@ export function matchHabitatFrame(fullText, upperText, fuzzyTolerance = 2) {
  *
  * Primary strategy: extract "No. XXX" from the banner OCR text and
  * look up the Pokémon by number. Works across all banner colors because
- * the brightness threshold (grayscale >200) isolates white text universally.
+ * raw 3× upscaled crops preserve white text on any colored banner.
  *
  * Captured vs sensed: "???" in the game OCRs as "PPP", repeated chars,
  * or question marks. If the name line matches such a pattern, the Pokémon
@@ -741,6 +741,21 @@ function extractFrameToCanvas(video, cropRegion, mode = 'standard') {
     canvas.width = upW;
     canvas.height = upH;
     ctx.drawImage(tempCanvas, 0, 0);
+  } else if (mode === 'raw') {
+    // Raw mode: no thresholding, just crop + 3x upscale.
+    // Testing proved that raw banner crops produce far better OCR than
+    // brightness or green-channel thresholding which destroy the text.
+    const rawUpW = sw * 3;
+    const rawUpH = sh * 3;
+    const rawTemp = document.createElement('canvas');
+    rawTemp.width = rawUpW;
+    rawTemp.height = rawUpH;
+    const rawCtx = rawTemp.getContext('2d');
+    rawCtx.imageSmoothingEnabled = false;
+    rawCtx.drawImage(canvas, 0, 0, sw, sh, 0, 0, rawUpW, rawUpH);
+    canvas.width = rawUpW;
+    canvas.height = rawUpH;
+    ctx.drawImage(rawTemp, 0, 0);
   } else {
     let imageData = ctx.getImageData(0, 0, sw, sh);
     imageData = applyMedianFilter(imageData);
@@ -817,9 +832,11 @@ function getDeduplicationCrop(scanMode) {
  */
 function getOcrParams(scanMode) {
   if (scanMode === 'pokemon' || scanMode === 'habitat') {
+    // PSM 6 (uniform block) reads multi-line banners ("No. XXX" + name) reliably.
+    // No whitelist: testing proved raw OCR without character restrictions produces
+    // far better results than the previous whitelist + PSM 7 approach.
     return {
-      tessedit_char_whitelist: '0123456789No.# ?PpRr',
-      tessedit_pageseg_mode: '7', // PSM 7 = single text line
+      tessedit_pageseg_mode: '6', // PSM 6 = uniform block of text
     };
   }
   // Generic mode: no restrictions
@@ -1216,14 +1233,14 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
         // Optimization B: Tighter crop for number region "No. XXX"
         // Number appears in center of upper banner
         const upperCrop = { x: 30, y: 0, w: 40, h: 12 };
-        job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'green');
+        job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'raw');
         const bottomCrop = { x: cropRegion.x, y: 50, w: cropRegion.w, h: 50 };
         job.canvases.bottom = extractFrameToCanvas(video, bottomCrop, 'standard');
       } else if (scanMode === 'pokemon') {
         // Optimization B: Tighter crop for number region
         // The "No. XXX" + name appears in center banner: 20-55% width, 0-12% height
         const bannerCrop = { x: 20, y: 0, w: 35, h: 12 };
-        job.canvases.banner = extractFrameToCanvas(video, bannerCrop, 'brightness');
+        job.canvases.banner = extractFrameToCanvas(video, bannerCrop, 'raw');
       } else {
         job.canvases.full = extractFrameToCanvas(video, cropRegion, 'standard');
       }
