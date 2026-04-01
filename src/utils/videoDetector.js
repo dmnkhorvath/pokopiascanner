@@ -3,8 +3,8 @@
  *
  * Analyzes sample frames from a video to determine the scan mode:
  * - Item grid: very light background, teal header, grid of square tiles
+ * - Pokémon: lime-green right panel (3D model display area)
  * - Habitat: purple banner with "No. XXX" and landscape illustration
- * - Pokémon: colored (non-purple) banner with "No. XXX" and detail tabs
  * - Falls back to 'all' if nothing is detected
  *
  * Detection is based on pixel-level color analysis of specific frame regions,
@@ -12,12 +12,13 @@
  */
 
 // Sample positions as percentage of video duration
-const SAMPLE_POSITIONS = [0.10, 0.30, 0.60];
-const SAMPLE_LABELS = ['10%', '30%', '60%'];
+// 5 positions for robust voting, avoiding very start/end transitions
+const SAMPLE_POSITIONS = [0.10, 0.25, 0.45, 0.65, 0.85];
+const SAMPLE_LABELS = ['10%', '25%', '45%', '65%', '85%'];
 
 // Timeouts
 const FRAME_TIMEOUT_MS = 5000;   // 5s per frame extraction
-const TOTAL_TIMEOUT_MS = 12000;  // 12s total for all detection
+const TOTAL_TIMEOUT_MS = 20000;  // 20s total for all detection (5 frames)
 
 /**
  * Wrap a promise with a timeout. Rejects if not resolved within ms.
@@ -155,12 +156,17 @@ function regionAvgRGB(imageData, x, y, w, h, step = 3) {
  *   - Edges near-white (luminance > 230)
  *   - Teal header bar at y 5-10% (G > 200, G > R * 1.2)
  *
+ * POKEMON signature (primary):
+ *   - Lime-green right panel at x 70-90%, y 30-70%
+ *   - Green-Blue gap > 50 and G > 200 (3D model display area)
+ *   - Catches ALL Pokémon types including purple-banner ones
+ *
  * HABITAT signature:
  *   - Purple banner at y 3-8% center (B > R, B > G, B > 130, G < 140)
+ *   - Only reached when right panel is NOT lime-green
  *
- * POKEMON signature:
- *   - Colored saturated banner at y 3-8% (not purple, not near-white)
- *   - Saturation (max channel - min channel) > 25
+ * POKEMON signature (fallback):
+ *   - Saturated non-purple banner at y 3-8% (sat > 25, lum 60-200)
  *
  * @returns {{ type: string|null, confidence: string, details: object }}
  */
@@ -189,7 +195,15 @@ function classifyFrame(imageData, width, height) {
 
   const edgeLum = (leftEdge.lum + rightEdge.lum) / 2;
 
-  const details = { topBanner, headerBar, centerContent, leftEdge, rightEdge, edgeLum };
+  // Right panel (tight): 70-90% width, 30-70% height
+  // Pokémon detail pages have a distinctive lime-green 3D model display area
+  const rightPanel = regionAvgRGB(imageData,
+    Math.floor(width * 0.70), Math.floor(height * 0.30),
+    Math.floor(width * 0.20), Math.floor(height * 0.40));
+
+  const rightGreenGap = rightPanel.g - rightPanel.b;
+
+  const details = { topBanner, headerBar, centerContent, leftEdge, rightEdge, edgeLum, rightPanel, rightGreenGap };
 
   // --- 1. ITEM GRID detection ---
   // Item grid has very light background everywhere and teal-ish header
@@ -198,24 +212,29 @@ function classifyFrame(imageData, width, height) {
     return { type: 'item', confidence: 'high', details };
   }
 
-  // --- 2. HABITAT detection ---
+  // --- 2. POKEMON detection (primary) via lime-green right panel ---
+  // Pokémon detail pages have a 3D model display area on the right side
+  // Real data: right panel G ~238-242, B ~161-174, gap ~67-81
+  // Habitat detail pages have a muted right side: gap ~18-37
+  if (rightGreenGap > 50 && rightPanel.g > 200) {
+    return { type: 'pokemon', confidence: 'high', details };
+  }
+
+  // --- 3. HABITAT detection ---
   // Habitat has a distinctive purple banner: B > R > G
-  // Real data: banner R~150 G~107 B~171 consistently across all frames
+  // Real data: banner R~166 G~118 B~205 consistently across all frames
   if (topBanner.b > topBanner.r && topBanner.b > topBanner.g &&
       topBanner.b > 130 && topBanner.g < 140 &&
       (topBanner.b - topBanner.g) > 30) {
     return { type: 'habitat', confidence: 'high', details };
   }
 
-  // --- 3. POKEMON detection ---
-  // Pokemon has a colored (saturated) banner that is NOT purple and NOT near-white
-  // Banner colors vary: green (R104 G178 B94), teal (R133 G147 B150), pink (R163 G115 B109)
-  // Key: the banner is saturated (max-min > 30) and not too bright (lum < 200)
+  // --- 4. POKEMON detection (fallback) via saturated banner ---
+  // Catches Pokémon with non-purple, non-green-panel frames (e.g. transitions)
   const bannerMax = Math.max(topBanner.r, topBanner.g, topBanner.b);
   const bannerMin = Math.min(topBanner.r, topBanner.g, topBanner.b);
   const bannerSat = bannerMax - bannerMin;
   if (bannerSat > 25 && topBanner.lum < 200 && topBanner.lum > 60) {
-    // Make sure it's not purple (already caught above, but double-check)
     const isPurple = topBanner.b > topBanner.r && topBanner.b > topBanner.g && (topBanner.b - topBanner.g) > 30;
     if (!isPurple) {
       return { type: 'pokemon', confidence: bannerSat > 40 ? 'high' : 'medium', details };
@@ -280,7 +299,7 @@ export async function detectVideoType(videoFile) {
           const [mode, count] = winner;
           return {
             detectedMode: mode,
-            confidence: count >= 2 ? 'high' : confidences[mode],
+            confidence: count >= 3 ? 'high' : (count >= 2 ? 'medium' : confidences[mode]),
             detectedAt: firstDetection,
           };
         }
