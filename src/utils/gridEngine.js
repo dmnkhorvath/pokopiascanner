@@ -361,12 +361,29 @@ export async function scanGridVideo(
 
   const yieldToBrowser = () => new Promise(r => setTimeout(r, 0));
 
+  // Robust seek: addEventListener with { once: true } + timeout fallback for mobile Safari
+  function seekVideo(vid, t, timeoutMs = 3000) {
+    return new Promise((resolve) => {
+      let settled = false;
+      const done = () => {
+        if (settled) return;
+        settled = true;
+        resolve();
+      };
+      const timer = setTimeout(done, timeoutMs);
+      vid.addEventListener('seeked', () => {
+        clearTimeout(timer);
+        done();
+      }, { once: true });
+      vid.currentTime = t;
+    });
+  }
+
   for (let time = 0; time < duration; time += frameIntervalSec) {
     if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
 
-    // Seek
-    video.currentTime = time;
-    await new Promise(resolve => { video.onseeked = resolve; });
+    // Seek (robust: addEventListener + timeout fallback for mobile Safari)
+    await seekVideo(video, time);
 
     // Draw frame
     frameCtx.drawImage(video, 0, 0);
@@ -428,6 +445,8 @@ export async function scanGridVideo(
           }
         }
       }
+      // Yield after each row so the browser can repaint (prevents freezing on mobile)
+      await yieldToBrowser();
     }
 
     if (newItems.length > 0) {

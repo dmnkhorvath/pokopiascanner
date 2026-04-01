@@ -655,6 +655,28 @@ function yieldToBrowser() {
   return new Promise(resolve => setTimeout(resolve, 0));
 }
 
+/**
+ * Robust video seeking: uses addEventListener with { once: true } and a
+ * timeout fallback so the scan never hangs if the 'seeked' event doesn't fire
+ * (common on mobile Safari).
+ */
+function seekVideo(video, time, timeoutMs = 3000) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+    const timer = setTimeout(done, timeoutMs);
+    video.addEventListener('seeked', () => {
+      clearTimeout(timer);
+      done();
+    }, { once: true });
+    video.currentTime = time;
+  });
+}
+
 
 /**
  * Create and run the OCR scanning pipeline with parallel worker pool.
@@ -927,9 +949,8 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     for (let time = 0; time < duration; time += frameIntervalSec) {
       if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
 
-      // Seek
-      video.currentTime = time;
-      await new Promise((resolve) => { video.onseeked = resolve; });
+      // Seek (robust: addEventListener + timeout fallback for mobile Safari)
+      await seekVideo(video, time);
 
       // Preview
       previewCanvas.width = video.videoWidth;
