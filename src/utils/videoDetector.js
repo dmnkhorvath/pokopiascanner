@@ -1,33 +1,46 @@
 /**
  * Video Type Auto-Detector for Pokopia Progress Scanner
  *
- * Analyzes sample frames from a video to determine the scan mode:
- * - Item grid: very light background, teal header, grid of square tiles
- * - Pokémon: lime-green right panel (3D model display area)
- * - Habitat: purple banner with "No. XXX" and landscape illustration
- * - Falls back to 'all' if nothing is detected
+ * Rebuilt from scratch using real frame measurements from actual gameplay videos.
  *
- * Detection is based on pixel-level color analysis of specific frame regions,
- * calibrated against real Pokopia gameplay footage.
+ * Measured pixel statistics (1920×1080 frames):
+ *
+ * POKÉMON GRID (vid1_all, 114 frames):
+ *   header: R=230.3 G=130.9 B=149.4 lum=170.2 sat=99.4
+ *   center_lum: 228–237  edge_lum: 129–132  sat_pct: 0.0–2.6%
+ *
+ * HABITAT GRID (vid2_all, 137 frames):
+ *   header: R=229.3 G=130.6 B=148.3 lum=169.4 sat=98.7
+ *   center_lum: 210–227  edge_lum: 129–130  sat_pct: 12.4–33.9%
+ *
+ * ITEM/RECIPE GRID (from earlier analysis):
+ *   header: teal (G > R × 1.2, G > 200)
+ *   center_lum: ~230  edge_lum: ~240  (very light everywhere)
+ *
+ * Detection strategy:
+ *   1. Item/Recipe: teal header + very light edges → "item"
+ *   2. Pokémon vs Habitat: both have identical pinkish headers (R~230, G~131, B~149)
+ *      → distinguished ONLY by content saturation percentage:
+ *        Pokémon: < 6%  |  Habitat: > 6%  |  Threshold: 6%
+ *      (gap: Pokémon max 2.6% vs Habitat min 12.4% — huge margin)
  */
 
-// Sample positions as percentage of video duration
-// 8 positions for robust voting, evenly spread while avoiding very start/end transitions
+// Sample 8 positions spread across the video, avoiding very start/end
 const SAMPLE_POSITIONS = [0.08, 0.20, 0.32, 0.44, 0.56, 0.68, 0.80, 0.92];
-const SAMPLE_LABELS = ['10%', '25%', '45%', '65%', '85%'];
 
-// Timeouts
-const FRAME_TIMEOUT_MS = 5000;   // 5s per frame extraction
-const TOTAL_TIMEOUT_MS = 20000;  // 20s total for all detection (5 frames)
+const FRAME_TIMEOUT_MS = 5000;
+const TOTAL_TIMEOUT_MS = 20000;
+
+// Content saturation threshold: Pokémon max=2.6%, Habitat min=12.4%
+// Using 6% gives a wide safety margin on both sides
+const SAT_THRESHOLD = 6.0;
 
 /**
- * Wrap a promise with a timeout. Rejects if not resolved within ms.
+ * Wrap a promise with a timeout.
  */
 function withTimeout(promise, ms, label = 'Operation') {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => {
-      reject(new Error(`${label} timed out after ${ms}ms`));
-    }, ms);
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
     promise.then(
       (val) => { clearTimeout(timer); resolve(val); },
       (err) => { clearTimeout(timer); reject(err); },
@@ -37,9 +50,9 @@ function withTimeout(promise, ms, label = 'Operation') {
 
 /**
  * Load a video file and seek to a specific time position.
- * Returns a canvas with the frame drawn on it.
+ * Returns canvas with the frame drawn on it.
  */
-function loadVideoFrame(videoFile, timePosition) {
+function extractFrame(videoFile, timePosition) {
   return withTimeout(
     new Promise((resolve, reject) => {
       const video = document.createElement('video');
@@ -66,7 +79,7 @@ function loadVideoFrame(videoFile, timePosition) {
         reject(new Error(msg));
       };
 
-      video.onerror = () => fail('Failed to load video for frame extraction');
+      video.onerror = () => fail('Failed to load video');
       video.onabort = () => fail('Video loading aborted');
 
       video.onloadedmetadata = () => {
@@ -76,8 +89,7 @@ function loadVideoFrame(videoFile, timePosition) {
           fail('Video has no valid duration');
           return;
         }
-        const seekTime = Math.min(timePosition * duration, duration - 0.1);
-        video.currentTime = Math.max(0, seekTime);
+        video.currentTime = Math.max(0, Math.min(timePosition * duration, duration - 0.1));
       };
 
       video.onseeked = () => {
@@ -86,24 +98,14 @@ function loadVideoFrame(videoFile, timePosition) {
         try {
           const w = video.videoWidth;
           const h = video.videoHeight;
-          if (!w || !h) {
-            cleanup();
-            reject(new Error('Video has no valid dimensions'));
-            return;
-          }
+          if (!w || !h) { cleanup(); reject(new Error('No valid dimensions')); return; }
           const canvas = document.createElement('canvas');
           canvas.width = w;
           canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(video, 0, 0);
           cleanup();
-          resolve({
-            canvas,
-            ctx,
-            width: w,
-            height: h,
-            imageData: ctx.getImageData(0, 0, w, h),
-          });
+          resolve({ canvas, width: w, height: h, imageData: ctx.getImageData(0, 0, w, h) });
         } catch (err) {
           cleanup();
           reject(err);
@@ -113,139 +115,137 @@ function loadVideoFrame(videoFile, timePosition) {
       video.src = url;
     }),
     FRAME_TIMEOUT_MS,
-    `Frame extraction at ${Math.round(timePosition * 100)}%`,
+    `Frame at ${Math.round(timePosition * 100)}%`,
   );
 }
 
 /**
- * Compute average RGB for a rectangular region of ImageData.
- * Samples every `step` pixels for speed.
+ * Compute average RGB for a rectangular region.
+ * Coordinates are pixel values. Samples every `step` pixels for speed.
  */
 function regionAvgRGB(imageData, x, y, w, h, step = 3) {
   const { data, width: imgW } = imageData;
-  let totalR = 0, totalG = 0, totalB = 0, count = 0;
+  let rSum = 0, gSum = 0, bSum = 0, count = 0;
   const x2 = Math.min(x + w, imgW);
   const y2 = Math.min(y + h, imageData.height);
 
   for (let py = y; py < y2; py += step) {
     for (let px = x; px < x2; px += step) {
       const idx = (py * imgW + px) * 4;
-      totalR += data[idx];
-      totalG += data[idx + 1];
-      totalB += data[idx + 2];
+      rSum += data[idx];
+      gSum += data[idx + 1];
+      bSum += data[idx + 2];
       count++;
     }
   }
-
   if (count === 0) return { r: 0, g: 0, b: 0 };
-  return {
-    r: totalR / count,
-    g: totalG / count,
-    b: totalB / count,
-    lum: (totalR + totalG + totalB) / (count * 3),
-  };
+  return { r: rSum / count, g: gSum / count, b: bSum / count };
 }
 
 /**
- * Classify a single frame based on pixel regions.
+ * Compute percentage of high-saturation pixels in the content area.
+ * Content area: y=15%–85%, x=5%–95% (avoids header, footer, edges).
+ * A pixel is "high-saturation" if max(R,G,B) - min(R,G,B) > 30.
  *
- * Regions analyzed (calibrated from real 1920x1080 Pokopia footage):
+ * Measured values:
+ *   Pokémon grid: 0.0%–2.6%
+ *   Habitat grid: 12.4%–33.9%
+ */
+function contentSaturationPct(imageData, width, height, step = 3) {
+  const { data } = imageData;
+  const x1 = Math.floor(width * 0.05);
+  const x2 = Math.floor(width * 0.95);
+  const y1 = Math.floor(height * 0.15);
+  const y2 = Math.floor(height * 0.85);
+  let highSat = 0, total = 0;
+
+  for (let py = y1; py < y2; py += step) {
+    for (let px = x1; px < x2; px += step) {
+      const idx = (py * width + px) * 4;
+      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+      if (Math.max(r, g, b) - Math.min(r, g, b) > 30) highSat++;
+      total++;
+    }
+  }
+  return total > 0 ? (highSat / total) * 100 : 0;
+}
+
+/**
+ * Classify a single frame.
  *
- * ITEM GRID signature:
- *   - Overall very light frame (center luminance > 220)
- *   - Edges near-white (luminance > 230)
- *   - Teal header bar at y 5-10% (G > 200, G > R * 1.2)
+ * Decision tree (based on real measured data):
  *
- * POKEMON signature (primary):
- *   - Lime-green right panel at x 70-90%, y 30-70%
- *   - Green-Blue gap > 50 and G > 200 (3D model display area)
- *   - Catches ALL Pokémon types including purple-banner ones
+ * 1. ITEM/RECIPE GRID:
+ *    - Teal header: G > 200 AND G > R × 1.2
+ *    - Very light edges: edge luminance > 220
+ *    → type: "item"
  *
- * HABITAT signature:
- *   - Purple banner at y 3-8% center (B > R, B > G, B > 130, G < 140)
- *   - Only reached when right panel is NOT lime-green
+ * 2. POKÉMON or HABITAT GRID:
+ *    - Pinkish header: R > 200, R > G, header saturation > 50
+ *    - Dark sidebars: edge luminance < 180
+ *    → Differentiate by content saturation:
+ *      sat_pct < 6% → "pokemon"
+ *      sat_pct ≥ 6% → "habitat"
  *
- * POKEMON signature (fallback):
- *   - Saturated non-purple banner at y 3-8% (sat > 25, lum 60-200)
- *
- * @returns {{ type: string|null, confidence: string, details: object }}
+ * 3. Otherwise: null (unrecognized)
  */
 function classifyFrame(imageData, width, height) {
-  // --- Region definitions ---
-  // Banner region at y=3%-8% avoids top decoration that dilutes colors
-  const topBanner = regionAvgRGB(imageData,
-    Math.floor(width * 0.25), Math.floor(height * 0.03),
-    Math.floor(width * 0.50), Math.floor(height * 0.05));
+  const h = height;
+  const w = width;
 
-  const headerBar = regionAvgRGB(imageData,
-    Math.floor(width * 0.10), Math.floor(height * 0.05),
-    Math.floor(width * 0.80), Math.floor(height * 0.05));
+  // Header bar: x=10%–90%, y=5%–10%
+  const header = regionAvgRGB(imageData,
+    Math.floor(w * 0.10), Math.floor(h * 0.05),
+    Math.floor(w * 0.80), Math.floor(h * 0.05));
 
-  const centerContent = regionAvgRGB(imageData,
-    Math.floor(width * 0.20), Math.floor(height * 0.20),
-    Math.floor(width * 0.60), Math.floor(height * 0.60));
-
+  // Left edge: x=0–4%, y=20%–80%
   const leftEdge = regionAvgRGB(imageData,
-    0, Math.floor(height * 0.20),
-    Math.floor(width * 0.04), Math.floor(height * 0.60));
+    0, Math.floor(h * 0.20),
+    Math.floor(w * 0.04), Math.floor(h * 0.60));
 
+  // Right edge: x=96%–100%, y=20%–80%
   const rightEdge = regionAvgRGB(imageData,
-    Math.floor(width * 0.96), Math.floor(height * 0.20),
-    Math.floor(width * 0.04), Math.floor(height * 0.60));
+    Math.floor(w * 0.96), Math.floor(h * 0.20),
+    Math.floor(w * 0.04), Math.floor(h * 0.60));
 
-  const edgeLum = (leftEdge.lum + rightEdge.lum) / 2;
+  const edgeLum = ((leftEdge.r + leftEdge.g + leftEdge.b) / 3 +
+                   (rightEdge.r + rightEdge.g + rightEdge.b) / 3) / 2;
 
-  // Right panel (tight): 70-90% width, 30-70% height
-  // Pokémon detail pages have a distinctive lime-green 3D model display area
-  const rightPanel = regionAvgRGB(imageData,
-    Math.floor(width * 0.70), Math.floor(height * 0.30),
-    Math.floor(width * 0.20), Math.floor(height * 0.40));
+  const headerSat = Math.max(header.r, header.g, header.b) -
+                    Math.min(header.r, header.g, header.b);
 
-  const rightGreenGap = rightPanel.g - rightPanel.b;
+  const satPct = contentSaturationPct(imageData, width, height);
 
-  const details = { topBanner, headerBar, centerContent, leftEdge, rightEdge, edgeLum, rightPanel, rightGreenGap };
+  const details = {
+    header: { r: header.r.toFixed(1), g: header.g.toFixed(1), b: header.b.toFixed(1) },
+    headerSat: headerSat.toFixed(1),
+    edgeLum: edgeLum.toFixed(1),
+    satPct: satPct.toFixed(1),
+  };
 
-  // --- 1. ITEM GRID detection ---
-  // Item grid has very light background everywhere and teal-ish header
-  // Real data: center lum ~230, edges lum ~240, header G ~225 R ~169
-  if (centerContent.lum > 220 && edgeLum > 230 && headerBar.g > 200 && headerBar.g > headerBar.r * 1.2) {
+  // --- 1. ITEM/RECIPE GRID ---
+  // Teal header (G dominant) + very light edges
+  if (header.g > 200 && header.g > header.r * 1.2 && edgeLum > 220) {
     return { type: 'item', confidence: 'high', details };
   }
 
-  // --- 2. POKEMON detection (primary) via lime-green right panel ---
-  // Pokémon detail pages have a 3D model display area on the right side
-  // Real data: right panel G ~238-242, B ~161-174, gap ~67-81
-  // Habitat detail pages have a muted right side: gap ~18-37
-  if (rightGreenGap > 50 && rightPanel.g > 200) {
-    return { type: 'pokemon', confidence: 'high', details };
-  }
-
-  // --- 3. HABITAT detection ---
-  // Habitat has a distinctive purple banner: B > R > G
-  // Real data: banner R~166 G~118 B~205 consistently across all frames
-  if (topBanner.b > topBanner.r && topBanner.b > topBanner.g &&
-      topBanner.b > 130 && topBanner.g < 140 &&
-      (topBanner.b - topBanner.g) > 30) {
-    return { type: 'habitat', confidence: 'high', details };
-  }
-
-  // --- 4. POKEMON detection (fallback) via saturated banner ---
-  // Catches Pokémon with non-purple, non-green-panel frames (e.g. transitions)
-  const bannerMax = Math.max(topBanner.r, topBanner.g, topBanner.b);
-  const bannerMin = Math.min(topBanner.r, topBanner.g, topBanner.b);
-  const bannerSat = bannerMax - bannerMin;
-  if (bannerSat > 25 && topBanner.lum < 200 && topBanner.lum > 60) {
-    const isPurple = topBanner.b > topBanner.r && topBanner.b > topBanner.g && (topBanner.b - topBanner.g) > 30;
-    if (!isPurple) {
-      return { type: 'pokemon', confidence: bannerSat > 40 ? 'high' : 'medium', details };
+  // --- 2. POKÉMON or HABITAT GRID ---
+  // Both have pinkish header (R~230, G~131, B~149) with dark sidebars (~130)
+  // Measured: R>200, R>G, headerSat~99, edgeLum~130
+  if (header.r > 200 && header.r > header.g && headerSat > 50 && edgeLum < 180) {
+    if (satPct >= SAT_THRESHOLD) {
+      return { type: 'habitat', confidence: 'high', details };
+    } else {
+      return { type: 'pokemon', confidence: 'high', details };
     }
   }
 
+  // --- 3. Unrecognized ---
   return { type: null, confidence: 'low', details };
 }
 
 /**
- * Detect the video type by analyzing sample frames.
+ * Detect the video type by sampling frames and voting.
  *
  * @param {File} videoFile - The video file to analyze
  * @returns {Promise<{detectedMode: string, confidence: string, detectedAt: string|null}>}
@@ -256,61 +256,60 @@ export async function detectVideoType(videoFile) {
   try {
     return await withTimeout(
       (async () => {
-        // Collect votes from all frames for robustness
         const votes = { item: 0, habitat: 0, pokemon: 0 };
-        const confidences = { item: 'low', habitat: 'low', pokemon: 'low' };
         let firstDetection = null;
 
         for (let i = 0; i < SAMPLE_POSITIONS.length; i++) {
-          const position = SAMPLE_POSITIONS[i];
-          const label = SAMPLE_LABELS[i];
+          const pos = SAMPLE_POSITIONS[i];
+          const label = `${Math.round(pos * 100)}%`;
 
           let frame;
           try {
-            frame = await loadVideoFrame(videoFile, position);
+            frame = await extractFrame(videoFile, pos);
           } catch (err) {
-            console.warn(`Frame extraction at ${label} failed:`, err.message);
+            console.warn(`[VideoDetector] Frame ${label} failed:`, err.message);
             continue;
           }
 
-          const { imageData, width, height } = frame;
-          const result = classifyFrame(imageData, width, height);
+          const result = classifyFrame(frame.imageData, frame.width, frame.height);
 
-          // Free canvas memory
+          // Free canvas memory immediately
           frame.canvas.width = 1;
           frame.canvas.height = 1;
 
           if (result.type) {
             votes[result.type]++;
-            if (result.confidence === 'high') confidences[result.type] = 'high';
             if (!firstDetection) firstDetection = label;
-            console.log(`[VideoDetector] Frame ${label}: ${result.type} (${result.confidence})`);
+            console.log(`[VideoDetector] ${label}: ${result.type} (satPct=${result.details.satPct}%)`);
           } else {
-            console.log(`[VideoDetector] Frame ${label}: unclassified`);
+            console.log(`[VideoDetector] ${label}: unclassified`, result.details);
           }
         }
 
-        // Determine winner by vote count
+        // Winner by vote count
         const winner = Object.entries(votes)
           .filter(([, count]) => count > 0)
           .sort((a, b) => b[1] - a[1])[0];
 
         if (winner) {
           const [mode, count] = winner;
+          const total = Object.values(votes).reduce((a, b) => a + b, 0);
+          console.log(`[VideoDetector] Result: item=${votes.item} pokemon=${votes.pokemon} habitat=${votes.habitat} → ${mode} (${count}/${total})`);
           return {
             detectedMode: mode,
-            confidence: count >= 5 ? 'high' : (count >= 3 ? 'medium' : confidences[mode]),
+            confidence: count >= 5 ? 'high' : count >= 3 ? 'medium' : 'low',
             detectedAt: firstDetection,
           };
         }
 
+        console.warn('[VideoDetector] No frames classified, falling back to all');
         return fallback;
       })(),
       TOTAL_TIMEOUT_MS,
       'Video type detection',
     );
   } catch (err) {
-    console.warn('Video type detection failed, defaulting to all:', err.message);
+    console.warn('[VideoDetector] Detection failed:', err.message);
     return fallback;
   }
 }
