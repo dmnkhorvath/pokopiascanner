@@ -334,6 +334,120 @@ function extractFrame(video, canvas, cropRegion) {
 }
 
 
+// ─── Frame deduplication helpers ───────────────────────────────────────────
+
+/**
+ * Compute a fast perceptual hash of a video frame's crop region.
+ * Samples a sparse grid of pixels (8x8 = 64 samples) and produces a
+ * 64-bit hash string. Identical or near-identical frames produce the
+ * same hash, allowing us to skip redundant OCR.
+ *
+ * @param {HTMLVideoElement} video
+ * @param {Object} cropRegion - { x, y, w, h } in percentages
+ * @returns {string} 16-char hex hash
+ */
+function computeFrameHash(video, cropRegion) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const vw = video.videoWidth;
+  const vh = video.videoHeight;
+
+  const sx = Math.floor((cropRegion.x / 100) * vw);
+  const sy = Math.floor((cropRegion.y / 100) * vh);
+  const sw = Math.floor((cropRegion.w / 100) * vw);
+  const sh = Math.floor((cropRegion.h / 100) * vh);
+
+  // Draw small 8x8 thumbnail of the crop region for hashing
+  canvas.width = 8;
+  canvas.height = 8;
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, 8, 8);
+  const imageData = ctx.getImageData(0, 0, 8, 8);
+  const data = imageData.data;
+
+  // Compute average brightness
+  let totalGray = 0;
+  const grays = [];
+  for (let i = 0; i < data.length; i += 4) {
+    const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+    grays.push(gray);
+    totalGray += gray;
+  }
+  const avgGray = totalGray / grays.length;
+
+  // Build 64-bit hash: each bit = 1 if pixel > average, 0 otherwise
+  let hash = '';
+  for (let i = 0; i < grays.length; i += 4) {
+    let nibble = 0;
+    for (let j = 0; j < 4 && (i + j) < grays.length; j++) {
+      if (grays[i + j] >= avgGray) nibble |= (1 << j);
+    }
+    hash += nibble.toString(16);
+  }
+
+  // Free canvas
+  canvas.width = 0;
+  canvas.height = 0;
+  return hash;
+}
+
+/**
+ * Quick pixel comparison between current video frame and a reference canvas.
+ * Samples a sparse set of pixels from the crop region and returns true if
+ * the frames are nearly identical (< threshold% difference).
+ *
+ * @param {HTMLVideoElement} video
+ * @param {Uint8ClampedArray|null} prevSamples - Previous frame's sample data
+ * @param {Object} cropRegion - { x, y, w, h } in percentages
+ * @param {number} diffThreshold - Max fraction of different samples (0.05 = 5%)
+ * @returns {{ similar: boolean, samples: Uint8ClampedArray }}
+ */
+function quickFrameCompare(video, prevSamples, cropRegion, diffThreshold = 0.05) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  const vw = video.videoWidth;
+  const vh = video.videoHeight;
+
+  const sx = Math.floor((cropRegion.x / 100) * vw);
+  const sy = Math.floor((cropRegion.y / 100) * vh);
+  const sw = Math.floor((cropRegion.w / 100) * vw);
+  const sh = Math.floor((cropRegion.h / 100) * vh);
+
+  // Draw a small 16x16 thumbnail for fast comparison
+  canvas.width = 16;
+  canvas.height = 16;
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, 16, 16);
+  const imageData = ctx.getImageData(0, 0, 16, 16);
+  const samples = imageData.data; // 16*16*4 = 1024 bytes
+
+  canvas.width = 0;
+  canvas.height = 0;
+
+  if (!prevSamples) {
+    return { similar: false, samples: new Uint8ClampedArray(samples) };
+  }
+
+  // Compare pixel-by-pixel with tolerance
+  const pixelCount = 16 * 16;
+  let diffCount = 0;
+  const pixelTolerance = 30; // per-channel tolerance
+
+  for (let i = 0; i < samples.length; i += 4) {
+    const dr = Math.abs(samples[i] - prevSamples[i]);
+    const dg = Math.abs(samples[i + 1] - prevSamples[i + 1]);
+    const db = Math.abs(samples[i + 2] - prevSamples[i + 2]);
+    if (dr > pixelTolerance || dg > pixelTolerance || db > pixelTolerance) {
+      diffCount++;
+    }
+  }
+
+  const diffRatio = diffCount / pixelCount;
+  return {
+    similar: diffRatio < diffThreshold,
+    samples: new Uint8ClampedArray(samples),
+  };
+}
+
+
 /**
  * Habitat-specific frame analysis using number-based matching.
  *
@@ -476,9 +590,9 @@ function isUndiscovered(text) {
   // Check for the exact phrase and common OCR variations
   return lower.includes("haven't discovered this habitat") ||
          lower.includes("havent discovered this habitat") ||
-         lower.includes("haven't discovered this habitat") ||
+         lower.includes("haven\u2019t discovered this habitat") ||
          lower.includes("not discovered this habitat") ||
-         lower.includes("haven’t discovered this habitat");
+         lower.includes("haven\'t discovered this habitat");
 }
 
 /**
@@ -526,19 +640,20 @@ export function matchText(text, fuzzyTolerance = 2) {
  */
 /**
  * Create a pool of Tesseract workers for parallel OCR.
+ * Accepts optional Tesseract parameters for speed optimization.
  * @param {number} poolSize - Number of workers to create
+ * @param {Object} [ocrParams] - Optional Tesseract parameters (whitelist, PSM, etc.)
  * @returns {Promise<Array>} Array of initialized Tesseract workers
  */
-/**
- * Create a pool of Tesseract workers for parallel OCR.
- * @param {number} poolSize
- * @returns {Promise<Array>}
- */
-async function createWorkerPool(poolSize) {
+async function createWorkerPool(poolSize, ocrParams = null) {
   const workers = await Promise.all(
-    Array.from({ length: poolSize }, () =>
-      createWorker('eng', 1, { logger: () => {} })
-    )
+    Array.from({ length: poolSize }, async () => {
+      const w = await createWorker('eng', 1, { logger: () => {} });
+      if (ocrParams) {
+        await w.setParameters(ocrParams);
+      }
+      return w;
+    })
   );
   return workers;
 }
@@ -563,7 +678,7 @@ function isMobileDevice() {
  * Extract a preprocessed frame from video into a standalone canvas.
  * @param {HTMLVideoElement} video
  * @param {Object} cropRegion - { x, y, w, h } in percentages
- * @param {string} mode - 'standard' or 'green'
+ * @param {string} mode - 'standard' or 'green' or 'brightness'
  * @returns {HTMLCanvasElement}
  */
 function extractFrameToCanvas(video, cropRegion, mode = 'standard') {
@@ -679,8 +794,60 @@ function seekVideo(video, time, timeoutMs = 3000) {
 
 
 /**
+ * Get the primary crop region used for deduplication hashing per scan mode.
+ * This is the region most likely to change between different content pages.
+ */
+function getDeduplicationCrop(scanMode) {
+  if (scanMode === 'habitat') {
+    // Habitat number region in the upper banner
+    return { x: 30, y: 0, w: 40, h: 12 };
+  } else if (scanMode === 'pokemon') {
+    // Pokemon banner region
+    return { x: 20, y: 0, w: 35, h: 12 };
+  } else {
+    // Full frame for generic mode
+    return { x: 0, y: 0, w: 100, h: 100 };
+  }
+}
+
+/**
+ * Get optimized Tesseract parameters per scan mode.
+ * For number-heavy modes (pokemon, habitat), restrict character whitelist
+ * and use single-line page segmentation for dramatic speed improvement.
+ */
+function getOcrParams(scanMode) {
+  if (scanMode === 'pokemon' || scanMode === 'habitat') {
+    return {
+      tessedit_char_whitelist: '0123456789No.# ?PpRr',
+      tessedit_pageseg_mode: '7', // PSM 7 = single text line
+    };
+  }
+  // Generic mode: no restrictions
+  return null;
+}
+
+/**
+ * Get optimized Tesseract parameters for the "full text" worker
+ * used in habitat mode for the bottom half (discovery status check).
+ * This needs to read full English text, not just numbers.
+ */
+function getFullTextOcrParams() {
+  return {
+    tessedit_pageseg_mode: '6', // PSM 6 = uniform block of text
+  };
+}
+
+
+/**
  * Create and run the OCR scanning pipeline with parallel worker pool.
  * Uses batched processing to keep memory bounded (mobile-safe).
+ *
+ * Optimizations over baseline:
+ * - Frame deduplication via perceptual hash (skip identical frames)
+ * - Quick pixel comparison to skip unchanged frames before canvas creation
+ * - Smaller crop regions focused on number areas for pokemon/habitat
+ * - Tesseract char whitelist + PSM optimization for number-heavy modes
+ * - Immediate preview frame sent before OCR starts (fixes black preview)
  *
  * @param {File} videoFile - The video file to scan
  * @param {Object} settings - Scanner settings
@@ -827,27 +994,51 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   // Keeps memory bounded — especially important on iOS Safari
   const batchSize = poolSize * 4;
 
+  // Get optimized Tesseract parameters for this scan mode
+  const ocrParams = getOcrParams(scanMode);
+
   onProgress({
     phase: 'init', current: 0, total: framesToProcess, percent: 0,
     message: `Initializing ${poolSize} parallel OCR workers${mobile ? ' (mobile mode)' : ''}... (${framesToProcess} frames at ${frameIntervalMs}ms intervals)`,
   });
 
-  const workers = await createWorkerPool(poolSize);
+  // Create primary worker pool with mode-specific optimizations
+  const workers = await createWorkerPool(poolSize, ocrParams);
+
+  // For habitat mode, we also need a "full text" worker for the bottom half
+  // that reads English text (discovery status). Use a separate small pool.
+  let fullTextWorkers = null;
+  if (scanMode === 'habitat') {
+    const ftPoolSize = Math.max(1, Math.floor(poolSize / 2));
+    fullTextWorkers = await createWorkerPool(ftPoolSize, getFullTextOcrParams());
+  }
 
   const previewCanvas = document.createElement('canvas');
   const previewCtx = previewCanvas.getContext('2d');
 
   let processedCount = 0;
+  let skippedCount = 0;
+
+  // Deduplication state
+  const dedupCrop = getDeduplicationCrop(scanMode);
+  let prevFrameHash = null;
+  let prevFrameSamples = null;
+
+  // Track whether we've sent the first preview
+  let firstPreviewSent = false;
 
   /**
-   * Process a single job with a given worker.
+   * Process a single job with a given worker (and optional full-text worker).
    */
-  async function processJob(job, worker) {
+  async function processJob(job, worker, ftWorker) {
     if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
 
     if (scanMode === 'habitat') {
+      // Use optimized number worker for upper banner
       const { data: upperData } = await worker.recognize(job.canvases.upper);
-      const { data: fullData } = await worker.recognize(job.canvases.bottom);
+      // Use full-text worker for bottom half (discovery status)
+      const ftW = ftWorker || worker;
+      const { data: fullData } = await ftW.recognize(job.canvases.bottom);
 
       if (upperData.confidence >= confidenceThreshold && upperData.text.trim()) {
         const habitat = matchHabitatFrame(fullData.text, upperData.text, fuzzyTolerance);
@@ -905,12 +1096,13 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     job.canvases = null;
 
     processedCount++;
+    const totalAccountedFor = processedCount + skippedCount;
     onProgress({
       phase: 'scanning',
-      current: processedCount,
+      current: totalAccountedFor,
       total: framesToProcess,
-      percent: Math.round((processedCount / framesToProcess) * 100),
-      message: `Scanning: ${processedCount}/${framesToProcess} (${poolSize} workers${mobile ? ', mobile' : ''})`,
+      percent: Math.round((totalAccountedFor / framesToProcess) * 100),
+      message: `Scanning: ${totalAccountedFor}/${framesToProcess} (${skippedCount} skipped, ${poolSize} workers${mobile ? ', mobile' : ''})`,
       currentFrame: job.previewDataUrl,
       timePosition: job.time,
       duration,
@@ -931,7 +1123,9 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       queues.map(async (queue, wIdx) => {
         for (const job of queue) {
           if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
-          await processJob(job, workers[wIdx]);
+          // Pass full-text worker for habitat mode (round-robin from ftWorkers pool)
+          const ftW = fullTextWorkers ? fullTextWorkers[wIdx % fullTextWorkers.length] : null;
+          await processJob(job, workers[wIdx], ftW);
           if (processingDelay > 0) {
             await new Promise(r => setTimeout(r, processingDelay));
           }
@@ -949,27 +1143,85 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     for (let time = 0; time < duration; time += frameIntervalSec) {
       if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
 
-      // Seek (robust: addEventListener + timeout fallback for mobile Safari)
-      await seekVideo(video, time);
+      // FIX: Seek to 0.1s for the first frame to avoid black frame from undecoded video
+      const seekTime = (time === 0) ? 0.1 : time;
+      await seekVideo(video, seekTime);
 
-      // Preview
+      // ─── Quick frame comparison (Optimization D) ─────────────────────
+      // Before creating any canvases, compare a small pixel sample to the
+      // previous frame. If nearly identical, skip entirely.
+      const { similar, samples: currentSamples } = quickFrameCompare(
+        video, prevFrameSamples, dedupCrop, 0.05
+      );
+
+      if (similar && prevFrameHash !== null) {
+        // Frame is nearly identical to previous — skip OCR entirely
+        skippedCount++;
+        frameIdx++;
+
+        // Still update progress so the UI doesn't appear stuck
+        if (skippedCount % 10 === 0) {
+          const totalAccountedFor = processedCount + skippedCount;
+          onProgress({
+            phase: 'scanning',
+            current: totalAccountedFor,
+            total: framesToProcess,
+            percent: Math.round((totalAccountedFor / framesToProcess) * 100),
+            message: `Scanning: ${totalAccountedFor}/${framesToProcess} (${skippedCount} skipped, ${poolSize} workers${mobile ? ', mobile' : ''})`,
+            timePosition: seekTime,
+            duration,
+          });
+          await yieldToBrowser();
+        }
+        continue;
+      }
+      prevFrameSamples = currentSamples;
+
+      // ─── Frame deduplication via perceptual hash (Optimization A) ────
+      const frameHash = computeFrameHash(video, dedupCrop);
+      if (frameHash === prevFrameHash) {
+        // Identical hash — skip this frame
+        skippedCount++;
+        frameIdx++;
+        continue;
+      }
+      prevFrameHash = frameHash;
+
+      // ─── Generate preview ────────────────────────────────────────────
       previewCanvas.width = video.videoWidth;
       previewCanvas.height = video.videoHeight;
       previewCtx.drawImage(video, 0, 0);
       const previewDataUrl = previewCanvas.toDataURL('image/jpeg', 0.5);
 
-      // Extract preprocessed canvases
-      const job = { index: frameIdx, time, previewDataUrl, canvases: {} };
+      // FIX: Send first preview immediately BEFORE any OCR starts
+      if (!firstPreviewSent) {
+        firstPreviewSent = true;
+        onProgress({
+          phase: 'scanning',
+          current: 0,
+          total: framesToProcess,
+          percent: 0,
+          message: `Starting scan... (${poolSize} workers${mobile ? ', mobile' : ''})`,
+          currentFrame: previewDataUrl,
+          timePosition: seekTime,
+          duration,
+        });
+        await yieldToBrowser();
+      }
+
+      // ─── Extract preprocessed canvases ───────────────────────────────
+      const job = { index: frameIdx, time: seekTime, previewDataUrl, canvases: {} };
 
       if (scanMode === 'habitat') {
-        // Crop center 40% width, top 12% height for cleaner banner OCR (avoids edge decorations)
+        // Optimization B: Tighter crop for number region "No. XXX"
+        // Number appears in center of upper banner
         const upperCrop = { x: 30, y: 0, w: 40, h: 12 };
         job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'green');
         const bottomCrop = { x: cropRegion.x, y: 50, w: cropRegion.w, h: 50 };
         job.canvases.bottom = extractFrameToCanvas(video, bottomCrop, 'standard');
       } else if (scanMode === 'pokemon') {
-        // Crop center banner: 20-55% width, 0-12% height
-        // Uses brightness threshold (grayscale >200) — works for all banner colors
+        // Optimization B: Tighter crop for number region
+        // The "No. XXX" + name appears in center banner: 20-55% width, 0-12% height
         const bannerCrop = { x: 20, y: 0, w: 35, h: 12 };
         job.canvases.banner = extractFrameToCanvas(video, bannerCrop, 'brightness');
       } else {
@@ -997,6 +1249,9 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
   } finally {
     await terminateWorkerPool(workers);
+    if (fullTextWorkers) {
+      await terminateWorkerPool(fullTextWorkers);
+    }
     URL.revokeObjectURL(videoUrl);
     freeCanvas(previewCanvas);
   }
@@ -1039,10 +1294,10 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     total: framesToProcess,
     percent: 100,
     message: scanMode === 'habitat'
-      ? `Scan complete! Found ${finalResults.habitats.found} habitats (${finalResults.habitats.items.filter(h => h.built).length} built, ${finalResults.habitats.items.filter(h => !h.built).length} not built). ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
+      ? `Scan complete! Found ${finalResults.habitats.found} habitats (${finalResults.habitats.items.filter(h => h.built).length} built, ${finalResults.habitats.items.filter(h => !h.built).length} not built). ${skippedCount} frames skipped. ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
       : scanMode === 'pokemon'
-      ? `Scan complete! Found ${finalResults.pokemon.found} Pokémon (${finalResults.pokemon.items.filter(p => p.captured).length} captured, ${finalResults.pokemon.items.filter(p => !p.captured).length} sensed). ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
-      : `Scan complete! Found ${finalResults.totalFound} items. ${poolSize} workers${mobile ? ' (mobile)' : ''}.`,
+      ? `Scan complete! Found ${finalResults.pokemon.found} Pokémon (${finalResults.pokemon.items.filter(p => p.captured).length} captured, ${finalResults.pokemon.items.filter(p => !p.captured).length} sensed). ${skippedCount} frames skipped. ${poolSize} workers${mobile ? ' (mobile)' : ''}.`
+      : `Scan complete! Found ${finalResults.totalFound} items. ${skippedCount} frames skipped. ${poolSize} workers${mobile ? ' (mobile)' : ''}.`,
   });
 
   return finalResults;
