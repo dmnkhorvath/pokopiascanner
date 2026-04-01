@@ -1038,6 +1038,10 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
   // Deduplication state
   const dedupCrop = getDeduplicationCrop(scanMode);
+  // Mode-dependent dedup sensitivity: habitat pages differ by tiny details
+  // (one small item/decoration), so we need extremely sensitive thresholds.
+  // Pokemon pages have distinct colored banners, moderate threshold is fine.
+  const dedupDiffThreshold = scanMode === 'habitat' ? 0.005 : scanMode === 'pokemon' ? 0.03 : 0.05;
   let prevFrameHash = null;
   let prevFrameSamples = null;
 
@@ -1168,7 +1172,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       // Before creating any canvases, compare a small pixel sample to the
       // previous frame. If nearly identical, skip entirely.
       const { similar, samples: currentSamples } = quickFrameCompare(
-        video, prevFrameSamples, dedupCrop, 0.05
+        video, prevFrameSamples, dedupCrop, dedupDiffThreshold
       );
 
       if (similar && prevFrameHash !== null) {
@@ -1196,7 +1200,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
       // ─── Frame deduplication via perceptual hash (Optimization A) ────
       const frameHash = computeFrameHash(video, dedupCrop);
-      if (frameHash === prevFrameHash) {
+      if (scanMode !== 'habitat' && frameHash === prevFrameHash) {
         // Identical hash — skip this frame
         skippedCount++;
         frameIdx++;
