@@ -1,6 +1,10 @@
 import { useState, useRef } from 'react';
 import { DEFAULT_SETTINGS, CROP_PRESETS, SCAN_MODES, detectVideoFPS } from '../utils/ocrEngine.js';
+import { detectVideoType } from '../utils/videoDetector.js';
 import './LandingPage.css';
+
+// Check for debug mode via URL query parameter
+const isDebugMode = new URLSearchParams(window.location.search).get('debug') === 'true';
 
 export default function LandingPage({ onStartScan, onImportResults, onShowHowTo, existingResults, scanCount = 0, onStartFresh, onViewResults }) {
   const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS });
@@ -9,6 +13,8 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
   const [dragActive, setDragActive] = useState(false);
   const [detectedFPS, setDetectedFPS] = useState(null);
   const [detectingFPS, setDetectingFPS] = useState(false);
+  const [detectingType, setDetectingType] = useState(false);
+  const [detectedType, setDetectedType] = useState(null);
   const fileInputRef = useRef(null);
   const importInputRef = useRef(null);
 
@@ -17,6 +23,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
       setVideoFile(file);
       setVideoPreview(URL.createObjectURL(file));
       setDetectedFPS(null);
+      setDetectedType(null);
 
       // Auto-detect FPS if enabled
       if (settings.autoDetectFPS) {
@@ -58,9 +65,31 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
     }));
   };
 
-  const handleStartScan = () => {
-    if (videoFile) {
+  const handleStartScan = async () => {
+    if (!videoFile) return;
+
+    // In debug mode, user has manually set scanMode — skip auto-detection
+    if (isDebugMode) {
       onStartScan(videoFile, settings);
+      return;
+    }
+
+    // Auto-detect video type
+    setDetectingType(true);
+    setDetectedType(null);
+    try {
+      const result = await detectVideoType(videoFile);
+      setDetectedType(result);
+      // Use detected mode in settings
+      const finalSettings = { ...settings, scanMode: result.detectedMode };
+      // Brief delay so user can see what was detected
+      await new Promise(r => setTimeout(r, 600));
+      onStartScan(videoFile, finalSettings);
+    } catch {
+      // Detection failed — fall back to 'all' mode
+      onStartScan(videoFile, { ...settings, scanMode: 'all' });
+    } finally {
+      setDetectingType(false);
     }
   };
 
@@ -77,6 +106,16 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
       }
     };
     reader.readAsText(file);
+  };
+
+  const modeEmoji = (mode) => {
+    switch (mode) {
+      case 'habitat': return '🏡';
+      case 'pokemon': return '🐾';
+      case 'item': return '🎒';
+      case 'recipe': return '🍳';
+      default: return '📦';
+    }
   };
 
   return (
@@ -172,226 +211,244 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
         </div>
       </section>
 
-      {/* Settings Section */}
-      <section>
-        <h2 className="text-xl font-bold mb-3">{"⚙️"} Scanner Settings</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Settings Section - only visible in debug mode */}
+      {isDebugMode && (
+        <section>
+          <h2 className="text-xl font-bold mb-3">{"⚙️"} Scanner Settings <span className="badge badge-warning badge-sm">Debug</span></h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-          {/* Scan Mode - full width */}
-          <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
-            <label className="block mb-1">
-              <span className="font-medium text-sm">Scan Mode</span>
-              <span className="block text-xs text-base-content/50">Choose what to scan from your video</span>
-            </label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {Object.entries(SCAN_MODES).map(([key, mode]) => (
-                <button
-                  key={key}
-                  className={`btn btn-sm ${
-                    settings.scanMode === key ? 'btn-primary' : 'btn-ghost bg-base-300'
-                  }`}
-                  onClick={() => updateSetting('scanMode', key)}
-                  title={mode.description}
-                >
-                  {key === 'all' ? '📦' :
-                   key === 'habitat' ? '🏡' :
-                   key === 'pokemon' ? '🐾' :
-                   key === 'item' ? '🎒' : '🍳'} {mode.label}
-                </button>
-              ))}
-            </div>
-            {settings.scanMode === 'habitat' && (
-              <p className="text-xs text-info mt-2">🏡 Habitat mode scans the upper banner for "No. XXX" + name, and detects built status from the bottom text.</p>
-            )}
-            {settings.scanMode === 'pokemon' && (
-              <p className="text-xs text-info mt-2">🔴 Pokémon mode scans the banner for "No. XXX" and detects captured vs sensed status. Works with all banner colors.</p>
-            )}
-            {settings.scanMode === 'item' && (
-              <p className="text-xs text-info mt-2">🎒 Item mode uses grid detection to identify discovered vs undiscovered items. Record a video scrolling through your item collection grid.</p>
-            )}
-            {settings.scanMode === 'recipe' && (
-              <p className="text-xs text-info mt-2">📋 Recipe mode uses grid detection to identify discovered vs undiscovered recipes. Record a video scrolling through your recipe collection grid.</p>
-            )}
-          </div>
-
-          {/* Frame Rate - full width */}
-          <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
-            <label className="block mb-1">
-              <span className="font-medium text-sm">Frame Rate</span>
-              <span className="block text-xs text-base-content/50">How frames are extracted from the video</span>
-            </label>
-            <div className="flex gap-2 mt-2">
-              <button
-                className={`btn btn-sm ${settings.autoDetectFPS ? 'btn-primary' : 'btn-ghost bg-base-300'}`}
-                onClick={() => {
-                  updateSetting('autoDetectFPS', true);
-                  updateSetting('frameIntervalMs', 0);
-                  if (videoFile && !detectedFPS) {
-                    setDetectingFPS(true);
-                    detectVideoFPS(videoFile)
-                      .then(info => setDetectedFPS(info))
-                      .catch(() => setDetectedFPS({ fps: 30, frameIntervalMs: 33, detected: false }))
-                      .finally(() => setDetectingFPS(false));
-                  }
-                }}
-              >
-                🎬 Auto-detect FPS
-              </button>
-              <button
-                className={`btn btn-sm ${!settings.autoDetectFPS ? 'btn-primary' : 'btn-ghost bg-base-300'}`}
-                onClick={() => {
-                  updateSetting('autoDetectFPS', false);
-                  updateSetting('frameIntervalMs', detectedFPS?.frameIntervalMs || 33);
-                }}
-              >
-                ✏️ Manual
-              </button>
-            </div>
-            {settings.autoDetectFPS && (
-              <div className="mt-2 text-xs">
-                {detectingFPS ? (
-                  <span className="text-warning">⏳ Detecting video framerate...</span>
-                ) : detectedFPS ? (
-                  <span className={detectedFPS.detected ? 'text-success' : 'text-warning'}>
-                    {detectedFPS.detected
-                      ? `✅ Detected: ${detectedFPS.fps} FPS (${detectedFPS.frameIntervalMs}ms per frame)`
-                      : `⚠️ Browser doesn't support detection — will use ${detectedFPS.fps} FPS fallback`}
-                  </span>
-                ) : (
-                  <span className="text-base-content/50">📎 Upload a video to detect its framerate</span>
-                )}
+            {/* Scan Mode - full width */}
+            <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
+              <label className="block mb-1">
+                <span className="font-medium text-sm">Scan Mode</span>
+                <span className="block text-xs text-base-content/50">Choose what to scan from your video</span>
+              </label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {Object.entries(SCAN_MODES).map(([key, mode]) => (
+                  <button
+                    key={key}
+                    className={`btn btn-sm ${
+                      settings.scanMode === key ? 'btn-primary' : 'btn-ghost bg-base-300'
+                    }`}
+                    onClick={() => updateSetting('scanMode', key)}
+                    title={mode.description}
+                  >
+                    {key === 'all' ? '📦' :
+                     key === 'habitat' ? '🏡' :
+                     key === 'pokemon' ? '🐾' :
+                     key === 'item' ? '🎒' : '🍳'} {mode.label}
+                  </button>
+                ))}
               </div>
-            )}
-            {!settings.autoDetectFPS && (
-              <div className="mt-2 flex items-center gap-3">
+              {settings.scanMode === 'habitat' && (
+                <p className="text-xs text-info mt-2">🏡 Habitat mode scans the upper banner for "No. XXX" + name, and detects built status from the bottom text.</p>
+              )}
+              {settings.scanMode === 'pokemon' && (
+                <p className="text-xs text-info mt-2">🔴 Pokémon mode scans the banner for "No. XXX" and detects captured vs sensed status. Works with all banner colors.</p>
+              )}
+              {settings.scanMode === 'item' && (
+                <p className="text-xs text-info mt-2">🎒 Item mode uses grid detection to identify discovered vs undiscovered items. Record a video scrolling through your item collection grid.</p>
+              )}
+              {settings.scanMode === 'recipe' && (
+                <p className="text-xs text-info mt-2">📋 Recipe mode uses grid detection to identify discovered vs undiscovered recipes. Record a video scrolling through your recipe collection grid.</p>
+              )}
+            </div>
+
+            {/* Frame Rate - full width */}
+            <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
+              <label className="block mb-1">
+                <span className="font-medium text-sm">Frame Rate</span>
+                <span className="block text-xs text-base-content/50">How frames are extracted from the video</span>
+              </label>
+              <div className="flex gap-2 mt-2">
+                <button
+                  className={`btn btn-sm ${settings.autoDetectFPS ? 'btn-primary' : 'btn-ghost bg-base-300'}`}
+                  onClick={() => {
+                    updateSetting('autoDetectFPS', true);
+                    updateSetting('frameIntervalMs', 0);
+                    if (videoFile && !detectedFPS) {
+                      setDetectingFPS(true);
+                      detectVideoFPS(videoFile)
+                        .then(info => setDetectedFPS(info))
+                        .catch(() => setDetectedFPS({ fps: 30, frameIntervalMs: 33, detected: false }))
+                        .finally(() => setDetectingFPS(false));
+                    }
+                  }}
+                >
+                  🎬 Auto-detect FPS
+                </button>
+                <button
+                  className={`btn btn-sm ${!settings.autoDetectFPS ? 'btn-primary' : 'btn-ghost bg-base-300'}`}
+                  onClick={() => {
+                    updateSetting('autoDetectFPS', false);
+                    updateSetting('frameIntervalMs', detectedFPS?.frameIntervalMs || 33);
+                  }}
+                >
+                  ✏️ Manual
+                </button>
+              </div>
+              {settings.autoDetectFPS && (
+                <div className="mt-2 text-xs">
+                  {detectingFPS ? (
+                    <span className="text-warning">⏳ Detecting video framerate...</span>
+                  ) : detectedFPS ? (
+                    <span className={detectedFPS.detected ? 'text-success' : 'text-warning'}>
+                      {detectedFPS.detected
+                        ? `✅ Detected: ${detectedFPS.fps} FPS (${detectedFPS.frameIntervalMs}ms per frame)`
+                        : `⚠️ Browser doesn't support detection — will use ${detectedFPS.fps} FPS fallback`}
+                    </span>
+                  ) : (
+                    <span className="text-base-content/50">📎 Upload a video to detect its framerate</span>
+                  )}
+                </div>
+              )}
+              {!settings.autoDetectFPS && (
+                <div className="mt-2 flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="10"
+                    max="500"
+                    value={settings.frameIntervalMs || 33}
+                    onChange={(e) => updateSetting('frameIntervalMs', Number(e.target.value))}
+                    step="10"
+                    className="range range-primary range-xs flex-1"
+                  />
+                  <span className="text-xs font-mono whitespace-nowrap">
+                    {settings.frameIntervalMs || 33}ms ({Math.round(1000 / (settings.frameIntervalMs || 33))} FPS)
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Processing Delay */}
+            <div className="bg-base-200 rounded-lg p-4">
+              <label className="block mb-1">
+                <span className="font-medium text-sm">Processing Delay</span>
+                <span className="block text-xs text-base-content/50">Delay between frames (ms)</span>
+              </label>
+              <div className="flex items-center gap-3 mt-2">
                 <input
                   type="range"
-                  min="10"
-                  max="500"
-                  value={settings.frameIntervalMs || 33}
-                  onChange={(e) => updateSetting('frameIntervalMs', Number(e.target.value))}
+                  min="0"
+                  max="200"
                   step="10"
+                  value={settings.processingDelay}
+                  onChange={(e) => updateSetting('processingDelay', Number(e.target.value))}
                   className="range range-primary range-xs flex-1"
                 />
-                <span className="text-xs font-mono whitespace-nowrap">
-                  {settings.frameIntervalMs || 33}ms ({Math.round(1000 / (settings.frameIntervalMs || 33))} FPS)
-                </span>
+                <span className="text-xs font-mono w-12 text-right">{settings.processingDelay}ms</span>
               </div>
-            )}
-          </div>
-
-          {/* Processing Delay */}
-          <div className="bg-base-200 rounded-lg p-4">
-            <label className="block mb-1">
-              <span className="font-medium text-sm">Processing Delay</span>
-              <span className="block text-xs text-base-content/50">Delay between frames (ms)</span>
-            </label>
-            <div className="flex items-center gap-3 mt-2">
-              <input
-                type="range"
-                min="0"
-                max="200"
-                step="10"
-                value={settings.processingDelay}
-                onChange={(e) => updateSetting('processingDelay', Number(e.target.value))}
-                className="range range-primary range-xs flex-1"
-              />
-              <span className="text-xs font-mono w-12 text-right">{settings.processingDelay}ms</span>
             </div>
-          </div>
 
-          {/* OCR Confidence */}
-          <div className="bg-base-200 rounded-lg p-4">
-            <label className="block mb-1">
-              <span className="font-medium text-sm">OCR Confidence Threshold</span>
-              <span className="block text-xs text-base-content/50">Minimum confidence to accept text</span>
-            </label>
-            <div className="flex items-center gap-3 mt-2">
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={settings.confidenceThreshold}
-                onChange={(e) => updateSetting('confidenceThreshold', Number(e.target.value))}
-                className="range range-primary range-xs flex-1"
-              />
-              <span className="text-xs font-mono w-10 text-right">{settings.confidenceThreshold}%</span>
-            </div>
-          </div>
-
-          {/* Fuzzy Tolerance */}
-          <div className="bg-base-200 rounded-lg p-4">
-            <label className="block mb-1">
-              <span className="font-medium text-sm">Fuzzy Match Tolerance</span>
-              <span className="block text-xs text-base-content/50">Max character distance for matching</span>
-            </label>
-            <div className="flex items-center gap-3 mt-2">
-              <input
-                type="range"
-                min="0"
-                max="5"
-                value={settings.fuzzyTolerance}
-                onChange={(e) => updateSetting('fuzzyTolerance', Number(e.target.value))}
-                className="range range-primary range-xs flex-1"
-              />
-              <span className="text-xs font-mono w-6 text-right">{settings.fuzzyTolerance}</span>
-            </div>
-          </div>
-
-          {/* Crop Region - full width */}
-          <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
-            <label className="block mb-1">
-              <span className="font-medium text-sm">Crop Region</span>
-            </label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {Object.entries(CROP_PRESETS).map(([key, preset]) => (
-                <button
-                  key={key}
-                  className={`btn btn-sm ${
-                    settings.cropPreset === key ? 'btn-primary' : 'btn-ghost bg-base-300'
-                  }`}
-                  onClick={() => updateSetting('cropPreset', key)}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Custom Crop Sliders */}
-          {settings.cropPreset === 'custom' && (
-            <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
-              <label className="block mb-2">
-                <span className="font-medium text-sm">Custom Crop Region (%)</span>
+            {/* OCR Confidence */}
+            <div className="bg-base-200 rounded-lg p-4">
+              <label className="block mb-1">
+                <span className="font-medium text-sm">OCR Confidence Threshold</span>
+                <span className="block text-xs text-base-content/50">Minimum confidence to accept text</span>
               </label>
-              <div className="grid grid-cols-2 gap-3">
-                {['x', 'y', 'w', 'h'].map((dim) => (
-                  <div key={dim} className="flex items-center gap-2">
-                    <span className="text-xs font-mono w-6">{dim.toUpperCase()}: {settings.customCrop[dim]}%</span>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={settings.customCrop[dim]}
-                      onChange={(e) => updateCustomCrop(dim, e.target.value)}
-                      className="range range-xs flex-1"
-                    />
-                  </div>
+              <div className="flex items-center gap-3 mt-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={settings.confidenceThreshold}
+                  onChange={(e) => updateSetting('confidenceThreshold', Number(e.target.value))}
+                  className="range range-primary range-xs flex-1"
+                />
+                <span className="text-xs font-mono w-10 text-right">{settings.confidenceThreshold}%</span>
+              </div>
+            </div>
+
+            {/* Fuzzy Tolerance */}
+            <div className="bg-base-200 rounded-lg p-4">
+              <label className="block mb-1">
+                <span className="font-medium text-sm">Fuzzy Match Tolerance</span>
+                <span className="block text-xs text-base-content/50">Max character distance for matching</span>
+              </label>
+              <div className="flex items-center gap-3 mt-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  value={settings.fuzzyTolerance}
+                  onChange={(e) => updateSetting('fuzzyTolerance', Number(e.target.value))}
+                  className="range range-primary range-xs flex-1"
+                />
+                <span className="text-xs font-mono w-6 text-right">{settings.fuzzyTolerance}</span>
+              </div>
+            </div>
+
+            {/* Crop Region - full width */}
+            <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
+              <label className="block mb-1">
+                <span className="font-medium text-sm">Crop Region</span>
+              </label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {Object.entries(CROP_PRESETS).map(([key, preset]) => (
+                  <button
+                    key={key}
+                    className={`btn btn-sm ${
+                      settings.cropPreset === key ? 'btn-primary' : 'btn-ghost bg-base-300'
+                    }`}
+                    onClick={() => updateSetting('cropPreset', key)}
+                  >
+                    {preset.label}
+                  </button>
                 ))}
               </div>
             </div>
-          )}
+
+            {/* Custom Crop Sliders */}
+            {settings.cropPreset === 'custom' && (
+              <div className="sm:col-span-2 bg-base-200 rounded-lg p-4">
+                <label className="block mb-2">
+                  <span className="font-medium text-sm">Custom Crop Region (%)</span>
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {['x', 'y', 'w', 'h'].map((dim) => (
+                    <div key={dim} className="flex items-center gap-2">
+                      <span className="text-xs font-mono w-6">{dim.toUpperCase()}: {settings.customCrop[dim]}%</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={settings.customCrop[dim]}
+                        onChange={(e) => updateCustomCrop(dim, e.target.value)}
+                        className="range range-xs flex-1"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Detection Result Banner */}
+      {detectingType && (
+        <div className="alert alert-info shadow-md">
+          <span className="loading loading-spinner loading-sm"></span>
+          <span>Detecting video type...</span>
         </div>
-      </section>
+      )}
+      {detectedType && !detectingType && (
+        <div className="alert alert-info shadow-md">
+          <span>{modeEmoji(detectedType.detectedMode)} Detected: <strong>{SCAN_MODES[detectedType.detectedMode]?.label || detectedType.detectedMode}</strong></span>
+          <span className="text-xs opacity-70">({detectedType.confidence} confidence{detectedType.detectedAt ? `, at ${detectedType.detectedAt}` : ''})</span>
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <button
           className="btn btn-primary btn-lg gap-2"
           onClick={handleStartScan}
-          disabled={!videoFile}
+          disabled={!videoFile || detectingType}
         >
-          {existingResults ? '➕ Scan & Merge' : '🔍 Start Scanning'}
+          {detectingType ? (
+            <><span className="loading loading-spinner loading-sm"></span> Detecting video type...</>
+          ) : existingResults ? '➕ Scan & Merge' : '🔍 Start Scanning'}
         </button>
         <button
           className="btn btn-secondary gap-2"
