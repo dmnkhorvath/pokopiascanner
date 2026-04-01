@@ -401,7 +401,7 @@ function computeFrameHash(video, cropRegion) {
  * @param {number} diffThreshold - Max fraction of different samples (0.05 = 5%)
  * @returns {{ similar: boolean, samples: Uint8ClampedArray }}
  */
-function quickFrameCompare(video, prevSamples, cropRegion, diffThreshold = 0.05) {
+function quickFrameCompare(video, prevSamples, cropRegion, diffThreshold = 0.05, resolution = 16, pixelTolerance = 30) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
   const vw = video.videoWidth;
@@ -412,12 +412,13 @@ function quickFrameCompare(video, prevSamples, cropRegion, diffThreshold = 0.05)
   const sw = Math.floor((cropRegion.w / 100) * vw);
   const sh = Math.floor((cropRegion.h / 100) * vh);
 
-  // Draw a small 16x16 thumbnail for fast comparison
-  canvas.width = 16;
-  canvas.height = 16;
-  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, 16, 16);
-  const imageData = ctx.getImageData(0, 0, 16, 16);
-  const samples = imageData.data; // 16*16*4 = 1024 bytes
+  // Draw thumbnail at the requested resolution for comparison.
+  // Higher resolution catches subtler changes (e.g. habitat number digits).
+  canvas.width = resolution;
+  canvas.height = resolution;
+  ctx.drawImage(video, sx, sy, sw, sh, 0, 0, resolution, resolution);
+  const imageData = ctx.getImageData(0, 0, resolution, resolution);
+  const samples = imageData.data; // resolution*resolution*4 bytes
 
   canvas.width = 0;
   canvas.height = 0;
@@ -426,10 +427,9 @@ function quickFrameCompare(video, prevSamples, cropRegion, diffThreshold = 0.05)
     return { similar: false, samples: new Uint8ClampedArray(samples) };
   }
 
-  // Compare pixel-by-pixel with tolerance
-  const pixelCount = 16 * 16;
+  // Compare pixel-by-pixel with per-channel tolerance
+  const pixelCount = resolution * resolution;
   let diffCount = 0;
-  const pixelTolerance = 30; // per-channel tolerance
 
   for (let i = 0; i < samples.length; i += 4) {
     const dr = Math.abs(samples[i] - prevSamples[i]);
@@ -1036,13 +1036,15 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   let processedCount = 0;
   let skippedCount = 0;
 
-  // Deduplication state (disabled for live testing — re-enable if perf is an issue)
-  const enableDedup = false;
+  // Deduplication state — mode-aware resolution & sensitivity.
+  // Habitat pages differ by tiny details (one small item), so we use higher
+  // resolution (48×48) and tighter pixel tolerance to catch subtle changes.
+  // Pokemon pages have distinct colored banners; moderate settings suffice.
+  const enableDedup = true;
   const dedupCrop = getDeduplicationCrop(scanMode);
-  // Mode-dependent dedup sensitivity: habitat pages differ by tiny details
-  // (one small item/decoration), so we need extremely sensitive thresholds.
-  // Pokemon pages have distinct colored banners, moderate threshold is fine.
-  const dedupDiffThreshold = scanMode === 'habitat' ? 0.005 : scanMode === 'pokemon' ? 0.03 : 0.05;
+  const dedupDiffThreshold = scanMode === 'habitat' ? 0.01 : scanMode === 'pokemon' ? 0.03 : 0.05;
+  const dedupResolution   = scanMode === 'habitat' ? 48   : scanMode === 'pokemon' ? 32   : 16;
+  const dedupPixelTol     = scanMode === 'habitat' ? 12   : scanMode === 'pokemon' ? 20   : 30;
   let prevFrameHash = null;
   let prevFrameSamples = null;
 
@@ -1173,7 +1175,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       // Before creating any canvases, compare a small pixel sample to the
       // previous frame. If nearly identical, skip entirely.
       const { similar, samples: currentSamples } = quickFrameCompare(
-        video, prevFrameSamples, dedupCrop, dedupDiffThreshold
+        video, prevFrameSamples, dedupCrop, dedupDiffThreshold, dedupResolution, dedupPixelTol
       );
 
       if (enableDedup && similar && prevFrameHash !== null) {
