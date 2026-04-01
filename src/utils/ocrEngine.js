@@ -75,48 +75,66 @@ export const DEFAULT_SETTINGS = {
  * @returns {Promise<{fps: number, frameIntervalMs: number}>}
  */
 export async function detectVideoFPS(videoFile, sampleDurationMs = 2000) {
-  return new Promise((resolve, reject) => {
+  const FPS_TIMEOUT_MS = 5000; // 5 second timeout for entire FPS detection
+
+  const detect = () => new Promise((resolve, reject) => {
     const video = document.createElement('video');
     video.muted = true;
     video.playsInline = true;
     const url = URL.createObjectURL(videoFile);
-    video.src = url;
+    let settled = false;
+
+    const cleanup = () => {
+      URL.revokeObjectURL(url);
+      video.onloadedmetadata = null;
+      video.oncanplay = null;
+      video.onerror = null;
+      video.pause();
+    };
+
+    const fallback = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve({ fps: 30, frameIntervalMs: 33, detected: false });
+    };
 
     video.onerror = () => {
-      URL.revokeObjectURL(url);
+      if (settled) return;
+      settled = true;
+      cleanup();
       reject(new Error('Failed to load video for FPS detection'));
     };
 
     video.onloadedmetadata = () => {
+      if (settled) return;
+
       // Fallback if requestVideoFrameCallback is not supported
       if (!('requestVideoFrameCallback' in HTMLVideoElement.prototype)) {
-        URL.revokeObjectURL(url);
-        // Default assumption: 30fps
-        resolve({ fps: 30, frameIntervalMs: 33, detected: false });
+        fallback();
         return;
       }
 
       const frameTimes = [];
       let startTime = null;
-      let callbackId = null;
 
       const onFrame = (now, metadata) => {
+        if (settled) return;
         if (startTime === null) startTime = now;
         frameTimes.push(metadata.mediaTime);
 
         if (now - startTime < sampleDurationMs) {
-          callbackId = video.requestVideoFrameCallback(onFrame);
+          video.requestVideoFrameCallback(onFrame);
         } else {
-          video.pause();
-          URL.revokeObjectURL(url);
+          if (settled) return;
+          settled = true;
+          cleanup();
 
           if (frameTimes.length < 3) {
-            // Not enough frames sampled, fallback
             resolve({ fps: 30, frameIntervalMs: 33, detected: false });
             return;
           }
 
-          // Calculate intervals between consecutive frames
           const intervals = [];
           for (let i = 1; i < frameTimes.length; i++) {
             const diff = frameTimes[i] - frameTimes[i - 1];
@@ -128,7 +146,6 @@ export async function detectVideoFPS(videoFile, sampleDurationMs = 2000) {
             return;
           }
 
-          // Use median interval for robustness
           intervals.sort((a, b) => a - b);
           const medianInterval = intervals[Math.floor(intervals.length / 2)];
           const fps = Math.round(1 / medianInterval);
@@ -139,14 +156,27 @@ export async function detectVideoFPS(videoFile, sampleDurationMs = 2000) {
       };
 
       video.oncanplay = () => {
-        callbackId = video.requestVideoFrameCallback(onFrame);
-        video.play().catch(() => {
-          URL.revokeObjectURL(url);
-          resolve({ fps: 30, frameIntervalMs: 33, detected: false });
-        });
+        if (settled) return;
+        video.requestVideoFrameCallback(onFrame);
+        video.play().catch(() => fallback());
       };
     };
+
+    video.src = url;
   });
+
+  // Wrap in timeout so it never hangs
+  try {
+    return await Promise.race([
+      detect(),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('FPS detection timed out')), FPS_TIMEOUT_MS)
+      ),
+    ]);
+  } catch (err) {
+    console.warn('FPS detection failed, using fallback:', err.message);
+    return { fps: 30, frameIntervalMs: 33, detected: false };
+  }
 }
 
 /**

@@ -25,8 +25,9 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
       setDetectedFPS(null);
       setDetectedType(null);
 
-      // Auto-detect FPS if enabled
-      if (settings.autoDetectFPS) {
+      // Auto-detect FPS only in debug mode (normal users can't see FPS settings,
+      // and scanVideo handles FPS detection internally)
+      if (isDebugMode && settings.autoDetectFPS) {
         setDetectingFPS(true);
         try {
           const fpsInfo = await detectVideoFPS(file);
