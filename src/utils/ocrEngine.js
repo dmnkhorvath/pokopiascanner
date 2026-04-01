@@ -1036,7 +1036,8 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   let processedCount = 0;
   let skippedCount = 0;
 
-  // Deduplication state
+  // Deduplication state (disabled for live testing — re-enable if perf is an issue)
+  const enableDedup = false;
   const dedupCrop = getDeduplicationCrop(scanMode);
   // Mode-dependent dedup sensitivity: habitat pages differ by tiny details
   // (one small item/decoration), so we need extremely sensitive thresholds.
@@ -1175,7 +1176,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
         video, prevFrameSamples, dedupCrop, dedupDiffThreshold
       );
 
-      if (similar && prevFrameHash !== null) {
+      if (enableDedup && similar && prevFrameHash !== null) {
         // Frame is nearly identical to previous — skip OCR entirely
         skippedCount++;
         frameIdx++;
@@ -1200,7 +1201,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
       // ─── Frame deduplication via perceptual hash (Optimization A) ────
       const frameHash = computeFrameHash(video, dedupCrop);
-      if (scanMode !== 'habitat' && frameHash === prevFrameHash) {
+      if (enableDedup && scanMode !== 'habitat' && frameHash === prevFrameHash) {
         // Identical hash — skip this frame
         skippedCount++;
         frameIdx++;
