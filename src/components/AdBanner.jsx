@@ -91,7 +91,7 @@ function AdsterraBanner({ position }) {
       className={`flex justify-center w-full ${
         position === 'top' ? 'mb-4' : 'mt-4'
       }`}
-      style={{ minHeight: `${height}px` }}
+      style={{ minHeight: `${height}px`, maxHeight: `${height + 20}px`, overflow: 'hidden' }}
     />
   );
 }
@@ -146,7 +146,7 @@ function AdSenseBanner({ adSlot, position, format }) {
         position === 'top' ? 'mb-4' : 'mt-4'
       }`}
       ref={adRef}
-      style={{ minWidth: '300px' }}
+      style={{ minWidth: '300px', maxHeight: '110px', overflow: 'hidden' }}
     />
   );
 }
