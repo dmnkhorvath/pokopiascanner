@@ -1036,15 +1036,17 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   let processedCount = 0;
   let skippedCount = 0;
 
-  // Deduplication state — mode-aware resolution & sensitivity.
-  // Habitat pages differ by tiny details (one small item), so we use higher
-  // resolution (48×48) and tighter pixel tolerance to catch subtle changes.
-  // Pokemon pages have distinct colored banners; moderate settings suffice.
-  const enableDedup = true;
+  // Deduplication state — mode-aware.
+  // Habitat mode: pixel dedup DISABLED because consecutive habitat pages can
+  // look nearly identical (differ by one small item/decoration). The results
+  // Map already prevents duplicate entries, so the only cost is extra OCR calls
+  // which are fast (just reading a number from the banner).
+  // Pokemon/default: pixel dedup enabled with mode-appropriate settings.
+  const enableDedup = scanMode !== 'habitat';
   const dedupCrop = getDeduplicationCrop(scanMode);
-  const dedupDiffThreshold = scanMode === 'habitat' ? 0.01 : scanMode === 'pokemon' ? 0.03 : 0.05;
-  const dedupResolution   = scanMode === 'habitat' ? 48   : scanMode === 'pokemon' ? 32   : 16;
-  const dedupPixelTol     = scanMode === 'habitat' ? 12   : scanMode === 'pokemon' ? 20   : 30;
+  const dedupDiffThreshold = scanMode === 'pokemon' ? 0.03 : 0.05;
+  const dedupResolution   = scanMode === 'pokemon' ? 32   : 16;
+  const dedupPixelTol     = scanMode === 'pokemon' ? 20   : 30;
   let prevFrameHash = null;
   let prevFrameSamples = null;
 
