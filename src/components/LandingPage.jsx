@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { DEFAULT_SETTINGS, CROP_PRESETS, SCAN_MODES, detectVideoFPS } from '../utils/ocrEngine.js';
 import { detectVideoType } from '../utils/videoDetector.js';
 import './LandingPage.css';
@@ -17,6 +17,41 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
   const [detectedType, setDetectedType] = useState(null);
   const fileInputRef = useRef(null);
   const importInputRef = useRef(null);
+
+  // Fun rotating messages during detection
+  const DETECTION_MESSAGES = [
+    '🔍 Peeking at your video...',
+    '🎬 Sampling frames from your recording...',
+    '🧪 Analyzing pixel patterns...',
+    '🐾 Looking for Pokémon banners...',
+    '🏡 Checking for habitat layouts...',
+    '🎒 Scanning for item grids...',
+    '🍳 Sniffing out recipe pages...',
+    '🤔 Hmm, what do we have here...',
+    '⚡ Almost there, stay tuned!',
+    '🔬 Running our super-smart heuristics...',
+    '🎯 Narrowing it down...',
+    '✨ Just a moment, magic in progress...',
+    '🧠 Teaching pixels to talk...',
+    '📊 Crunching the colors...',
+    '🌈 Reading the rainbow of your screen...',
+    '🕵️ Detective mode activated...',
+    '💡 We are halfway through, hang tight!',
+    '🚀 Boosting detection engines...',
+    '🎮 Recognizing your gameplay style...',
+    '🏆 Almost got it, one sec...',
+  ];
+  const [detectionMsgIndex, setDetectionMsgIndex] = useState(0);
+  useEffect(() => {
+    if (!detectingType) {
+      setDetectionMsgIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setDetectionMsgIndex(prev => (prev + 1) % DETECTION_MESSAGES.length);
+    }, 1200);
+    return () => clearInterval(interval);
+  }, [detectingType]);
 
   const handleFileSelect = async (file) => {
     if (file && file.type.startsWith('video/')) {
@@ -430,7 +465,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
       {detectingType && (
         <div className="alert alert-info shadow-md">
           <span className="loading loading-spinner loading-sm"></span>
-          <span>Detecting video type...</span>
+          <span className="transition-opacity duration-300">{DETECTION_MESSAGES[detectionMsgIndex]}</span>
         </div>
       )}
       {detectedType && !detectingType && (
@@ -448,7 +483,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
           disabled={!videoFile || detectingType}
         >
           {detectingType ? (
-            <><span className="loading loading-spinner loading-sm"></span> Detecting video type...</>
+            <><span className="loading loading-spinner loading-sm"></span> {DETECTION_MESSAGES[detectionMsgIndex]}</>
           ) : existingResults ? '➕ Scan & Merge' : '🔍 Start Scanning'}
         </button>
         <button
