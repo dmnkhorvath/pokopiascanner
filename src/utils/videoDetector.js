@@ -2,15 +2,14 @@
  * Video Type Auto-Detector for Pokopia Progress Scanner
  *
  * Analyzes sample frames from a video to determine the scan mode:
- * - Grid layout (items/recipes) → detected via saturation patterns at expected grid positions
- * - Habitat banners → detected via green-tinted top banner
- * - Pokémon banners → detected via colored top banner (not green)
+ * - Item grid: very light background, teal header, grid of square tiles
+ * - Habitat: purple banner with "No. XXX" and landscape illustration
+ * - Pokémon: colored (non-purple) banner with "No. XXX" and detail tabs
  * - Falls back to 'all' if nothing is detected
  *
- * Designed to be fast (< 5 seconds) using canvas color analysis only (no OCR).
+ * Detection is based on pixel-level color analysis of specific frame regions,
+ * calibrated against real Pokopia gameplay footage.
  */
-
-import { detectGridParams } from './gridEngine.js';
 
 // Sample positions as percentage of video duration
 const SAMPLE_POSITIONS = [0.10, 0.30, 0.60];
@@ -19,19 +18,6 @@ const SAMPLE_LABELS = ['10%', '30%', '60%'];
 // Timeouts
 const FRAME_TIMEOUT_MS = 5000;   // 5s per frame extraction
 const TOTAL_TIMEOUT_MS = 12000;  // 12s total for all detection
-
-// Grid detection thresholds
-const GRID_SAT_THRESHOLD = 15;
-const GRID_MIN_CELLS_MATCH = 3;
-
-// Banner detection: top 15% of frame
-const BANNER_HEIGHT_RATIO = 0.15;
-
-// Color thresholds for banner detection
-const HABITAT_GREEN_DOMINANCE = 1.15;
-const HABITAT_MIN_GREEN = 80;
-const POKEMON_SAT_THRESHOLD = 25;
-const POKEMON_MIN_BRIGHTNESS = 60;
 
 /**
  * Wrap a promise with a timeout. Rejects if not resolved within ms.
@@ -69,8 +55,6 @@ function loadVideoFrame(videoFile, timePosition) {
         video.onseeked = null;
         video.onerror = null;
         video.onabort = null;
-        video.onstalled = null;
-        // Don't aggressively reset src — just revoke the blob URL
         video.pause();
       };
 
@@ -133,152 +117,112 @@ function loadVideoFrame(videoFile, timePosition) {
 }
 
 /**
- * Check if a frame has a grid layout by sampling expected cell positions.
+ * Compute average RGB for a rectangular region of ImageData.
+ * Samples every `step` pixels for speed.
  */
-function detectGrid(imageData, width, height) {
-  const gp = detectGridParams(width, height);
-  let matchingCells = 0;
-  let totalCells = 0;
-  let discoveredCells = 0;
-  let undiscoveredCells = 0;
-
-  const rowsToCheck = Math.min(3, gp.visibleRows);
-  const colsToCheck = Math.min(6, gp.cols);
-
-  for (let r = 0; r < rowsToCheck; r++) {
-    const cy = gp.row0Y + r * gp.cell;
-    const ty = cy - gp.tileHalf;
-    if (ty < 0 || cy + gp.tileHalf >= height) continue;
-
-    for (let c = 0; c < colsToCheck; c++) {
-      const cx = gp.col0X + c * gp.cell;
-      const tx = cx - gp.tileHalf;
-      if (tx < 0 || cx + gp.tileHalf >= width) continue;
-
-      const sat = meanSaturationRegion(imageData, tx, ty,
-        gp.tileHalf * 2, gp.tileHalf * 2, width);
-
-      totalCells++;
-      if (sat > GRID_SAT_THRESHOLD) {
-        discoveredCells++;
-      } else {
-        undiscoveredCells++;
-      }
-      if (sat > GRID_SAT_THRESHOLD || sat < 8) {
-        matchingCells++;
-      }
-    }
-  }
-
-  const isGrid = matchingCells >= GRID_MIN_CELLS_MATCH && totalCells >= 4;
-
-  return { isGrid, matchingCells, totalCells, discoveredCells, undiscoveredCells };
-}
-
-/**
- * Compute mean saturation for a rectangular region of ImageData.
- */
-function meanSaturationRegion(imageData, x, y, w, h, imgWidth) {
-  const { data } = imageData;
-  let totalSat = 0;
-  let count = 0;
-  const x2 = Math.min(x + w, imgWidth);
+function regionAvgRGB(imageData, x, y, w, h, step = 3) {
+  const { data, width: imgW } = imageData;
+  let totalR = 0, totalG = 0, totalB = 0, count = 0;
+  const x2 = Math.min(x + w, imgW);
   const y2 = Math.min(y + h, imageData.height);
 
-  for (let py = y; py < y2; py += 3) {
-    for (let px = x; px < x2; px += 3) {
-      const idx = (py * imgWidth + px) * 4;
-      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      const sat = max === 0 ? 0 : ((max - min) / max) * 100;
-      totalSat += sat;
+  for (let py = y; py < y2; py += step) {
+    for (let px = x; px < x2; px += step) {
+      const idx = (py * imgW + px) * 4;
+      totalR += data[idx];
+      totalG += data[idx + 1];
+      totalB += data[idx + 2];
       count++;
     }
   }
-  return count > 0 ? totalSat / count : 0;
+
+  if (count === 0) return { r: 0, g: 0, b: 0 };
+  return {
+    r: totalR / count,
+    g: totalG / count,
+    b: totalB / count,
+    lum: (totalR + totalG + totalB) / (count * 3),
+  };
 }
 
 /**
- * Analyze the top banner region for habitat-like green tint.
+ * Classify a single frame based on pixel regions.
+ *
+ * Regions analyzed (calibrated from real 1920x1080 Pokopia footage):
+ *
+ * ITEM GRID signature:
+ *   - Overall very light frame (center luminance > 220)
+ *   - Edges near-white (luminance > 230)
+ *   - Teal header bar at y 5-10% (G > 200, G > R * 1.2)
+ *
+ * HABITAT signature:
+ *   - Purple banner at y 3-8% center (B > R, B > G, B > 130, G < 140)
+ *
+ * POKEMON signature:
+ *   - Colored saturated banner at y 3-8% (not purple, not near-white)
+ *   - Saturation (max channel - min channel) > 25
+ *
+ * @returns {{ type: string|null, confidence: string, details: object }}
  */
-function detectHabitatBanner(imageData, width, height) {
-  const bannerH = Math.floor(height * BANNER_HEIGHT_RATIO);
-  const { data } = imageData;
-  let totalR = 0, totalG = 0, totalB = 0;
-  let totalSat = 0;
-  let count = 0;
+function classifyFrame(imageData, width, height) {
+  // --- Region definitions ---
+  // Banner region at y=3%-8% avoids top decoration that dilutes colors
+  const topBanner = regionAvgRGB(imageData,
+    Math.floor(width * 0.25), Math.floor(height * 0.03),
+    Math.floor(width * 0.50), Math.floor(height * 0.05));
 
-  for (let py = 0; py < bannerH; py += 4) {
-    for (let px = 0; px < width; px += 4) {
-      const idx = (py * width + px) * 4;
-      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-      totalR += r;
-      totalG += g;
-      totalB += b;
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      totalSat += max === 0 ? 0 : ((max - min) / max) * 100;
-      count++;
+  const headerBar = regionAvgRGB(imageData,
+    Math.floor(width * 0.10), Math.floor(height * 0.05),
+    Math.floor(width * 0.80), Math.floor(height * 0.05));
+
+  const centerContent = regionAvgRGB(imageData,
+    Math.floor(width * 0.20), Math.floor(height * 0.20),
+    Math.floor(width * 0.60), Math.floor(height * 0.60));
+
+  const leftEdge = regionAvgRGB(imageData,
+    0, Math.floor(height * 0.20),
+    Math.floor(width * 0.04), Math.floor(height * 0.60));
+
+  const rightEdge = regionAvgRGB(imageData,
+    Math.floor(width * 0.96), Math.floor(height * 0.20),
+    Math.floor(width * 0.04), Math.floor(height * 0.60));
+
+  const edgeLum = (leftEdge.lum + rightEdge.lum) / 2;
+
+  const details = { topBanner, headerBar, centerContent, leftEdge, rightEdge, edgeLum };
+
+  // --- 1. ITEM GRID detection ---
+  // Item grid has very light background everywhere and teal-ish header
+  // Real data: center lum ~230, edges lum ~240, header G ~225 R ~169
+  if (centerContent.lum > 220 && edgeLum > 230 && headerBar.g > 200 && headerBar.g > headerBar.r * 1.2) {
+    return { type: 'item', confidence: 'high', details };
+  }
+
+  // --- 2. HABITAT detection ---
+  // Habitat has a distinctive purple banner: B > R > G
+  // Real data: banner R~150 G~107 B~171 consistently across all frames
+  if (topBanner.b > topBanner.r && topBanner.b > topBanner.g &&
+      topBanner.b > 130 && topBanner.g < 140 &&
+      (topBanner.b - topBanner.g) > 30) {
+    return { type: 'habitat', confidence: 'high', details };
+  }
+
+  // --- 3. POKEMON detection ---
+  // Pokemon has a colored (saturated) banner that is NOT purple and NOT near-white
+  // Banner colors vary: green (R104 G178 B94), teal (R133 G147 B150), pink (R163 G115 B109)
+  // Key: the banner is saturated (max-min > 30) and not too bright (lum < 200)
+  const bannerMax = Math.max(topBanner.r, topBanner.g, topBanner.b);
+  const bannerMin = Math.min(topBanner.r, topBanner.g, topBanner.b);
+  const bannerSat = bannerMax - bannerMin;
+  if (bannerSat > 25 && topBanner.lum < 200 && topBanner.lum > 60) {
+    // Make sure it's not purple (already caught above, but double-check)
+    const isPurple = topBanner.b > topBanner.r && topBanner.b > topBanner.g && (topBanner.b - topBanner.g) > 30;
+    if (!isPurple) {
+      return { type: 'pokemon', confidence: bannerSat > 40 ? 'high' : 'medium', details };
     }
   }
 
-  if (count === 0) return { isHabitat: false };
-
-  const avgR = totalR / count;
-  const avgG = totalG / count;
-  const avgB = totalB / count;
-  const avgSat = totalSat / count;
-  const avgRB = (avgR + avgB) / 2;
-  const greenDominance = avgRB > 0 ? avgG / avgRB : 0;
-  const isHabitat = avgG >= HABITAT_MIN_GREEN &&
-    greenDominance >= HABITAT_GREEN_DOMINANCE &&
-    avgSat > 15;
-
-  return { isHabitat, avgR, avgG, avgB, avgSat, greenDominance };
-}
-
-/**
- * Analyze the top banner region for Pokémon-like saturated colored banner.
- */
-function detectPokemonBanner(imageData, width, height) {
-  const bannerH = Math.floor(height * BANNER_HEIGHT_RATIO);
-  const { data } = imageData;
-  let totalSat = 0;
-  let totalBrightness = 0;
-  let totalR = 0, totalG = 0, totalB = 0;
-  let count = 0;
-
-  for (let py = 0; py < bannerH; py += 4) {
-    for (let px = 0; px < width; px += 4) {
-      const idx = (py * width + px) * 4;
-      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-      totalR += r;
-      totalG += g;
-      totalB += b;
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      totalSat += max === 0 ? 0 : ((max - min) / max) * 100;
-      totalBrightness += (r + g + b) / 3;
-      count++;
-    }
-  }
-
-  if (count === 0) return { isPokemon: false };
-
-  const avgSat = totalSat / count;
-  const avgBrightness = totalBrightness / count;
-  const avgR = totalR / count;
-  const avgG = totalG / count;
-  const avgB = totalB / count;
-  const avgRB = (avgR + avgB) / 2;
-  const greenDominance = avgRB > 0 ? avgG / avgRB : 0;
-
-  const isPokemon = avgSat > POKEMON_SAT_THRESHOLD &&
-    avgBrightness > POKEMON_MIN_BRIGHTNESS &&
-    greenDominance < HABITAT_GREEN_DOMINANCE;
-
-  return { isPokemon, avgSat, avgBrightness, avgR, avgG, avgB };
+  return { type: null, confidence: 'low', details };
 }
 
 /**
@@ -291,9 +235,13 @@ export async function detectVideoType(videoFile) {
   const fallback = { detectedMode: 'all', confidence: 'low', detectedAt: null };
 
   try {
-    // Wrap entire detection in a global timeout
     return await withTimeout(
       (async () => {
+        // Collect votes from all frames for robustness
+        const votes = { item: 0, habitat: 0, pokemon: 0 };
+        const confidences = { item: 'low', habitat: 'low', pokemon: 'low' };
+        let firstDetection = null;
+
         for (let i = 0; i < SAMPLE_POSITIONS.length; i++) {
           const position = SAMPLE_POSITIONS[i];
           const label = SAMPLE_LABELS[i];
@@ -303,62 +251,38 @@ export async function detectVideoType(videoFile) {
             frame = await loadVideoFrame(videoFile, position);
           } catch (err) {
             console.warn(`Frame extraction at ${label} failed:`, err.message);
-            continue; // Skip this sample position
+            continue;
           }
 
           const { imageData, width, height } = frame;
-
-          // 1. Check for grid layout (items/recipes)
-          try {
-            const gridResult = detectGrid(imageData, width, height);
-            if (gridResult.isGrid) {
-              frame.canvas.width = 1;
-              frame.canvas.height = 1;
-              return {
-                detectedMode: 'item',
-                confidence: gridResult.matchingCells >= 6 ? 'high' : 'medium',
-                detectedAt: label,
-              };
-            }
-          } catch (err) {
-            console.warn('Grid detection error:', err.message);
-          }
-
-          // 2. Check for habitat banner
-          try {
-            const habitatResult = detectHabitatBanner(imageData, width, height);
-            if (habitatResult.isHabitat) {
-              frame.canvas.width = 1;
-              frame.canvas.height = 1;
-              return {
-                detectedMode: 'habitat',
-                confidence: habitatResult.greenDominance >= 1.3 ? 'high' : 'medium',
-                detectedAt: label,
-              };
-            }
-          } catch (err) {
-            console.warn('Habitat detection error:', err.message);
-          }
-
-          // 3. Check for Pokémon banner
-          try {
-            const pokemonResult = detectPokemonBanner(imageData, width, height);
-            if (pokemonResult.isPokemon) {
-              frame.canvas.width = 1;
-              frame.canvas.height = 1;
-              return {
-                detectedMode: 'pokemon',
-                confidence: pokemonResult.avgSat > 40 ? 'high' : 'medium',
-                detectedAt: label,
-              };
-            }
-          } catch (err) {
-            console.warn('Pokemon detection error:', err.message);
-          }
+          const result = classifyFrame(imageData, width, height);
 
           // Free canvas memory
           frame.canvas.width = 1;
           frame.canvas.height = 1;
+
+          if (result.type) {
+            votes[result.type]++;
+            if (result.confidence === 'high') confidences[result.type] = 'high';
+            if (!firstDetection) firstDetection = label;
+            console.log(`[VideoDetector] Frame ${label}: ${result.type} (${result.confidence})`);
+          } else {
+            console.log(`[VideoDetector] Frame ${label}: unclassified`);
+          }
+        }
+
+        // Determine winner by vote count
+        const winner = Object.entries(votes)
+          .filter(([, count]) => count > 0)
+          .sort((a, b) => b[1] - a[1])[0];
+
+        if (winner) {
+          const [mode, count] = winner;
+          return {
+            detectedMode: mode,
+            confidence: count >= 2 ? 'high' : confidences[mode],
+            detectedAt: firstDetection,
+          };
         }
 
         return fallback;

@@ -27,3 +27,4 @@ test_ocr/
 tmp_pokedex_frames/
 .env
 
+debug_frames/
