@@ -419,22 +419,79 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
         />
       </div>
 
-      {/* How To Guide Teaser */}
+      {/* How It Works - Inline Guide */}
       <section>
-        <div className="card bg-base-200">
-          <div className="card-body flex-row items-center gap-4">
-            <span className="text-4xl">{"📖"}</span>
-            <div className="flex-1">
-              <h2 className="card-title text-base">New here? Learn how to scan in 5 easy steps</h2>
-              <p className="text-sm text-base-content/60">
-                Record a video on your Nintendo Switch, transfer it to your device, and let the scanner do the rest.
+        <h2 className="text-2xl font-bold text-center mb-6">{"📖"} How It Works</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+          {/* Step 1: Record */}
+          <div className="card bg-base-200 shadow-md">
+            <figure className="px-4 pt-4">
+              <img
+                src={`${import.meta.env.BASE_URL}howto/habitat-scroll.gif`}
+                alt="Scrolling through habitats on Nintendo Switch"
+                className="rounded-lg w-full"
+              />
+            </figure>
+            <div className="card-body pt-3">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="badge badge-primary font-bold">1</div>
+                <h3 className="card-title text-base">{"🎮"} Record</h3>
+              </div>
+              <p className="text-sm text-base-content/70">
+                Open your collection in Pokopia and scroll through entries using <kbd className="kbd kbd-xs">ZR</kbd>.
+                Hold the <strong>Capture button</strong> to save the last 30s. Press every ~25s for longer lists.
               </p>
             </div>
-            <button className="btn btn-outline btn-sm" onClick={onShowHowTo}>
-              {"👉"} How to Use
-            </button>
           </div>
+
+          {/* Step 2: Transfer */}
+          <div className="card bg-base-200 shadow-md">
+            <figure className="px-4 pt-4">
+              <img
+                src={`${import.meta.env.BASE_URL}howto/pokemon-scroll.gif`}
+                alt="Scrolling through Pokédex on Nintendo Switch"
+                className="rounded-lg w-full"
+              />
+            </figure>
+            <div className="card-body pt-3">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="badge badge-primary font-bold">2</div>
+                <h3 className="card-title text-base">{"📲"} Transfer</h3>
+              </div>
+              <p className="text-sm text-base-content/70">
+                Send the video to your phone or PC. Use the Switch’s <strong>Send to Smartphone</strong> (QR code),
+                a <strong>USB-C cable</strong>, or copy from a <strong>microSD card</strong>.
+              </p>
+            </div>
+          </div>
+
+          {/* Step 3: Scan */}
+          <div className="card bg-base-200 shadow-md">
+            <figure className="px-4 pt-4">
+              <img
+                src={`${import.meta.env.BASE_URL}howto/items-scroll.gif`}
+                alt="Scrolling through items grid on Nintendo Switch"
+                className="rounded-lg w-full"
+              />
+            </figure>
+            <div className="card-body pt-3">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="badge badge-primary font-bold">3</div>
+                <h3 className="card-title text-base">{"🔍"} Scan</h3>
+              </div>
+              <p className="text-sm text-base-content/70">
+                Drop your videos above and hit <strong>Start Scanning</strong>.
+                The scanner auto-detects the category, identifies entries, and deduplicates overlapping clips.
+              </p>
+            </div>
+          </div>
+
         </div>
+        <p className="text-center text-xs text-base-content/40 mt-4">
+          Supports Pokédex, Habitats, Items & Recipes • Multiple videos merge automatically •{" "}
+          <button className="link link-primary" onClick={onShowHowTo}>Full guide →</button>
+        </p>
       </section>
     </div>
   );
