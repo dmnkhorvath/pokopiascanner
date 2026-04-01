@@ -983,7 +983,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
   // Determine worker pool size — smaller on mobile to save memory
   const mobile = isMobileDevice();
-  const maxWorkers = mobile ? 2 : 4;
+  const maxWorkers = mobile ? 4 : 8;
   const poolSize = Math.min(
     navigator.hardwareConcurrency || 4,
     maxWorkers,
