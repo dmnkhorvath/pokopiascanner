@@ -1,13 +1,10 @@
 /**
- * Grid-based Scanner Engine with Icon Fingerprint Matching
+ * Grid-based Scanner Engine
  *
- * Detects item/recipe grids in video frames, classifies tiles as
- * discovered vs undiscovered using saturation analysis, and identifies
- * discovered items via normalized cross-correlation (NCC) against
- * pre-computed 16×16 grayscale fingerprints.
- *
- * No scroll tracking needed for identification — each tile is matched
- * independently against the full reference database.
+ * Supports 4 scan modes:
+ *  - item/recipe: 12-col grid with icon fingerprint matching + D/U row-pattern scroll tracking
+ *  - pokemon: 8-col grid with saturation/brightness classification + pixel cross-correlation scroll
+ *  - habitat: 4-col grid with purple/scenic classification + pixel cross-correlation scroll
  *
  * Works entirely with canvas pixel operations — no ML dependencies.
  */
@@ -15,38 +12,84 @@
 import pokopiaDataset from '../assets/pokopiaDataset.json';
 import fingerprintData from '../assets/iconFingerprints.json';
 
-// ─── Reference layout (1920×1080) ────────────────────────────────────────────
+// ─── Reference resolution ────────────────────────────────────────────────────
 
 const REF_WIDTH  = 1920;
 const REF_HEIGHT = 1080;
-const REF_CELL   = 138;   // px between tile centers
-const REF_COL0_X = 201;   // first column center x
-const REF_ROW0_Y = 298;   // first row center y
-const REF_COLS   = 12;
-const REF_VISIBLE_ROWS = 5;
-const REF_TILE_HALF = 55; // half-tile crop radius (slightly larger for full icon)
 
-// Tile classification
-const SAT_THRESHOLD = 15; // mean saturation above this → discovered
+// ─── Item/Recipe grid layout (1920×1080) ─────────────────────────────────────
 
-// Fingerprint matching
-const FP_SIZE  = fingerprintData.size;   // 16
-const FP_SCALE = fingerprintData.scale;  // 10000
-const MIN_MATCH_SCORE = 0.65; // minimum NCC to accept a match
+const ITEM_CELL      = 138;
+const ITEM_COL0_X    = 201;
+const ITEM_ROW0_Y    = 298;
+const ITEM_COLS      = 12;
+const ITEM_VIS_ROWS  = 5;
+const ITEM_TILE_HALF = 55;
+const SAT_THRESHOLD  = 15;
+
+// ─── Pokémon grid layout (1920×1080) ─────────────────────────────────────────
+
+const POKE_COLS      = 8;
+const POKE_VIS_ROWS  = 5;
+const POKE_TILE_XS   = [310, 505, 700, 895, 1090, 1285, 1480, 1675];
+const POKE_ROW0_Y    = 270;
+const POKE_ROW_SPACE = 155;
+const POKE_TILE_HALF = 50;
+const POKE_SAT_THRESH = 20;
+
+// ─── Habitat grid layout (1920×1080) ─────────────────────────────────────────
+
+const HAB_COLS       = 4;
+const HAB_VIS_ROWS   = 3;
+const HAB_TILE_XS    = [454, 777, 1098, 1421];
+const HAB_ROW0_Y     = 305;
+const HAB_ROW_SPACE  = 240;
+const HAB_TILE_HW    = 100; // half-width
+const HAB_TILE_HH    = 70;  // half-height
+
+// ─── Cross-correlation parameters ────────────────────────────────────────────
+
+const XCORR_Y_START     = 150;
+const XCORR_Y_END       = 900;
+const XCORR_MAX_SHIFT   = 200;
+const XCORR_MIN_CORR    = 0.2;
+const POKE_STRIP_X      = 400;
+const POKE_STRIP_W      = 300;
+const HAB_STRIP_X       = 400;
+const HAB_STRIP_W       = 200;
+
+// ─── Fingerprint matching (item/recipe) ──────────────────────────────────────
+
+const FP_SIZE  = fingerprintData.size;
+const FP_SCALE = fingerprintData.scale;
+const MIN_MATCH_SCORE = 0.65;
 
 // ─── Dataset ordering ────────────────────────────────────────────────────────
 
 const itemList   = pokopiaDataset.items   || [];
 const recipeList = pokopiaDataset.recipes || [];
 
+// Sort pokemon by number (strip '#' prefix, parse as int)
+const pokemonList = [...(pokopiaDataset.pokemon || [])].sort((a, b) => {
+  const na = parseInt(a.number.replace('#', ''), 10);
+  const nb = parseInt(b.number.replace('#', ''), 10);
+  return na - nb;
+});
+
+// Sort habitats by number (parse as int)
+const habitatList = [...(pokopiaDataset.habitats || [])].sort((a, b) => {
+  const na = parseInt(a.number, 10);
+  const nb = parseInt(b.number, 10);
+  return na - nb;
+});
+
 // ─── Pre-process fingerprint database ────────────────────────────────────────
 
-// Convert quantized int16 arrays to normalized Float32Arrays for fast NCC
 const fpNames = Object.keys(fingerprintData.fingerprints);
 const fpVectors = new Float32Array(fpNames.length * FP_SIZE * FP_SIZE);
 
 (function initFingerprints() {
-  const dim = FP_SIZE * FP_SIZE; // 256
+  const dim = FP_SIZE * FP_SIZE;
   for (let i = 0; i < fpNames.length; i++) {
     const quantized = fingerprintData.fingerprints[fpNames[i]];
     const offset = i * dim;
@@ -56,7 +99,7 @@ const fpVectors = new Float32Array(fpNames.length * FP_SIZE * FP_SIZE);
   }
 })();
 
-// Build a lookup from item name → type info from the dataset
+// Build a lookup from item name → type info
 const itemTypeMap = new Map();
 for (const entry of itemList) {
   itemTypeMap.set(entry.name, { type: 'item', category: entry.category || 'Unknown' });
@@ -71,23 +114,81 @@ export function detectGridParams(videoWidth, videoHeight) {
   const sx = videoWidth  / REF_WIDTH;
   const sy = videoHeight / REF_HEIGHT;
   return {
-    cols:        REF_COLS,
-    visibleRows: REF_VISIBLE_ROWS,
-    cell:        Math.round(REF_CELL   * sx),
-    col0X:       Math.round(REF_COL0_X * sx),
-    row0Y:       Math.round(REF_ROW0_Y * sy),
-    tileHalf:    Math.round(REF_TILE_HALF * Math.min(sx, sy)),
+    // Item/recipe params
+    cols:        ITEM_COLS,
+    visibleRows: ITEM_VIS_ROWS,
+    cell:        Math.round(ITEM_CELL   * sx),
+    col0X:       Math.round(ITEM_COL0_X * sx),
+    row0Y:       Math.round(ITEM_ROW0_Y * sy),
+    tileHalf:    Math.round(ITEM_TILE_HALF * Math.min(sx, sy)),
     width:       videoWidth,
     height:      videoHeight,
+    sx, sy,
+  };
+}
+
+/**
+ * Build scaled parameters for any scan mode.
+ */
+function getModeParams(videoWidth, videoHeight, scanMode) {
+  const sx = videoWidth  / REF_WIDTH;
+  const sy = videoHeight / REF_HEIGHT;
+
+  if (scanMode === 'pokemon') {
+    return {
+      cols:        POKE_COLS,
+      visibleRows: POKE_VIS_ROWS,
+      tileXs:      POKE_TILE_XS.map(x => Math.round(x * sx)),
+      row0Y:       Math.round(POKE_ROW0_Y * sy),
+      rowSpacing:  Math.round(POKE_ROW_SPACE * sy),
+      tileHalf:    Math.round(POKE_TILE_HALF * Math.min(sx, sy)),
+      width:       videoWidth,
+      height:      videoHeight,
+      sx, sy,
+      // Cross-correlation strip
+      stripX:  Math.round(POKE_STRIP_X * sx),
+      stripW:  Math.round(POKE_STRIP_W * sx),
+      yStart:  Math.round(XCORR_Y_START * sy),
+      yEnd:    Math.round(XCORR_Y_END * sy),
+    };
+  }
+
+  if (scanMode === 'habitat') {
+    return {
+      cols:        HAB_COLS,
+      visibleRows: HAB_VIS_ROWS,
+      tileXs:      HAB_TILE_XS.map(x => Math.round(x * sx)),
+      row0Y:       Math.round(HAB_ROW0_Y * sy),
+      rowSpacing:  Math.round(HAB_ROW_SPACE * sy),
+      tileHW:      Math.round(HAB_TILE_HW * sx),
+      tileHH:      Math.round(HAB_TILE_HH * sy),
+      width:       videoWidth,
+      height:      videoHeight,
+      sx, sy,
+      // Cross-correlation strip
+      stripX:  Math.round(HAB_STRIP_X * sx),
+      stripW:  Math.round(HAB_STRIP_W * sx),
+      yStart:  Math.round(XCORR_Y_START * sy),
+      yEnd:    Math.round(XCORR_Y_END * sy),
+    };
+  }
+
+  // item/recipe — use existing layout
+  return {
+    cols:        ITEM_COLS,
+    visibleRows: ITEM_VIS_ROWS,
+    cell:        Math.round(ITEM_CELL * sx),
+    col0X:       Math.round(ITEM_COL0_X * sx),
+    row0Y:       Math.round(ITEM_ROW0_Y * sy),
+    tileHalf:    Math.round(ITEM_TILE_HALF * Math.min(sx, sy)),
+    width:       videoWidth,
+    height:      videoHeight,
+    sx, sy,
   };
 }
 
 // ─── Pixel helpers ───────────────────────────────────────────────────────────
 
-/**
- * Compute mean saturation for a rectangular region of an ImageData.
- * Samples every 2nd pixel for speed.
- */
 function meanSaturation(imageData, x, y, w, h) {
   const { data, width } = imageData;
   let totalSat = 0;
@@ -106,30 +207,226 @@ function meanSaturation(imageData, x, y, w, h) {
   return count > 0 ? totalSat / count : 0;
 }
 
-// ─── Icon fingerprint extraction ─────────────────────────────────────────────
+/**
+ * Compute mean saturation (0-100) and mean brightness (0-255) for a region.
+ */
+function meanSatBright(imageData, x, y, w, h) {
+  const { data, width } = imageData;
+  let totalSat = 0, totalBright = 0, count = 0;
+  for (let py = y; py < y + h; py += 2) {
+    for (let px = x; px < x + w; px += 2) {
+      const idx = (py * width + px) * 4;
+      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+      const max = Math.max(r, g, b);
+      const min = Math.min(r, g, b);
+      totalSat += max === 0 ? 0 : ((max - min) / max) * 100;
+      totalBright += max;
+      count++;
+    }
+  }
+  return {
+    sat:    count > 0 ? totalSat / count : 0,
+    bright: count > 0 ? totalBright / count : 0,
+  };
+}
 
 /**
- * Extract a 16×16 normalized grayscale fingerprint from a tile canvas region.
- *
- * Pipeline (mirrors the Python build-time process):
- *  1. Read tile pixels from ImageData
- *  2. Classify each pixel as background (low saturation, high value) or icon
- *  3. Find bounding box of icon pixels
- *  4. Crop to content, pad to square
- *  5. Resize to 16×16 using area averaging
- *  6. Convert to grayscale, normalize (subtract mean, divide by L2 norm)
- *
- * @param {ImageData} imageData - Full frame image data
- * @param {number} tx - Tile top-left x
- * @param {number} ty - Tile top-left y
- * @param {number} tw - Tile width
- * @param {number} th - Tile height
- * @returns {Float32Array|null} - Normalized 256-element fingerprint or null
+ * RGB to HSV. Returns H in [0,360], S in [0,100], V in [0,255].
  */
+function rgbToHsv(r, g, b) {
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r)      h = ((g - b) / d + 6) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else                h = (r - g) / d + 4;
+    h *= 60;
+  }
+  const s = max === 0 ? 0 : (d / max) * 100;
+  return { h, s, v: max };
+}
+
+/**
+ * Classify a habitat tile.
+ * Returns 'B' (built), 'U' (unbuilt/purple), or 'E' (empty/transition).
+ */
+function classifyHabitatTile(imageData, cx, cy, hw, hh) {
+  const { data, width } = imageData;
+  const x0 = cx - hw;
+  const y0 = cy - hh;
+  const w = hw * 2;
+  const h = hh * 2;
+
+  let purpleCount = 0;
+  let greenCount = 0;
+  let blueCount = 0;
+  let highSatCount = 0;
+  let contentCount = 0;
+  let totalPixels = 0;
+
+  // Background color (242, 239, 243)
+  const bgR = 242, bgG = 239, bgB = 243;
+
+  for (let py = y0; py < y0 + h; py += 2) {
+    for (let px = x0; px < x0 + w; px += 2) {
+      if (px < 0 || py < 0 || px >= imageData.width || py >= imageData.height) continue;
+      const idx = (py * width + px) * 4;
+      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+      totalPixels++;
+
+      // Content detection: RGB distance from background > 20
+      const dist = Math.sqrt((r - bgR) ** 2 + (g - bgG) ** 2 + (b - bgB) ** 2);
+      if (dist > 20) contentCount++;
+
+      const hsv = rgbToHsv(r, g, b);
+
+      // Purple: H 230-330 (browser 0-360), S >= 15%, V >= 140
+      if (hsv.h >= 230 && hsv.h <= 330 && hsv.s >= 15 && hsv.v >= 140) {
+        purpleCount++;
+      }
+
+      // Green: H 60-170, S > 40%
+      if (hsv.h >= 60 && hsv.h <= 170 && hsv.s > 40) {
+        greenCount++;
+      }
+
+      // Blue: H 170-230, S > 30%
+      if (hsv.h >= 170 && hsv.h <= 230 && hsv.s > 30) {
+        blueCount++;
+      }
+
+      // High saturation
+      if (hsv.s > 25) {
+        highSatCount++;
+      }
+    }
+  }
+
+  if (totalPixels === 0) return 'E';
+
+  const contentPct  = contentCount / totalPixels;
+  const purplePct   = purpleCount / totalPixels;
+  const scenicPct   = (greenCount + blueCount) / totalPixels;
+  const highSatPct  = highSatCount / totalPixels;
+
+  // Empty: too little content (transition frame)
+  if (contentPct < 0.10) return 'E';
+
+  // Unbuilt: purple blob
+  if (purplePct > 0.20) return 'U';
+
+  // Built: scenic or colorful
+  if (scenicPct > 0.10 || highSatPct > 0.20 || (contentPct > 0.30 && highSatPct > 0.05)) {
+    return 'B';
+  }
+
+  // Default: unbuilt (not enough color to be built)
+  return 'U';
+}
+
+/**
+ * Classify a Pokémon tile.
+ * Returns 'C' (captured), 'U' (unknown/?), or 'S' (sensed/silhouette).
+ */
+function classifyPokemonTile(imageData, cx, cy, half) {
+  const x = cx - half;
+  const y = cy - half;
+  const w = half * 2;
+  const h = half * 2;
+  const { sat, bright } = meanSatBright(imageData, x, y, w, h);
+
+  if (sat > POKE_SAT_THRESH) return 'C';       // Colorful sprite → captured
+  if (bright > 180)          return 'U';        // Grey '?' bright → unknown
+  return 'S';                                   // Dark silhouette → sensed
+}
+
+// ─── Pixel cross-correlation scroll tracking ─────────────────────────────────
+
+/**
+ * Extract a 1D vertical brightness profile by averaging a horizontal strip.
+ * Returns Float64Array of length (yEnd - yStart).
+ */
+function extractVerticalProfile(imageData, stripX, stripW, yStart, yEnd) {
+  const { data, width } = imageData;
+  const len = yEnd - yStart;
+  const profile = new Float64Array(len);
+
+  for (let py = yStart; py < yEnd; py++) {
+    let sum = 0;
+    let cnt = 0;
+    for (let px = stripX; px < stripX + stripW && px < width; px++) {
+      const idx = (py * width + px) * 4;
+      // Grayscale
+      sum += 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+      cnt++;
+    }
+    profile[py - yStart] = cnt > 0 ? sum / cnt : 0;
+  }
+  return profile;
+}
+
+/**
+ * Normalize a profile: subtract mean, divide by std.
+ */
+function normalizeProfile(profile) {
+  const n = profile.length;
+  let mean = 0;
+  for (let i = 0; i < n; i++) mean += profile[i];
+  mean /= n;
+
+  let variance = 0;
+  for (let i = 0; i < n; i++) {
+    const d = profile[i] - mean;
+    variance += d * d;
+  }
+  const std = Math.sqrt(variance / n);
+
+  const result = new Float64Array(n);
+  if (std > 0.001) {
+    for (let i = 0; i < n; i++) result[i] = (profile[i] - mean) / std;
+  }
+  return result;
+}
+
+/**
+ * Measure vertical pixel shift between two frames using cross-correlation.
+ * Positive shift = content moved up (scrolled down).
+ * Returns { shift, correlation }.
+ */
+function measurePixelShift(prevProfile, currProfile, maxShift) {
+  const n = prevProfile.length;
+  let bestShift = 0;
+  let bestCorr  = -Infinity;
+
+  for (let shift = -10; shift <= maxShift; shift++) {
+    let dot = 0;
+    let cnt = 0;
+    for (let i = 0; i < n; i++) {
+      const j = i + shift;
+      if (j >= 0 && j < n) {
+        dot += prevProfile[j] * currProfile[i];
+        cnt++;
+      }
+    }
+    if (cnt > 0) {
+      const corr = dot / cnt;
+      if (corr > bestCorr) {
+        bestCorr  = corr;
+        bestShift = shift;
+      }
+    }
+  }
+
+  return { shift: bestShift, correlation: bestCorr };
+}
+
+// ─── Icon fingerprint extraction (item/recipe) ──────────────────────────────
+
 function extractTileFingerprint(imageData, tx, ty, tw, th) {
   const { data, width } = imageData;
 
-  // Step 1: Find icon bounding box by excluding low-sat high-value background
   let minX = tw, maxX = 0, minY = th, maxY = 0;
   let hasIcon = false;
 
@@ -141,7 +438,6 @@ function extractTileFingerprint(imageData, tx, ty, tw, th) {
       const min = Math.min(r, g, b);
       const sat = max === 0 ? 0 : (max - min) / max;
       const val = max / 255;
-      // Background: low saturation AND high value (lavender/white)
       if (sat < 0.10 && val > 0.70) continue;
       if (px < minX) minX = px;
       if (px > maxX) maxX = px;
@@ -153,14 +449,12 @@ function extractTileFingerprint(imageData, tx, ty, tw, th) {
 
   if (!hasIcon || maxX - minX < 3 || maxY - minY < 3) return null;
 
-  // Step 2: Extract cropped icon as RGB array
   const cw = maxX - minX + 1;
   const ch = maxY - minY + 1;
   const sq = Math.max(cw, ch);
   const ox = Math.floor((sq - cw) / 2);
   const oy = Math.floor((sq - ch) / 2);
 
-  // Create square canvas with white background
   const squarePixels = new Uint8Array(sq * sq * 3);
   squarePixels.fill(255);
 
@@ -174,7 +468,6 @@ function extractTileFingerprint(imageData, tx, ty, tw, th) {
     }
   }
 
-  // Step 3: Resize to FP_SIZE×FP_SIZE using area averaging
   const fp = new Float32Array(FP_SIZE * FP_SIZE);
   const blockW = sq / FP_SIZE;
   const blockH = sq / FP_SIZE;
@@ -190,7 +483,6 @@ function extractTileFingerprint(imageData, tx, ty, tw, th) {
       for (let sy = srcY0; sy < srcY1; sy++) {
         for (let sx = srcX0; sx < srcX1; sx++) {
           const idx = (sy * sq + sx) * 3;
-          // Grayscale: 0.299R + 0.587G + 0.114B
           sum += 0.299 * squarePixels[idx] + 0.587 * squarePixels[idx + 1] + 0.114 * squarePixels[idx + 2];
           cnt++;
         }
@@ -199,7 +491,6 @@ function extractTileFingerprint(imageData, tx, ty, tw, th) {
     }
   }
 
-  // Step 4: Normalize (subtract mean, divide by L2 norm)
   let mean = 0;
   for (let i = 0; i < fp.length; i++) mean += fp[i];
   mean /= fp.length;
@@ -215,10 +506,6 @@ function extractTileFingerprint(imageData, tx, ty, tw, th) {
   return fp;
 }
 
-/**
- * Match a tile fingerprint against the reference database.
- * Returns { name, score } or null if no match above threshold.
- */
 function matchFingerprint(tileFp) {
   const dim = FP_SIZE * FP_SIZE;
   let bestIdx   = -1;
@@ -242,7 +529,7 @@ function matchFingerprint(tileFp) {
   return null;
 }
 
-// ─── Tile classification ─────────────────────────────────────────────────────
+// ─── Tile classification (item/recipe) ───────────────────────────────────────
 
 export function classifyFrame(imageData, gp) {
   const rows = [];
@@ -270,12 +557,7 @@ export function classifyFrame(imageData, gp) {
   return rows;
 }
 
-// ─── Row-pattern scroll tracking (for undiscovered counting) ─────────────────
-
-function rowKey(row) {
-  if (!row) return null;
-  return row.map(v => v ? '1' : '0').join('');
-}
+// ─── Row-pattern scroll tracking (item/recipe) ──────────────────────────────
 
 function rowsMatch(a, b, tolerance = 1) {
   if (!a || !b || a.length !== b.length) return false;
@@ -311,95 +593,62 @@ export function findRowShift(prevRows, currRows) {
   return bestShift;
 }
 
-// ─── Main scanning pipeline ─────────────────────────────────────────────────
+// ─── Shared utilities ────────────────────────────────────────────────────────
 
-/**
- * Scan a video of a scrolling item/recipe grid using icon fingerprint matching.
- *
- * Algorithm:
- *  1. For each frame, classify all visible tiles as discovered / undiscovered.
- *  2. For each discovered tile, extract a 16×16 fingerprint and match it
- *     against the pre-computed reference database via NCC.
- *  3. Track scroll position via D/U row patterns to count total rows
- *     (for undiscovered tile counting).
- *  4. Deduplicate: each unique item name is recorded once with best score.
- *
- * @param {HTMLVideoElement} video
- * @param {object}   settings
- * @param {Function} onProgress
- * @param {Function} onMatch
- * @param {AbortSignal} signal
- * @returns {Promise<Map<string, object>>}
- */
-export async function scanGridVideo(
-  video, settings, onProgress, onMatch, signal,
-) {
-  const {
-    frameIntervalMs = 100,
-    scanMode        = 'item',
-  } = settings;
+const yieldToBrowser = () => new Promise(r => setTimeout(r, 0));
 
+function seekVideo(vid, t, timeoutMs = 3000) {
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      resolve();
+    };
+    const timer = setTimeout(done, timeoutMs);
+    vid.addEventListener('seeked', () => {
+      clearTimeout(timer);
+      done();
+    }, { once: true });
+    vid.currentTime = t;
+  });
+}
+
+// ─── Item/Recipe scan pipeline ──────────────────────────────────────────────
+
+async function scanItemRecipe(video, settings, onProgress, onMatch, signal) {
+  const { frameIntervalMs = 100, scanMode = 'item' } = settings;
   const frameIntervalSec = frameIntervalMs / 1000;
   const duration    = video.duration;
   const totalFrames = Math.ceil(duration / frameIntervalSec);
-  const gp          = detectGridParams(video.videoWidth, video.videoHeight);
-  const dataList    = scanMode === 'recipe' ? recipeList : itemList;
-  const totalItems  = dataList.length;
+  const gp          = getModeParams(video.videoWidth, video.videoHeight, scanMode);
 
-  // Canvas for frame capture
   let frameCanvas = document.createElement('canvas');
   frameCanvas.width  = video.videoWidth;
   frameCanvas.height = video.videoHeight;
   const frameCtx = frameCanvas.getContext('2d', { willReadFrequently: true });
 
-  const results       = new Map();   // name → result object
+  const results       = new Map();
   let absRowOffset    = 0;
   let prevRows        = null;
   let processedFrames = 0;
-  let totalUndiscovered = 0;         // count of unique undiscovered positions
-  const seenPositions = new Set();   // track grid positions we've seen
-
-  const yieldToBrowser = () => new Promise(r => setTimeout(r, 0));
-
-  // Robust seek: addEventListener with { once: true } + timeout fallback for mobile Safari
-  function seekVideo(vid, t, timeoutMs = 3000) {
-    return new Promise((resolve) => {
-      let settled = false;
-      const done = () => {
-        if (settled) return;
-        settled = true;
-        resolve();
-      };
-      const timer = setTimeout(done, timeoutMs);
-      vid.addEventListener('seeked', () => {
-        clearTimeout(timer);
-        done();
-      }, { once: true });
-      vid.currentTime = t;
-    });
-  }
+  const seenPositions = new Set();
+  let totalUndiscovered = 0;
 
   for (let time = 0; time < duration; time += frameIntervalSec) {
     if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
 
-    // Seek (robust: addEventListener + timeout fallback for mobile Safari)
     await seekVideo(video, time);
-
-    // Draw frame
     frameCtx.drawImage(video, 0, 0);
-    const imageData = frameCtx.getImageData(0, 0,
-                                            frameCanvas.width, frameCanvas.height);
+    const imageData = frameCtx.getImageData(0, 0, frameCanvas.width, frameCanvas.height);
 
-    // Classify tiles
     const currRows = classifyFrame(imageData, gp);
 
-    // Detect scroll shift for position tracking
     if (prevRows) {
       const shift = findRowShift(prevRows, currRows);
       absRowOffset += shift;
     }
 
-    // Process each tile
     const newItems = [];
     for (let r = 0; r < currRows.length; r++) {
       if (!currRows[r]) continue;
@@ -409,7 +658,6 @@ export async function scanGridVideo(
         const discovered = currRows[r][c];
 
         if (discovered) {
-          // Extract fingerprint and match
           const cx = gp.col0X + c * gp.cell;
           const cy = gp.row0Y + r * gp.cell;
           const tx = cx - gp.tileHalf;
@@ -438,14 +686,12 @@ export async function scanGridVideo(
             }
           }
         } else {
-          // Track undiscovered positions
           if (!seenPositions.has(posKey)) {
             seenPositions.add(posKey);
             totalUndiscovered++;
           }
         }
       }
-      // Yield after each row so the browser can repaint (prevents freezing on mobile)
       await yieldToBrowser();
     }
 
@@ -457,7 +703,6 @@ export async function scanGridVideo(
     prevRows = currRows;
     processedFrames++;
 
-    // Progress
     const discoveredCount = results.size;
     const previewDataUrl  = frameCanvas.toDataURL('image/jpeg', 0.4);
     onProgress({
@@ -476,8 +721,8 @@ export async function scanGridVideo(
     if (processedFrames % 5 === 0) await yieldToBrowser();
   }
 
-  // Add undiscovered entries from the dataset for items NOT matched
-  // This gives a complete picture of what's missing
+  // Add undiscovered entries
+  const dataList = scanMode === 'recipe' ? recipeList : itemList;
   for (const entry of dataList) {
     if (!results.has(entry.name)) {
       results.set(entry.name, {
@@ -491,7 +736,6 @@ export async function scanGridVideo(
   }
 
   // Cleanup
-  prevRows = null;
   frameCanvas.width = 1;
   frameCanvas.height = 1;
   frameCanvas = null;
@@ -499,11 +743,351 @@ export async function scanGridVideo(
   return results;
 }
 
+// ─── Pokémon scan pipeline ──────────────────────────────────────────────────
+
+async function scanPokemon(video, settings, onProgress, onMatch, signal) {
+  const { frameIntervalMs = 100 } = settings;
+  const frameIntervalSec = frameIntervalMs / 1000;
+  const duration    = video.duration;
+  const totalFrames = Math.ceil(duration / frameIntervalSec);
+  const mp          = getModeParams(video.videoWidth, video.videoHeight, 'pokemon');
+
+  let frameCanvas = document.createElement('canvas');
+  frameCanvas.width  = video.videoWidth;
+  frameCanvas.height = video.videoHeight;
+  const frameCtx = frameCanvas.getContext('2d', { willReadFrequently: true });
+
+  const results       = new Map();  // name → result
+  let cumPixelOffset  = 0;
+  let prevProfile     = null;
+  let processedFrames = 0;
+  let capturedCount   = 0;
+  let sensedCount     = 0;
+
+  // Compute row center Ys (scaled)
+  const rowYs = [];
+  for (let r = 0; r < mp.visibleRows; r++) {
+    rowYs.push(mp.row0Y + r * mp.rowSpacing);
+  }
+
+  for (let time = 0; time < duration; time += frameIntervalSec) {
+    if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
+
+    await seekVideo(video, time);
+    frameCtx.drawImage(video, 0, 0);
+    const imageData = frameCtx.getImageData(0, 0, frameCanvas.width, frameCanvas.height);
+
+    // Cross-correlation scroll tracking
+    const currProfile = normalizeProfile(
+      extractVerticalProfile(imageData, mp.stripX, mp.stripW, mp.yStart, mp.yEnd)
+    );
+
+    if (prevProfile) {
+      const { shift, correlation } = measurePixelShift(
+        prevProfile, currProfile, XCORR_MAX_SHIFT
+      );
+      if (correlation > XCORR_MIN_CORR) {
+        cumPixelOffset += shift;
+      }
+    }
+    prevProfile = currProfile;
+
+    // Classify each visible tile
+    const newItems = [];
+    for (let r = 0; r < mp.visibleRows; r++) {
+      const cy = rowYs[r];
+      if (cy - mp.tileHalf < 0 || cy + mp.tileHalf >= mp.height) continue;
+
+      // Compute absolute row for this visible row
+      const absRow = Math.round((cy + cumPixelOffset - mp.row0Y) / mp.rowSpacing);
+      if (absRow < 0) continue;
+
+      for (let c = 0; c < mp.cols; c++) {
+        const cx = mp.tileXs[c];
+        if (cx - mp.tileHalf < 0 || cx + mp.tileHalf >= mp.width) continue;
+
+        const cls = classifyPokemonTile(imageData, cx, cy, mp.tileHalf);
+        const idx = absRow * POKE_COLS + c;
+        if (idx < 0 || idx >= pokemonList.length) continue;
+
+        const entry = pokemonList[idx];
+        const existing = results.get(entry.name);
+
+        if (cls === 'C') {
+          // Captured — always upgrade
+          if (!existing || !existing.captured) {
+            const result = {
+              name:     entry.name,
+              type:     'pokemon',
+              category: entry.species || 'Pokémon',
+              captured: true,
+              sensed:   true,  // captured implies sensed
+            };
+            const isNew = !existing;
+            results.set(entry.name, result);
+            if (isNew) {
+              capturedCount++;
+              newItems.push(result);
+            } else if (!existing.captured) {
+              capturedCount++;
+              if (existing.sensed) sensedCount--; // was counted as sensed-only
+            }
+          }
+        } else if (cls === 'S') {
+          // Sensed (silhouette) — only set if not already captured
+          if (!existing) {
+            const result = {
+              name:     entry.name,
+              type:     'pokemon',
+              category: entry.species || 'Pokémon',
+              captured: false,
+              sensed:   true,
+            };
+            results.set(entry.name, result);
+            sensedCount++;
+            newItems.push(result);
+          }
+        }
+        // cls === 'U' (unknown/?) — we don't record these during scanning
+      }
+      await yieldToBrowser();
+    }
+
+    if (newItems.length > 0) {
+      onMatch({ items: newItems, frameIndex: processedFrames });
+      await yieldToBrowser();
+    }
+
+    processedFrames++;
+
+    const previewDataUrl = frameCanvas.toDataURL('image/jpeg', 0.4);
+    onProgress({
+      phase:        'scanning',
+      current:      processedFrames,
+      total:        totalFrames,
+      percent:      Math.round((processedFrames / totalFrames) * 100),
+      message:      `Pokémon scan: ${processedFrames}/${totalFrames} frames | `
+                  + `${capturedCount} captured, ${sensedCount} sensed`,
+      currentFrame: previewDataUrl,
+      timePosition: time,
+      duration,
+    });
+    await yieldToBrowser();
+
+    if (processedFrames % 5 === 0) await yieldToBrowser();
+  }
+
+  // Add remaining pokemon as unknown
+  for (const entry of pokemonList) {
+    if (!results.has(entry.name)) {
+      results.set(entry.name, {
+        name:     entry.name,
+        type:     'pokemon',
+        category: entry.species || 'Pokémon',
+        captured: false,
+        sensed:   false,
+      });
+    }
+  }
+
+  // Cleanup
+  frameCanvas.width = 1;
+  frameCanvas.height = 1;
+  frameCanvas = null;
+
+  return results;
+}
+
+// ─── Habitat scan pipeline ──────────────────────────────────────────────────
+
+async function scanHabitat(video, settings, onProgress, onMatch, signal) {
+  const { frameIntervalMs = 100 } = settings;
+  const frameIntervalSec = frameIntervalMs / 1000;
+  const duration    = video.duration;
+  const totalFrames = Math.ceil(duration / frameIntervalSec);
+  const mp          = getModeParams(video.videoWidth, video.videoHeight, 'habitat');
+
+  let frameCanvas = document.createElement('canvas');
+  frameCanvas.width  = video.videoWidth;
+  frameCanvas.height = video.videoHeight;
+  const frameCtx = frameCanvas.getContext('2d', { willReadFrequently: true });
+
+  const results       = new Map();
+  let cumPixelOffset  = 0;
+  let prevProfile     = null;
+  let processedFrames = 0;
+  let builtCount      = 0;
+  let unbuiltCount    = 0;
+
+  // Compute row center Ys (scaled)
+  const rowYs = [];
+  for (let r = 0; r < mp.visibleRows; r++) {
+    rowYs.push(mp.row0Y + r * mp.rowSpacing);
+  }
+
+  for (let time = 0; time < duration; time += frameIntervalSec) {
+    if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
+
+    await seekVideo(video, time);
+    frameCtx.drawImage(video, 0, 0);
+    const imageData = frameCtx.getImageData(0, 0, frameCanvas.width, frameCanvas.height);
+
+    // Cross-correlation scroll tracking
+    const currProfile = normalizeProfile(
+      extractVerticalProfile(imageData, mp.stripX, mp.stripW, mp.yStart, mp.yEnd)
+    );
+
+    if (prevProfile) {
+      const { shift, correlation } = measurePixelShift(
+        prevProfile, currProfile, XCORR_MAX_SHIFT
+      );
+      if (correlation > XCORR_MIN_CORR) {
+        cumPixelOffset += shift;
+      }
+    }
+    prevProfile = currProfile;
+
+    // Classify each visible tile
+    const newItems = [];
+    for (let r = 0; r < mp.visibleRows; r++) {
+      const cy = rowYs[r];
+      if (cy - mp.tileHH < 0 || cy + mp.tileHH >= mp.height) continue;
+
+      const absRow = Math.round((cy + cumPixelOffset - mp.row0Y) / mp.rowSpacing);
+      if (absRow < 0) continue;
+
+      for (let c = 0; c < mp.cols; c++) {
+        const cx = mp.tileXs[c];
+        if (cx - mp.tileHW < 0 || cx + mp.tileHW >= mp.width) continue;
+
+        const cls = classifyHabitatTile(imageData, cx, cy, mp.tileHW, mp.tileHH);
+        if (cls === 'E') continue; // Skip empty/transition frames
+
+        const idx = absRow * HAB_COLS + c;
+        if (idx < 0 || idx >= habitatList.length) continue;
+
+        const entry = habitatList[idx];
+        const existing = results.get(entry.name);
+
+        if (cls === 'B') {
+          // Built — always upgrade
+          if (!existing || !existing.built) {
+            const result = {
+              name:       entry.name,
+              type:       'habitat',
+              category:   'Habitat',
+              built:      true,
+              discovered: true,
+            };
+            const isNew = !existing;
+            results.set(entry.name, result);
+            if (isNew) {
+              builtCount++;
+              newItems.push(result);
+            } else if (!existing.built) {
+              builtCount++;
+              unbuiltCount--;
+            }
+          }
+        } else if (cls === 'U') {
+          // Unbuilt (purple) — only set if not already known
+          if (!existing) {
+            const result = {
+              name:       entry.name,
+              type:       'habitat',
+              category:   'Habitat',
+              built:      false,
+              discovered: true,
+            };
+            results.set(entry.name, result);
+            unbuiltCount++;
+            newItems.push(result);
+          }
+        }
+      }
+      await yieldToBrowser();
+    }
+
+    if (newItems.length > 0) {
+      onMatch({ items: newItems, frameIndex: processedFrames });
+      await yieldToBrowser();
+    }
+
+    processedFrames++;
+
+    const previewDataUrl = frameCanvas.toDataURL('image/jpeg', 0.4);
+    onProgress({
+      phase:        'scanning',
+      current:      processedFrames,
+      total:        totalFrames,
+      percent:      Math.round((processedFrames / totalFrames) * 100),
+      message:      `Habitat scan: ${processedFrames}/${totalFrames} frames | `
+                  + `${builtCount} built, ${unbuiltCount} unbuilt`,
+      currentFrame: previewDataUrl,
+      timePosition: time,
+      duration,
+    });
+    await yieldToBrowser();
+
+    if (processedFrames % 5 === 0) await yieldToBrowser();
+  }
+
+  // Add remaining habitats as undiscovered
+  for (const entry of habitatList) {
+    if (!results.has(entry.name)) {
+      results.set(entry.name, {
+        name:       entry.name,
+        type:       'habitat',
+        category:   'Habitat',
+        built:      false,
+        discovered: false,
+      });
+    }
+  }
+
+  // Cleanup
+  frameCanvas.width = 1;
+  frameCanvas.height = 1;
+  frameCanvas = null;
+
+  return results;
+}
+
+// ─── Main scanning entry point ──────────────────────────────────────────────
+
+/**
+ * Scan a video of a scrolling grid.
+ *
+ * @param {HTMLVideoElement} video
+ * @param {object}   settings - must include scanMode: 'item'|'recipe'|'pokemon'|'habitat'
+ * @param {Function} onProgress
+ * @param {Function} onMatch
+ * @param {AbortSignal} signal
+ * @returns {Promise<Map<string, object>>}
+ */
+export async function scanGridVideo(
+  video, settings, onProgress, onMatch, signal,
+) {
+  const { scanMode = 'item' } = settings;
+
+  if (scanMode === 'pokemon') {
+    return scanPokemon(video, settings, onProgress, onMatch, signal);
+  }
+  if (scanMode === 'habitat') {
+    return scanHabitat(video, settings, onProgress, onMatch, signal);
+  }
+  // item or recipe
+  return scanItemRecipe(video, settings, onProgress, onMatch, signal);
+}
+
 /**
  * Get the dataset list for a scan mode.
  */
 export function getGridDataList(scanMode) {
-  return scanMode === 'recipe' ? recipeList : itemList;
+  if (scanMode === 'pokemon') return pokemonList;
+  if (scanMode === 'habitat') return habitatList;
+  if (scanMode === 'recipe')  return recipeList;
+  return itemList;
 }
 
 export default {

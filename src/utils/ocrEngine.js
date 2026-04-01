@@ -898,7 +898,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   // Items and recipes appear in a scrolling grid without text labels.
   // Instead of OCR, we use canvas pixel analysis to detect the grid layout,
   // classify tiles as discovered/undiscovered, and track scroll position.
-  if (scanMode === 'item' || scanMode === 'recipe') {
+  if (scanMode === 'item' || scanMode === 'recipe' || scanMode === 'pokemon' || scanMode === 'habitat') {
     // Auto-detect FPS first
     if (autoDetectFPS && frameIntervalMs === 0) {
       onProgress({
@@ -926,7 +926,10 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
     // Convert grid results to standard format
     const dataList = getGridDataList(scanMode);
-    const categoryKey = scanMode === 'recipe' ? 'recipe' : 'item';
+    const categoryKey = scanMode === 'recipe' ? 'recipe'
+                      : scanMode === 'pokemon' ? 'pokemon'
+                      : scanMode === 'habitat' ? 'habitat'
+                      : 'item';
     for (const [name, entry] of gridResults) {
       results[categoryKey].set(name, entry);
     }
@@ -950,7 +953,11 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     onProgress({
       phase: 'complete',
       current: 1, total: 1, percent: 100,
-      message: `Grid scan complete! Mapped ${gridResults.size} ${scanMode}s (${discovered} discovered, ${undiscovered} undiscovered).`,
+      message: scanMode === 'pokemon'
+        ? `Pokémon scan complete! Found ${gridResults.size} Pokémon (${[...gridResults.values()].filter(r => r.captured).length} captured, ${[...gridResults.values()].filter(r => r.sensed).length} sensed).`
+        : scanMode === 'habitat'
+        ? `Habitat scan complete! Found ${gridResults.size} habitats (${[...gridResults.values()].filter(r => r.built).length} built, ${[...gridResults.values()].filter(r => !r.built).length} unbuilt).`
+        : `Grid scan complete! Mapped ${gridResults.size} ${scanMode}s (${discovered} discovered, ${undiscovered} undiscovered).`,
     });
 
     return finalResults;

@@ -28,3 +28,4 @@ tmp_pokedex_frames/
 .env
 
 debug_frames/
+tmp_analysis/
