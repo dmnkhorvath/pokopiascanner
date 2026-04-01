@@ -831,28 +831,12 @@ function getDeduplicationCrop(scanMode) {
  * and use single-line page segmentation for dramatic speed improvement.
  */
 function getOcrParams(scanMode) {
-  if (scanMode === 'pokemon' || scanMode === 'habitat') {
-    // PSM 6 (uniform block) reads multi-line banners ("No. XXX" + name) reliably.
-    // No whitelist: testing proved raw OCR without character restrictions produces
-    // far better results than the previous whitelist + PSM 7 approach.
-    return {
-      tessedit_pageseg_mode: '6', // PSM 6 = uniform block of text
-    };
-  }
-  // Generic mode: no restrictions
+  // No special OCR restrictions — let Tesseract use default settings
+  // for maximum detection accuracy across all modes.
   return null;
 }
 
-/**
- * Get optimized Tesseract parameters for the "full text" worker
- * used in habitat mode for the bottom half (discovery status check).
- * This needs to read full English text, not just numbers.
- */
-function getFullTextOcrParams() {
-  return {
-    tessedit_pageseg_mode: '6', // PSM 6 = uniform block of text
-  };
-}
+
 
 
 /**
@@ -1022,13 +1006,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   // Create primary worker pool with mode-specific optimizations
   const workers = await createWorkerPool(poolSize, ocrParams);
 
-  // For habitat mode, we also need a "full text" worker for the bottom half
-  // that reads English text (discovery status). Use a separate small pool.
-  let fullTextWorkers = null;
-  if (scanMode === 'habitat') {
-    const ftPoolSize = Math.max(1, Math.floor(poolSize / 2));
-    fullTextWorkers = await createWorkerPool(ftPoolSize, getFullTextOcrParams());
-  }
+  // No separate worker pool needed — all workers use default Tesseract settings.
 
   const previewCanvas = document.createElement('canvas');
   const previewCtx = previewCanvas.getContext('2d');
@@ -1036,17 +1014,15 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   let processedCount = 0;
   let skippedCount = 0;
 
-  // Deduplication state — mode-aware.
-  // Habitat mode: pixel dedup DISABLED because consecutive habitat pages can
-  // look nearly identical (differ by one small item/decoration). The results
-  // Map already prevents duplicate entries, so the only cost is extra OCR calls
-  // which are fast (just reading a number from the banner).
-  // Pokemon/default: pixel dedup enabled with mode-appropriate settings.
-  const enableDedup = scanMode !== 'habitat';
+  // Deduplication state — DISABLED for all modes during live testing.
+  // The results Map already prevents duplicate entries, so the only cost
+  // of disabling dedup is extra OCR calls. Re-enable selectively once
+  // detection accuracy is confirmed across all scan types.
+  const enableDedup = false;
   const dedupCrop = getDeduplicationCrop(scanMode);
-  const dedupDiffThreshold = scanMode === 'pokemon' ? 0.03 : 0.05;
-  const dedupResolution   = scanMode === 'pokemon' ? 32   : 16;
-  const dedupPixelTol     = scanMode === 'pokemon' ? 20   : 30;
+  const dedupDiffThreshold = 0.05;
+  const dedupResolution = 16;
+  const dedupPixelTol = 30;
   let prevFrameHash = null;
   let prevFrameSamples = null;
 
@@ -1056,15 +1032,12 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   /**
    * Process a single job with a given worker (and optional full-text worker).
    */
-  async function processJob(job, worker, ftWorker) {
+  async function processJob(job, worker) {
     if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
 
     if (scanMode === 'habitat') {
-      // Use optimized number worker for upper banner
       const { data: upperData } = await worker.recognize(job.canvases.upper);
-      // Use full-text worker for bottom half (discovery status)
-      const ftW = ftWorker || worker;
-      const { data: fullData } = await ftW.recognize(job.canvases.bottom);
+      const { data: fullData } = await worker.recognize(job.canvases.bottom);
 
       if (upperData.confidence >= confidenceThreshold && upperData.text.trim()) {
         const habitat = matchHabitatFrame(fullData.text, upperData.text, fuzzyTolerance);
@@ -1149,9 +1122,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       queues.map(async (queue, wIdx) => {
         for (const job of queue) {
           if (signal?.aborted) throw new DOMException('Scan cancelled', 'AbortError');
-          // Pass full-text worker for habitat mode (round-robin from ftWorkers pool)
-          const ftW = fullTextWorkers ? fullTextWorkers[wIdx % fullTextWorkers.length] : null;
-          await processJob(job, workers[wIdx], ftW);
+          await processJob(job, workers[wIdx]);
           if (processingDelay > 0) {
             await new Promise(r => setTimeout(r, processingDelay));
           }
@@ -1242,14 +1213,14 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
         // Optimization B: Tighter crop for number region "No. XXX"
         // Number appears in center of upper banner
         const upperCrop = { x: 30, y: 0, w: 40, h: 12 };
-        job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'raw');
+        job.canvases.upper = extractFrameToCanvas(video, upperCrop, 'green');
         const bottomCrop = { x: cropRegion.x, y: 50, w: cropRegion.w, h: 50 };
         job.canvases.bottom = extractFrameToCanvas(video, bottomCrop, 'standard');
       } else if (scanMode === 'pokemon') {
         // Optimization B: Tighter crop for number region
         // The "No. XXX" + name appears in center banner: 20-55% width, 0-12% height
         const bannerCrop = { x: 20, y: 0, w: 35, h: 12 };
-        job.canvases.banner = extractFrameToCanvas(video, bannerCrop, 'raw');
+        job.canvases.banner = extractFrameToCanvas(video, bannerCrop, 'brightness');
       } else {
         job.canvases.full = extractFrameToCanvas(video, cropRegion, 'standard');
       }
@@ -1275,9 +1246,6 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
   } finally {
     await terminateWorkerPool(workers);
-    if (fullTextWorkers) {
-      await terminateWorkerPool(fullTextWorkers);
-    }
     URL.revokeObjectURL(videoUrl);
     freeCanvas(previewCanvas);
   }
