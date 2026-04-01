@@ -429,7 +429,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
             <figure className="px-4 pt-4">
               <img
                 src={`${import.meta.env.BASE_URL}howto/habitat-scroll.gif`}
-                alt="Scrolling through habitats on Nintendo Switch"
+                alt="Scrolling through the Habitat Dex list on Nintendo Switch"
                 className="rounded-lg w-full"
               />
             </figure>
@@ -439,8 +439,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
                 <h3 className="card-title text-base">{"🎮"} Record</h3>
               </div>
               <p className="text-sm text-base-content/70">
-                Open your collection in Pokopia and scroll through entries using <kbd className="kbd kbd-xs">ZR</kbd>.
-                Hold the <strong>Capture button</strong> to save the last 30s. Press every ~25s for longer lists.
+                Open the collection you want to scan and scroll through it. For habitats, the simple list/grid scroll works too. Hold the <strong>Capture button</strong> to save the last 30s, and press every ~25s for longer lists.
               </p>
             </div>
           </div>
