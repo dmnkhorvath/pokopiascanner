@@ -39,7 +39,7 @@ function getPageFromHash() {
 
 export default function App() {
   const [page, setPage] = useState(() => getPageFromHash() || PAGES.LANDING);
-  const [videoFile, setVideoFile] = useState(null);
+  const [videoFiles, setVideoFiles] = useState([]);
   const [settings, setSettings] = useState(null);
   const [scanResults, setScanResults] = useState(null);
   const [scanCount, setScanCount] = useState(0);
@@ -74,8 +74,8 @@ export default function App() {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleStartScan = useCallback((file, scanSettings) => {
-    setVideoFile(file);
+  const handleStartScan = useCallback((files, scanSettings) => {
+    setVideoFiles(files);
     setSettings(scanSettings);
     navigateTo(PAGES.SCANNING);
   }, [navigateTo]);
@@ -102,7 +102,7 @@ export default function App() {
 
   // Go back to landing to add more videos (keeps results)
   const handleAddMore = useCallback(() => {
-    setVideoFile(null);
+    setVideoFiles([]);
     navigateTo(PAGES.LANDING);
   }, [navigateTo]);
 
@@ -110,7 +110,7 @@ export default function App() {
   const handleStartFresh = useCallback(() => {
     setScanResults(null);
     setScanCount(0);
-    setVideoFile(null);
+    setVideoFiles([]);
     setSettings(null);
     navigateTo(PAGES.LANDING);
   }, [navigateTo]);
@@ -169,11 +169,11 @@ export default function App() {
           </>
         )}
 
-        {page === PAGES.SCANNING && videoFile && settings && (
+        {page === PAGES.SCANNING && videoFiles.length > 0 && settings && (
           <>
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_TOP} position="top" />
             <VideoScanner
-              videoFile={videoFile}
+              videoFiles={videoFiles}
               settings={settings}
               onScanComplete={handleScanComplete}
               onCancel={handleCancelScan}

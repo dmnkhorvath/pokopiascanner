@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { DEFAULT_SETTINGS, CROP_PRESETS, SCAN_MODES, detectVideoFPS } from '../utils/ocrEngine.js';
-import { detectVideoType } from '../utils/videoDetector.js';
 import './LandingPage.css';
 
 // Check for debug mode via URL query parameter
@@ -8,79 +7,32 @@ const isDebugMode = new URLSearchParams(window.location.search).get('debug') ===
 
 export default function LandingPage({ onStartScan, onImportResults, onShowHowTo, existingResults, scanCount = 0, onStartFresh, onViewResults }) {
   const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS });
-  const [videoFile, setVideoFile] = useState(null);
-  const [videoPreview, setVideoPreview] = useState(null);
+  const [videoFiles, setVideoFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
   const [detectedFPS, setDetectedFPS] = useState(null);
   const [detectingFPS, setDetectingFPS] = useState(false);
-  const [detectingType, setDetectingType] = useState(false);
-  const [detectedType, setDetectedType] = useState(null);
   const fileInputRef = useRef(null);
   const importInputRef = useRef(null);
 
-  // Fun rotating messages during detection
-  const DETECTION_MESSAGES = [
-    '🔍 Peeking at your video...',
-    '🎬 Sampling frames from your recording...',
-    '🧪 Analyzing pixel patterns...',
-    '🐾 Looking for Pokémon banners...',
-    '🏡 Checking for habitat layouts...',
-    '🎒 Scanning for item grids...',
-    '🍳 Sniffing out recipe pages...',
-    '🤔 Hmm, what do we have here...',
-    '⚡ Almost there, stay tuned!',
-    '🔬 Running our super-smart heuristics...',
-    '🎯 Narrowing it down...',
-    '✨ Just a moment, magic in progress...',
-    '🧠 Teaching pixels to talk...',
-    '📊 Crunching the colors...',
-    '🌈 Reading the rainbow of your screen...',
-    '🕵️ Detective mode activated...',
-    '💡 We are halfway through, hang tight!',
-    '🚀 Boosting detection engines...',
-    '🎮 Recognizing your gameplay style...',
-    '🏆 Almost got it, one sec...',
-  ];
-  const [detectionMsgIndex, setDetectionMsgIndex] = useState(0);
-  useEffect(() => {
-    if (!detectingType) {
-      setDetectionMsgIndex(0);
-      return;
-    }
-    const interval = setInterval(() => {
-      setDetectionMsgIndex(prev => (prev + 1) % DETECTION_MESSAGES.length);
-    }, 1200);
-    return () => clearInterval(interval);
-  }, [detectingType]);
+  const addFiles = (newFiles) => {
+    const validFiles = Array.from(newFiles).filter(f => f.type.startsWith('video/'));
+    if (validFiles.length === 0) return;
+    setVideoFiles(prev => {
+      // Deduplicate by name+size+lastModified
+      const existing = new Set(prev.map(f => f.name + f.size + f.lastModified));
+      const unique = validFiles.filter(f => !existing.has(f.name + f.size + f.lastModified));
+      return [...prev, ...unique];
+    });
+  };
 
-  const handleFileSelect = async (file) => {
-    if (file && file.type.startsWith('video/')) {
-      setVideoFile(file);
-      setVideoPreview(URL.createObjectURL(file));
-      setDetectedFPS(null);
-      setDetectedType(null);
-
-      // Auto-detect FPS only in debug mode (normal users can't see FPS settings,
-      // and scanVideo handles FPS detection internally)
-      if (isDebugMode && settings.autoDetectFPS) {
-        setDetectingFPS(true);
-        try {
-          const fpsInfo = await detectVideoFPS(file);
-          setDetectedFPS(fpsInfo);
-        } catch {
-          setDetectedFPS({ fps: 30, frameIntervalMs: 33, detected: false });
-        } finally {
-          setDetectingFPS(false);
-        }
-      }
-    }
+  const removeFile = (index) => {
+    setVideoFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setDragActive(false);
-    const file = e.dataTransfer.files[0];
-    handleFileSelect(file);
+    addFiles(e.dataTransfer.files);
   };
 
   const handleDragOver = (e) => {
@@ -101,32 +53,10 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
     }));
   };
 
-  const handleStartScan = async () => {
-    if (!videoFile) return;
-
-    // In debug mode, user has manually set scanMode — skip auto-detection
-    if (isDebugMode) {
-      onStartScan(videoFile, settings);
-      return;
-    }
-
-    // Auto-detect video type
-    setDetectingType(true);
-    setDetectedType(null);
-    try {
-      const result = await detectVideoType(videoFile);
-      setDetectedType(result);
-      // Use detected mode in settings
-      const finalSettings = { ...settings, scanMode: result.detectedMode };
-      // Brief delay so user can see what was detected
-      await new Promise(r => setTimeout(r, 600));
-      onStartScan(videoFile, finalSettings);
-    } catch {
-      // Detection failed — fall back to 'all' mode
-      onStartScan(videoFile, { ...settings, scanMode: 'all' });
-    } finally {
-      setDetectingType(false);
-    }
+  const handleStartScan = () => {
+    if (videoFiles.length === 0) return;
+    // Pass array of files + settings; detection happens in VideoScanner
+    onStartScan(videoFiles, settings);
   };
 
   const handleImport = (e) => {
@@ -144,14 +74,9 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
     reader.readAsText(file);
   };
 
-  const modeEmoji = (mode) => {
-    switch (mode) {
-      case 'habitat': return '🏡';
-      case 'pokemon': return '🐾';
-      case 'item': return '🎒';
-      case 'recipe': return '🍳';
-      default: return '📦';
-    }
+  const formatSize = (bytes) => {
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   return (
@@ -164,8 +89,8 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
             <h1 className="text-4xl sm:text-5xl font-bold">Pokopia Progress Scanner</h1>
             <p className="py-4 text-base-content/60">
               {existingResults
-              ? 'Upload another video to add more entries to your current session.'
-              : 'Upload a Nintendo Switch video recording of your Pokémon Pokopia game to scan and track your collection progress.'
+              ? 'Upload more videos to add entries to your current session.'
+              : 'Upload Nintendo Switch video recordings of your Pokémon Pokopia game to scan and track your collection progress.'
             }
             </p>
           </div>
@@ -179,8 +104,8 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
             <div className="flex-1">
               <h3 className="font-bold">📊 Session in progress</h3>
               <p className="text-sm opacity-80">
-                You have {existingResults.totalFound} items from {scanCount} video{scanCount > 1 ? 's' : ''}.
-                Upload another video to merge more results.
+                You have {existingResults.totalFound} items from {scanCount} scan{scanCount > 1 ? 's' : ''}.
+                Upload more videos to merge additional results.
               </p>
             </div>
             <div className="flex gap-2">
@@ -197,12 +122,17 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
 
       {/* Upload Section */}
       <section>
-        <h2 className="text-xl font-bold mb-3">{"📹"} Upload Video</h2>
+        <div className="flex items-center gap-3 mb-3">
+          <h2 className="text-xl font-bold">{"📹"} Upload Videos</h2>
+          {videoFiles.length > 0 && (
+            <span className="badge badge-primary">{videoFiles.length} video{videoFiles.length > 1 ? 's' : ''}</span>
+          )}
+        </div>
         <div
           className={`card border-2 border-dashed cursor-pointer transition-colors ${
             dragActive
               ? 'border-primary bg-primary/10'
-              : videoFile
+              : videoFiles.length > 0
                 ? 'border-success/50 bg-base-200'
                 : 'border-base-content/20 bg-base-200 hover:border-primary/50'
           }`}
@@ -211,35 +141,47 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
           onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
         >
-          <div className="card-body items-center text-center py-8">
+          <div className="card-body items-center text-center py-6">
             <input
               ref={fileInputRef}
               type="file"
               accept="video/*"
-              onChange={(e) => handleFileSelect(e.target.files[0])}
+              multiple
+              onChange={(e) => { addFiles(e.target.files); e.target.value = ''; }}
               hidden
             />
-            {videoFile ? (
-              <div className="flex flex-col items-center gap-3 w-full">
-                <video src={videoPreview} className="rounded-lg max-h-48 w-auto" muted />
-                <div className="text-center">
-                  <p className="font-medium text-sm">{videoFile.name}</p>
-                  <p className="text-xs text-base-content/50">
-                    {(videoFile.size / (1024 * 1024)).toFixed(1)} MB
-                  </p>
+            {videoFiles.length > 0 ? (
+              <div className="w-full" onClick={(e) => e.stopPropagation()}>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {videoFiles.map((file, i) => (
+                    <div key={file.name + file.size + i} className="flex items-center gap-3 bg-base-300 rounded-lg px-3 py-2">
+                      <span className="text-lg">{"🎬"}</span>
+                      <div className="flex-1 text-left min-w-0">
+                        <p className="font-medium text-sm truncate">{file.name}</p>
+                        <p className="text-xs text-base-content/50">{formatSize(file.size)}</p>
+                      </div>
+                      <button
+                        className="btn btn-ghost btn-xs btn-circle text-error"
+                        onClick={(e) => { e.stopPropagation(); removeFile(i); }}
+                        title="Remove"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
                 </div>
                 <button
-                  className="btn btn-ghost btn-xs"
+                  className="btn btn-ghost btn-sm mt-3 gap-1"
                   onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                 >
-                  Change file
+                  ➕ Add more videos
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <span className="text-4xl">{"⬆️"}</span>
-                <p className="font-medium">Drag & drop your video here</p>
-                <p className="text-sm text-base-content/50">or click to browse</p>
+                <p className="font-medium">Drag & drop your videos here</p>
+                <p className="text-sm text-base-content/50">or click to browse — select multiple files</p>
                 <p className="text-xs text-base-content/40">Supports MP4, MOV, WebM, AVI</p>
               </div>
             )}
@@ -302,13 +244,6 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
                   onClick={() => {
                     updateSetting('autoDetectFPS', true);
                     updateSetting('frameIntervalMs', 0);
-                    if (videoFile && !detectedFPS) {
-                      setDetectingFPS(true);
-                      detectVideoFPS(videoFile)
-                        .then(info => setDetectedFPS(info))
-                        .catch(() => setDetectedFPS({ fps: 30, frameIntervalMs: 33, detected: false }))
-                        .finally(() => setDetectingFPS(false));
-                    }
                   }}
                 >
                   🎬 Auto-detect FPS
@@ -325,17 +260,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
               </div>
               {settings.autoDetectFPS && (
                 <div className="mt-2 text-xs">
-                  {detectingFPS ? (
-                    <span className="text-warning">⏳ Detecting video framerate...</span>
-                  ) : detectedFPS ? (
-                    <span className={detectedFPS.detected ? 'text-success' : 'text-warning'}>
-                      {detectedFPS.detected
-                        ? `✅ Detected: ${detectedFPS.fps} FPS (${detectedFPS.frameIntervalMs}ms per frame)`
-                        : `⚠️ Browser doesn't support detection — will use ${detectedFPS.fps} FPS fallback`}
-                    </span>
-                  ) : (
-                    <span className="text-base-content/50">📎 Upload a video to detect its framerate</span>
-                  )}
+                  <span className="text-base-content/50">📎 FPS will be auto-detected per video during scanning</span>
                 </div>
               )}
               {!settings.autoDetectFPS && (
@@ -461,29 +386,17 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
         </section>
       )}
 
-      {/* Detection Result Banner */}
-      {detectingType && (
-        <div className="alert alert-info shadow-md">
-          <span className="loading loading-spinner loading-sm"></span>
-          <span className="transition-opacity duration-300">{DETECTION_MESSAGES[detectionMsgIndex]}</span>
-        </div>
-      )}
-      {detectedType && !detectingType && (
-        <div className="alert alert-info shadow-md">
-          <span>{modeEmoji(detectedType.detectedMode)} Detected: <strong>{SCAN_MODES[detectedType.detectedMode]?.label || detectedType.detectedMode}</strong></span>
-          <span className="text-xs opacity-70">({detectedType.confidence} confidence{detectedType.detectedAt ? `, at ${detectedType.detectedAt}` : ''})</span>
-        </div>
-      )}
-
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <button
           className="btn btn-primary btn-lg gap-2"
           onClick={handleStartScan}
-          disabled={!videoFile || detectingType}
+          disabled={videoFiles.length === 0}
         >
-          {detectingType ? '⏳ Detecting...'
-          : existingResults ? '➕ Scan & Merge' : '🔍 Start Scanning'}
+          {existingResults
+            ? `➕ Scan & Merge (${videoFiles.length} video${videoFiles.length !== 1 ? 's' : ''})`
+            : `🔍 Start Scanning (${videoFiles.length} video${videoFiles.length !== 1 ? 's' : ''})`
+          }
         </button>
         <button
           className="btn btn-secondary gap-2"
