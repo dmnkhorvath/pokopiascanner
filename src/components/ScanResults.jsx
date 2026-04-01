@@ -26,8 +26,9 @@ const CATEGORY_TEXT = {
 };
 
 export default function ScanResults({ results, scanCount = 0, onAddMore, onStartFresh, onImportResults }) {
+  const isDebug = new URLSearchParams(window.location.search).get('debug') === 'true';
+
   const [activeTab, setActiveTab] = useState('all');
-  const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [builtFilter, setBuiltFilter] = useState('all');
   const [capturedFilter, setCapturedFilter] = useState('all');
@@ -225,152 +226,94 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
               found={cat.found}
               total={cat.total}
               items={cat.items}
-              onClick={() => setActiveTab(key)}
+              onClick={() => isDebug && setActiveTab(key)}
             />
           ))}
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="space-y-3">
-        {/* Tabs */}
-        <div className="tabs tabs-box">
-          {TABS.map(tab => (
-            <button
-              key={tab.key}
-              className={`tab gap-1 ${activeTab === tab.key ? 'tab-active' : ''}`}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              <span>{tab.icon}</span>
-              <span className="hidden sm:inline">{tab.label}</span>
-              {tab.key !== 'all' && (
-                <span className="badge badge-sm badge-ghost">
-                  {categories[tab.key]?.found || 0}
-                  {tab.key === 'pokemon' && categories.pokemon.items.some(p => p.captured != null) && (
-                    <span className="ml-0.5">({categories.pokemon.items.filter(p => p.captured).length}✅)</span>
-                  )}
-                  {tab.key === 'habitats' && categories.habitats.items.some(h => h.built != null) && (
-                    <span className="ml-0.5">({categories.habitats.items.filter(h => h.built).length}✅)</span>
-                  )}
-                  {tab.key === 'items' && categories.items.items.some(i => i.discovered != null) && (
-                    <span className="ml-0.5">({categories.items.items.filter(i => i.discovered).length}✅)</span>
-                  )}
-                  {tab.key === 'recipes' && categories.recipes.items.some(r => r.discovered != null) && (
-                    <span className="ml-0.5">({categories.recipes.items.filter(r => r.discovered).length}✅)</span>
-                  )}
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Search */}
-          <div className="relative flex-1 min-w-48">
-            <input
-              type="text"
-              placeholder="Search items..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input input-bordered input-sm w-full pr-8"
-            />
-            {searchQuery && (
+      {/* Debug-only: Detailed item browser */}
+      {isDebug && (
+        <>
+          {/* Tabs */}
+          <div className="tabs tabs-box">
+            {TABS.map(tab => (
               <button
-                className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle"
-                onClick={() => setSearchQuery('')}
+                key={tab.key}
+                className={`tab gap-1 ${activeTab === tab.key ? 'tab-active' : ''}`}
+                onClick={() => setActiveTab(tab.key)}
               >
-                ✕
+                <span>{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+                {tab.key !== 'all' && (
+                  <span className="badge badge-sm badge-ghost">
+                    {categories[tab.key]?.found || 0}
+                  </span>
+                )}
               </button>
+            ))}
+          </div>
+
+          {/* Controls */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative flex-1 min-w-48">
+              <input
+                type="text"
+                placeholder="Search items..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input input-bordered input-sm w-full pr-8"
+              />
+              {searchQuery && (
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle"
+                  onClick={() => setSearchQuery('')}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {(activeTab === 'habitats' || activeTab === 'all') && (
+              <div className="join">
+                <button className={`btn btn-xs join-item ${builtFilter === 'all' ? 'btn-active' : ''}`} onClick={() => setBuiltFilter('all')}>All</button>
+                <button className={`btn btn-xs join-item ${builtFilter === 'built' ? 'btn-active' : ''}`} onClick={() => setBuiltFilter('built')}>✅ Built</button>
+                <button className={`btn btn-xs join-item ${builtFilter === 'notbuilt' ? 'btn-active' : ''}`} onClick={() => setBuiltFilter('notbuilt')}>❌ Not Built</button>
+              </div>
+            )}
+
+            {(activeTab === 'pokemon' || activeTab === 'all') && (
+              <div className="join">
+                <button className={`btn btn-xs join-item ${capturedFilter === 'all' ? 'btn-active' : ''}`} onClick={() => setCapturedFilter('all')}>All</button>
+                <button className={`btn btn-xs join-item ${capturedFilter === 'captured' ? 'btn-active' : ''}`} onClick={() => setCapturedFilter('captured')}>✅ Captured</button>
+                <button className={`btn btn-xs join-item ${capturedFilter === 'sensed' ? 'btn-active' : ''}`} onClick={() => setCapturedFilter('sensed')}>👁️ Sensed</button>
+              </div>
+            )}
+
+            {(activeTab === 'items' || activeTab === 'recipes' || activeTab === 'all') && (
+              <div className="join">
+                <button className={`btn btn-xs join-item ${discoveredFilter === 'all' ? 'btn-active' : ''}`} onClick={() => setDiscoveredFilter('all')}>All</button>
+                <button className={`btn btn-xs join-item ${discoveredFilter === 'discovered' ? 'btn-active' : ''}`} onClick={() => setDiscoveredFilter('discovered')}>✅ Discovered</button>
+                <button className={`btn btn-xs join-item ${discoveredFilter === 'undiscovered' ? 'btn-active' : ''}`} onClick={() => setDiscoveredFilter('undiscovered')}>❓ Undiscovered</button>
+              </div>
             )}
           </div>
 
-          {/* Built filter */}
-          {(activeTab === 'habitats' || activeTab === 'all') && (
-            <div className="join">
-              <button
-                className={`btn btn-xs join-item ${builtFilter === 'all' ? 'btn-active' : ''}`}
-                onClick={() => setBuiltFilter('all')}
-              >All</button>
-              <button
-                className={`btn btn-xs join-item ${builtFilter === 'built' ? 'btn-active' : ''}`}
-                onClick={() => setBuiltFilter('built')}
-              >✅ Built</button>
-              <button
-                className={`btn btn-xs join-item ${builtFilter === 'notbuilt' ? 'btn-active' : ''}`}
-                onClick={() => setBuiltFilter('notbuilt')}
-              >❌ Not Built</button>
+          {/* Items list (simple, no cards) */}
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-8 text-base-content/40">
+              <p>{searchQuery ? 'No items match your search.' : 'No items found in this category.'}</p>
             </div>
-          )}
-
-          {/* Captured filter */}
-          {(activeTab === 'pokemon' || activeTab === 'all') && (
-            <div className="join">
-              <button
-                className={`btn btn-xs join-item ${capturedFilter === 'all' ? 'btn-active' : ''}`}
-                onClick={() => setCapturedFilter('all')}
-              >All</button>
-              <button
-                className={`btn btn-xs join-item ${capturedFilter === 'captured' ? 'btn-active' : ''}`}
-                onClick={() => setCapturedFilter('captured')}
-              >✅ Captured</button>
-              <button
-                className={`btn btn-xs join-item ${capturedFilter === 'sensed' ? 'btn-active' : ''}`}
-                onClick={() => setCapturedFilter('sensed')}
-              >👁️ Sensed</button>
-            </div>
-          )}
-
-          {/* Discovered filter */}
-          {(activeTab === 'items' || activeTab === 'recipes' || activeTab === 'all') && (
-            <div className="join">
-              <button
-                className={`btn btn-xs join-item ${discoveredFilter === 'all' ? 'btn-active' : ''}`}
-                onClick={() => setDiscoveredFilter('all')}
-              >All</button>
-              <button
-                className={`btn btn-xs join-item ${discoveredFilter === 'discovered' ? 'btn-active' : ''}`}
-                onClick={() => setDiscoveredFilter('discovered')}
-              >✅ Discovered</button>
-              <button
-                className={`btn btn-xs join-item ${discoveredFilter === 'undiscovered' ? 'btn-active' : ''}`}
-                onClick={() => setDiscoveredFilter('undiscovered')}
-              >❓ Undiscovered</button>
-            </div>
-          )}
-
-          {/* View toggle */}
-          <div className="join">
-            <button
-              className={`btn btn-xs join-item ${viewMode === 'grid' ? 'btn-active' : ''}`}
-              onClick={() => setViewMode('grid')}
-              title="Grid view"
-            >▦</button>
-            <button
-              className={`btn btn-xs join-item ${viewMode === 'list' ? 'btn-active' : ''}`}
-              onClick={() => setViewMode('list')}
-              title="List view"
-            >☰</button>
-          </div>
-        </div>
-      </div>
-
-      {/* Items Display */}
-      {filteredItems.length === 0 ? (
-        <div className="text-center py-12 text-base-content/40">
-          <p>{searchQuery ? 'No items match your search.' : 'No items found in this category.'}</p>
-        </div>
-      ) : viewMode === 'grid' ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
-          {filteredItems.map((item, i) => (
-            <div
-              key={`${item.name}-${i}`}
-              className={`card bg-base-200 border-l-4 ${CATEGORY_BORDER[item._category] || 'border-l-base-content/20'}`}
-            >
-              <div className="card-body p-3 gap-1">
-                <span className="font-medium text-sm truncate">{item.name}</span>
-                <div className="flex items-center gap-1 flex-wrap">
+          ) : (
+            <div className="space-y-1">
+              {filteredItems.map((item, i) => (
+                <div
+                  key={`${item.name}-${i}`}
+                  className={`flex items-center gap-3 px-3 py-1.5 bg-base-200 rounded border-l-4 ${CATEGORY_BORDER[item._category] || 'border-l-base-content/20'}`}
+                >
+                  <span className="font-medium text-sm flex-1 truncate">{item.name}</span>
                   {item.number && <span className="badge badge-ghost badge-xs">{item.number}</span>}
+                  {item.category && <span className="badge badge-ghost badge-xs">{item.category}</span>}
                   {item._category === 'habitats' && item.built != null && (
                     <span className={`badge badge-xs ${item.built ? 'badge-success' : 'badge-error'}`}>
                       {item.built ? '✅ Built' : '❌ Not Built'}
@@ -386,58 +329,29 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
                       {item.discovered ? '✅ Discovered' : '❓ Undiscovered'}
                     </span>
                   )}
+                  <span className={`text-xs ${CATEGORY_TEXT[item._category] || ''}`}>{item._category}</span>
                 </div>
-                <span className={`text-xs ${CATEGORY_TEXT[item._category] || ''}`}>{item._category}</span>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-1">
-          {filteredItems.map((item, i) => (
-            <div
-              key={`${item.name}-${i}`}
-              className={`flex items-center gap-3 px-3 py-2 bg-base-200 rounded-lg border-l-4 ${CATEGORY_BORDER[item._category] || 'border-l-base-content/20'}`}
-            >
-              <span className="font-medium text-sm flex-1 truncate">{item.name}</span>
-              {item.number && <span className="badge badge-ghost badge-xs">{item.number}</span>}
-              {item.category && <span className="badge badge-ghost badge-xs">{item.category}</span>}
-              {item._category === 'habitats' && item.built != null && (
-                <span className={`badge badge-xs ${item.built ? 'badge-success' : 'badge-error'}`}>
-                  {item.built ? '✅ Built' : '❌ Not Built'}
-                </span>
-              )}
-              {item._category === 'pokemon' && item.captured != null && (
-                <span className={`badge badge-xs ${item.captured ? 'badge-success' : 'badge-warning'}`}>
-                  {item.captured ? '✅ Captured' : '👁️ Sensed'}
-                </span>
-              )}
-              {(item._category === 'items' || item._category === 'recipes') && item.discovered != null && (
-                <span className={`badge badge-xs ${item.discovered ? 'badge-success' : 'badge-ghost'}`}>
-                  {item.discovered ? '✅ Discovered' : '❓ Undiscovered'}
-                </span>
-              )}
-              <span className={`text-xs ${CATEGORY_TEXT[item._category] || ''}`}>{item._category}</span>
-            </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       {/* Footer Actions */}
       <div className="flex flex-col items-center gap-4 pt-6 border-t border-base-content/10">
-        {/* Primary: Export when done */}
         <div className="flex flex-wrap gap-2 justify-center">
           <button className="btn btn-success btn-md gap-1" onClick={handleExport}>
             📥 Export All Data
           </button>
-          <button
-            className={`btn btn-md gap-1 ${copySuccess ? 'btn-success' : 'btn-secondary'}`}
-            onClick={handleCopyToClipboard}
-          >
-            {copySuccess ? '✅ Copied!' : '📋 Copy Names'}
-          </button>
+          {isDebug && (
+            <button
+              className={`btn btn-md gap-1 ${copySuccess ? 'btn-success' : 'btn-secondary'}`}
+              onClick={handleCopyToClipboard}
+            >
+              {copySuccess ? '✅ Copied!' : '📋 Copy Names'}
+            </button>
+          )}
         </div>
-        {/* Secondary: Continue session */}
         <div className="flex flex-wrap gap-2 justify-center">
           <button className="btn btn-primary btn-sm gap-1" onClick={onAddMore}>
             ➕ Add More Videos
