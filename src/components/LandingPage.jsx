@@ -482,9 +482,8 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
           onClick={handleStartScan}
           disabled={!videoFile || detectingType}
         >
-          {detectingType ? (
-            <><span className="loading loading-spinner loading-sm"></span> {DETECTION_MESSAGES[detectionMsgIndex]}</>
-          ) : existingResults ? '➕ Scan & Merge' : '🔍 Start Scanning'}
+          {detectingType ? '⏳ Detecting...'
+          : existingResults ? '➕ Scan & Merge' : '🔍 Start Scanning'}
         </button>
         <button
           className="btn btn-secondary gap-2"
