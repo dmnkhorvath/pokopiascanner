@@ -59,8 +59,9 @@ function modeEmoji(mode) {
 export default function VideoScanner({ videoFiles, settings, onScanComplete, onCancel }) {
   // Per-video state: array of objects
   const [videoStates, setVideoStates] = useState(() =>
-    videoFiles.map((file) => ({
-      file,
+    videoFiles.map((v) => ({
+      file: v.file,
+      userScanMode: v.scanMode || 'auto', // 'auto' = auto-detect, otherwise user-chosen
       status: 'queued', // queued | detecting | scanning | complete | error
       detectedMode: null,
       progress: { phase: 'init', current: 0, total: 0, percent: 0, message: 'Queued...', currentFrame: null },
@@ -99,14 +100,24 @@ export default function VideoScanner({ videoFiles, settings, onScanComplete, onC
   }, []);
 
   // Process a single video: detect type then scan
-  const processVideo = useCallback(async (file, index, settingsObj) => {
+  const processVideo = useCallback(async (file, index, settingsObj, userScanMode) => {
     const controller = new AbortController();
     abortControllersRef.current[index] = controller;
 
     let finalSettings = { ...settingsObj };
 
-    // Phase 1: Detect video type (skip in debug mode where user sets scanMode)
-    if (!isDebugMode) {
+    // Check if user chose a specific category for this video
+    const userMode = userScanMode || 'auto';
+
+    if (userMode !== 'auto') {
+      // User explicitly chose a category — skip detection
+      finalSettings = { ...finalSettings, scanMode: userMode };
+      updateVideoState(index, (prev) => ({
+        ...prev,
+        detectedMode: userMode,
+      }));
+    } else if (!isDebugMode) {
+      // Auto-detect video type
       updateVideoState(index, { status: 'detecting' });
       try {
         const result = await detectVideoType(file);
@@ -178,7 +189,7 @@ export default function VideoScanner({ videoFiles, settings, onScanComplete, onC
     if (scanStarted.current) return;
     scanStarted.current = true;
 
-    const queue = videoFiles.map((file, i) => ({ file, index: i }));
+    const queue = videoFiles.map((v, i) => ({ file: v.file, index: i, userScanMode: v.scanMode || 'auto' }));
     let running = 0;
     let queuePos = 0;
     let completedCount = 0;
@@ -186,9 +197,9 @@ export default function VideoScanner({ videoFiles, settings, onScanComplete, onC
 
     const tryNext = () => {
       while (running < MAX_CONCURRENT && queuePos < queue.length) {
-        const { file, index } = queue[queuePos++];
+        const { file, index, userScanMode } = queue[queuePos++];
         running++;
-        processVideo(file, index, settings).then(() => {
+        processVideo(file, index, settings, userScanMode).then(() => {
           running--;
           completedCount++;
           if (completedCount === totalCount) {
@@ -330,8 +341,13 @@ export default function VideoScanner({ videoFiles, settings, onScanComplete, onC
                             {DETECTION_MESSAGES[detectionMsgIndex]}
                           </p>
                         )}
-                        {vs.status === 'scanning' && vs.progress.message && (
-                          <p className="text-xs text-base-content/50 mt-0.5 truncate">{vs.progress.message}</p>
+                        {vs.status === 'scanning' && (
+                          <p className="text-xs text-base-content/50 mt-0.5 truncate">
+                            {isDebugMode && vs.progress.message
+                              ? vs.progress.message
+                              : `Scanning... ${vs.progress.percent || 0}%`
+                            }
+                          </p>
                         )}
                       </div>
                     )}

@@ -19,14 +19,20 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
     if (validFiles.length === 0) return;
     setVideoFiles(prev => {
       // Deduplicate by name+size+lastModified
-      const existing = new Set(prev.map(f => f.name + f.size + f.lastModified));
-      const unique = validFiles.filter(f => !existing.has(f.name + f.size + f.lastModified));
+      const existing = new Set(prev.map(v => v.file.name + v.file.size + v.file.lastModified));
+      const unique = validFiles
+        .filter(f => !existing.has(f.name + f.size + f.lastModified))
+        .map(f => ({ file: f, scanMode: 'auto' }));
       return [...prev, ...unique];
     });
   };
 
   const removeFile = (index) => {
     setVideoFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateVideoScanMode = (index, mode) => {
+    setVideoFiles(prev => prev.map((v, i) => i === index ? { ...v, scanMode: mode } : v));
   };
 
   const handleDrop = (e) => {
@@ -55,7 +61,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
 
   const handleStartScan = () => {
     if (videoFiles.length === 0) return;
-    // Pass array of files + settings; detection happens in VideoScanner
+    // Pass enriched array [{file, scanMode}] + settings
     onStartScan(videoFiles, settings);
   };
 
@@ -153,13 +159,25 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
             {videoFiles.length > 0 ? (
               <div className="w-full" onClick={(e) => e.stopPropagation()}>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {videoFiles.map((file, i) => (
-                    <div key={file.name + file.size + i} className="flex items-center gap-3 bg-base-300 rounded-lg px-3 py-2">
+                  {videoFiles.map((v, i) => (
+                    <div key={v.file.name + v.file.size + i} className="flex items-center gap-3 bg-base-300 rounded-lg px-3 py-2">
                       <span className="text-lg">{"🎬"}</span>
                       <div className="flex-1 text-left min-w-0">
-                        <p className="font-medium text-sm truncate">{file.name}</p>
-                        <p className="text-xs text-base-content/50">{formatSize(file.size)}</p>
+                        <p className="font-medium text-sm truncate">{v.file.name}</p>
+                        <p className="text-xs text-base-content/50">{formatSize(v.file.size)}</p>
                       </div>
+                      <select
+                        className="select select-bordered select-xs text-xs w-28 sm:w-36"
+                        value={v.scanMode}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => { e.stopPropagation(); updateVideoScanMode(i, e.target.value); }}
+                      >
+                        <option value="auto">🔍 Auto-detect</option>
+                        <option value="pokemon">🔴 Pokémon</option>
+                        <option value="habitat">🏠 Habitats</option>
+                        <option value="item">🎒 Items</option>
+                        <option value="recipe">📋 Recipes</option>
+                      </select>
                       <button
                         className="btn btn-ghost btn-xs btn-circle text-error"
                         onClick={(e) => { e.stopPropagation(); removeFile(i); }}
@@ -480,15 +498,15 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
                 <h3 className="card-title text-base">{"🔍"} Scan</h3>
               </div>
               <p className="text-sm text-base-content/70">
-                Drop your videos above and hit <strong>Start Scanning</strong>.
-                The scanner auto-detects the category, identifies entries, and deduplicates overlapping clips.
+                Drop your videos above, choose a category per video or leave on auto-detect, and hit <strong>Start Scanning</strong>.
+                The scanner identifies entries and deduplicates overlapping clips.
               </p>
             </div>
           </div>
 
         </div>
         <p className="text-center text-xs text-base-content/40 mt-4">
-          Supports Pokédex, Habitats, Items & Recipes • Multiple videos merge automatically •{" "}
+          Supports Pokédex, Habitats, Items & Recipes • Choose category per video or auto-detect •{" "}
           <button className="link link-primary" onClick={onShowHowTo}>Full guide →</button>
         </p>
       </section>
