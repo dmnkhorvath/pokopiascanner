@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { getCategoryTotals } from '../utils/ocrEngine.js';
 import { buildNewItemSet } from '../utils/scanDiff.js';
+import { getMissingItems, getMissingStats, getClosestToCompletion, getWikiUrl, getIconPath } from '../utils/missingItems.js';
 import CategoryCard from './CategoryCard';
 import ProgressBar from './ProgressBar';
 import './ScanResults.css';
@@ -54,9 +55,24 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
   const [showNewOnly, setShowNewOnly] = useState(false);
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
+  // Missing Items feature state
+  const [viewMode, setViewMode] = useState('found'); // 'found' or 'missing'
+  const [missingTab, setMissingTab] = useState('all');
+  const [missingSearch, setMissingSearch] = useState('');
+  const [iconMap, setIconMap] = useState(null);
+
   const [totals, setTotals] = useState({ pokemon: 300, items: 1254, habitats: 209, recipes: 743 });
   useEffect(() => {
     getCategoryTotals().then(setTotals).catch(() => {});
+  }, []);
+
+  // Load icon map for missing items display
+  useEffect(() => {
+    const base = import.meta.env.BASE_URL || '/';
+    fetch(`${base}icons/items/icon_map.json`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setIconMap(data); })
+      .catch(() => {});
   }, []);
 
   const categories = useMemo(() => ({
@@ -70,6 +86,41 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
   const newItemNames = useMemo(() => buildNewItemSet(scanDiff), [scanDiff]);
   const hasNewItems = scanDiff && scanDiff.totalNew > 0;
 
+  // Missing items computation
+  const missingItems = useMemo(() => getMissingItems(results), [results]);
+  const missingStats = useMemo(() => getMissingStats(results), [results]);
+  const closestCategory = useMemo(() => getClosestToCompletion(missingStats), [missingStats]);
+
+  // Filtered missing items for the missing browser
+  const filteredMissingItems = useMemo(() => {
+    let items = [];
+    const query = missingSearch.toLowerCase().trim();
+
+    if (missingTab === 'all') {
+      for (const catKey of ['pokemon', 'items', 'habitats', 'recipes']) {
+        for (const item of (missingItems[catKey] || [])) {
+          items.push({ ...item, _category: catKey });
+        }
+      }
+    } else {
+      for (const item of (missingItems[missingTab] || [])) {
+        items.push({ ...item, _category: missingTab });
+      }
+    }
+
+    if (query) {
+      items = items.filter(item => {
+        const name = (item.name || '').toLowerCase();
+        const category = (item.category || item._category || '').toLowerCase();
+        return name.includes(query) || category.includes(query);
+      });
+    }
+
+    // Sort alphabetically by name
+    items.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+    return items;
+  }, [missingTab, missingItems, missingSearch]);
 
   const filteredItems = useMemo(() => {
     let items = [];
@@ -216,6 +267,13 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
   const totalFound = results?.totalFound || 0;
   const totalPossible = totals.pokemon + totals.items + totals.habitats + totals.recipes;
   const overallPercent = totalPossible > 0 ? Math.round((totalFound / totalPossible) * 100) : 0;
+
+  /** Resolve icon src for a missing item */
+  const getItemIconSrc = (item, category) => {
+    const base = import.meta.env.BASE_URL || '/';
+    const path = getIconPath(item, category, iconMap);
+    return path ? `${base}${path}` : null;
+  };
 
   return (
     <div className="space-y-6">
@@ -364,8 +422,166 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
         ))}
       </div>
 
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {/* Missing Items Summary Card */}
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {missingStats.overall.missing > 0 && (
+        <div className="card bg-base-200 border border-warning/20">
+          <div className="card-body p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="flex-1">
+                <h3 className="font-bold text-lg flex items-center gap-2">
+                  🔍 Missing Items
+                </h3>
+                <p className="text-sm text-base-content/60 mt-1">
+                  {"You're missing "}
+                  {['pokemon', 'items', 'habitats', 'recipes']
+                    .filter(cat => missingStats[cat]?.missing > 0)
+                    .map((cat, i, arr) => {
+                      const s = missingStats[cat];
+                      const meta = CATEGORY_META[cat];
+                      return (
+                        <span key={cat}>
+                          <strong className={meta.textClass}>{s.missing} {meta.label}</strong>
+                          {i < arr.length - 1 ? ', ' : ''}
+                        </span>
+                      );
+                    })
+                  }
+                </p>
+                {closestCategory && (
+                  <p className="text-sm mt-2 text-success font-medium">
+                    🏆 {"You're closest to completing "}
+                    <strong>{closestCategory.label}</strong>!
+                    {' Only '}<strong>{closestCategory.missing}</strong>{' more to go!'}
+                    {' ('}{closestCategory.percent}% complete)
+                  </p>
+                )}
+              </div>
+              <button
+                className={`btn btn-sm ${viewMode === 'missing' ? 'btn-warning' : 'btn-outline btn-warning'}`}
+                onClick={() => setViewMode(viewMode === 'missing' ? 'found' : 'missing')}
+              >
+                {viewMode === 'missing' ? '📊 Show Found' : '🔍 Show Missing'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {/* Missing Items Browser */}
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {viewMode === 'missing' && (
+        <>
+          {/* Missing Tabs */}
+          <div className="tabs tabs-box">
+            {TABS.map(tab => (
+              <button
+                key={tab.key}
+                className={`tab gap-1 ${missingTab === tab.key ? 'tab-active' : ''}`}
+                onClick={() => setMissingTab(tab.key)}
+              >
+                <span>{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+                {tab.key !== 'all' && (
+                  <span className="badge badge-sm badge-warning">
+                    {missingItems[tab.key]?.length || 0}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Missing Search */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative flex-1 min-w-48">
+              <input
+                type="text"
+                placeholder="Search missing items..."
+                value={missingSearch}
+                onChange={(e) => setMissingSearch(e.target.value)}
+                className="input input-bordered input-sm w-full pr-8"
+              />
+              {missingSearch && (
+                <button
+                  className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs btn-circle"
+                  onClick={() => setMissingSearch('')}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <span className="text-sm text-base-content/50">
+              {filteredMissingItems.length} missing item{filteredMissingItems.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+
+          {/* Missing Items Grid */}
+          {filteredMissingItems.length === 0 ? (
+            <div className="text-center py-8 text-base-content/40">
+              <p className="text-4xl mb-2">🎉</p>
+              <p>{missingSearch ? 'No missing items match your search.' : 'Nothing missing in this category — great job!'}</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {filteredMissingItems.map((item, i) => {
+                const meta = CATEGORY_META[item._category];
+                const iconSrc = getItemIconSrc(item, item._category);
+                const wikiUrl = getWikiUrl(item.name);
+                return (
+                  <div
+                    key={`${item._category}-${item.name}-${i}`}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg border border-base-content/10 bg-base-200/50 opacity-75 hover:opacity-100 transition-opacity`}
+                  >
+                    {/* Icon */}
+                    {iconSrc ? (
+                      <img
+                        src={iconSrc}
+                        alt={item.name}
+                        className="w-8 h-8 object-contain rounded flex-shrink-0"
+                        loading="lazy"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <span className="w-8 h-8 flex items-center justify-center text-lg flex-shrink-0 opacity-40">
+                        {meta?.icon || '❓'}
+                      </span>
+                    )}
+
+                    {/* Name & metadata */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate text-base-content/60">{item.name}</p>
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        {item.number && <span className="badge badge-ghost badge-xs">{item.number}</span>}
+                        {item.category && <span className="badge badge-ghost badge-xs">{item.category}</span>}
+                        {item.species && <span className="badge badge-ghost badge-xs">{item.species}</span>}
+                        <span className={`badge badge-xs ${meta?.textClass || ''} badge-outline`}>
+                          {meta?.label || item._category}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Wiki link */}
+                    <a
+                      href={wikiUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-ghost btn-xs btn-circle flex-shrink-0"
+                      title={`Look up ${item.name} on Pokopiadex`}
+                    >
+                      🔗
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
+
       {/* Debug-only: Detailed item browser */}
-      {isDebug && (
+      {isDebug && viewMode === 'found' && (
         <>
           {/* Tabs */}
           <div className="tabs tabs-box">
