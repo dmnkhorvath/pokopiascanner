@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { initAllConsentScripts } from '../utils/consentScripts';
 import './CookieConsent.css';
 
 const STORAGE_KEY = 'pokopia_cookie_consent';
@@ -16,17 +17,11 @@ export function hasConsent() {
 }
 
 /**
- * Updates Google Consent Mode v2 to grant all storage types.
+ * Load all consent-gated third-party scripts (GA + AdSense)
+ * and update Google Consent Mode v2 to grant all storage types.
  */
-function grantConsent() {
-  if (typeof gtag === 'function') {
-    gtag('consent', 'update', {
-      'analytics_storage': 'granted',
-      'ad_storage': 'granted',
-      'ad_user_data': 'granted',
-      'ad_personalization': 'granted',
-    });
-  }
+function activateConsentScripts() {
+  initAllConsentScripts();
 }
 
 export default function CookieConsent({ onOpenSettings, onNavigatePrivacy }) {
@@ -38,7 +33,7 @@ export default function CookieConsent({ onOpenSettings, onNavigatePrivacy }) {
       if (!pref) {
         setVisible(true);
       } else if (pref === 'accepted') {
-        grantConsent();
+        activateConsentScripts();
       }
     } catch {
       setVisible(true);
@@ -53,7 +48,7 @@ export default function CookieConsent({ onOpenSettings, onNavigatePrivacy }) {
 
   const handleAccept = useCallback(() => {
     try { localStorage.setItem(STORAGE_KEY, 'accepted'); } catch { /* noop */ }
-    grantConsent();
+    activateConsentScripts();
     setVisible(false);
     window.dispatchEvent(new Event('cookie-consent-changed'));
   }, []);

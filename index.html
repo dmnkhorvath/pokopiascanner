@@ -18,7 +18,7 @@
     <meta name="twitter:title" content="Pokopia Progress Scanner" />
     <meta name="twitter:description" content="Free browser-based tool to scan Nintendo Switch video recordings and track your Pokémon Pokopia collection progress." />
 
-    <!-- Google Consent Mode v2: default to denied until user accepts -->
+    <!-- Google Consent Mode v2: define gtag function and default to denied -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -30,21 +30,7 @@
         'wait_for_update': 500
       });
     </script>
-
-    <!-- Google Analytics (loads in cookieless mode until consent is granted) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=%VITE_GA_MEASUREMENT_ID%"></script>
-    <script>
-      gtag('js', new Date());
-      gtag('config', '%VITE_GA_MEASUREMENT_ID%');
-    </script>
-
-    <!-- Google AdSense (ads only render when cookie consent is given) -->
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=%VITE_ADSENSE_CLIENT%"
-      crossorigin="anonymous"
-      data-ad-frequency-hint="30s"
-    ></script>
+    <!-- GA and AdSense scripts are loaded dynamically after cookie consent -->
   </head>
   <body>
     <div id="root"></div>
