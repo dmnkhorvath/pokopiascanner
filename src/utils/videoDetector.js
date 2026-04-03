@@ -103,6 +103,7 @@ function extractFrame(videoFile, timePosition) {
           canvas.width = w;
           canvas.height = h;
           const ctx = canvas.getContext('2d');
+          if (!ctx) { cleanup(); reject(new Error('Canvas context unavailable')); return; }
           ctx.drawImage(video, 0, 0);
           cleanup();
           resolve({ canvas, width: w, height: h, imageData: ctx.getImageData(0, 0, w, h) });
@@ -125,12 +126,14 @@ function extractFrame(videoFile, timePosition) {
  */
 function regionAvgRGB(imageData, x, y, w, h, step = 3) {
   const { data, width: imgW } = imageData;
+  const x1 = Math.max(0, x);
+  const y1 = Math.max(0, y);
   let rSum = 0, gSum = 0, bSum = 0, count = 0;
-  const x2 = Math.min(x + w, imgW);
-  const y2 = Math.min(y + h, imageData.height);
+  const x2 = Math.min(x1 + w, imgW);
+  const y2 = Math.min(y1 + h, imageData.height);
 
-  for (let py = y; py < y2; py += step) {
-    for (let px = x; px < x2; px += step) {
+  for (let py = y1; py < y2; py += step) {
+    for (let px = x1; px < x2; px += step) {
       const idx = (py * imgW + px) * 4;
       rSum += data[idx];
       gSum += data[idx + 1];

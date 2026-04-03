@@ -17,6 +17,7 @@ export function listSessions() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const sessions = JSON.parse(raw);
+    if (!Array.isArray(sessions)) return [];
     return sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
   } catch {
     return [];
@@ -34,14 +35,15 @@ export function listSessions() {
 export function saveSession(results, scanCount, sessionId = null) {
   try {
     // Estimate payload size before saving
-    const payload = JSON.stringify({ results, scanCount, savedAt: new Date().toISOString() });
+    let payload;
+    try { payload = JSON.stringify({ results, scanCount, savedAt: new Date().toISOString() }); } catch (serErr) { console.warn('[scanStorage] JSON.stringify failed (circular ref?):', serErr); return null; }
     if (payload.length > MAX_PAYLOAD_BYTES) {
       console.warn(`[scanStorage] Payload too large (${(payload.length / 1024 / 1024).toFixed(1)} MB). Skipping save.`);
       return 'QUOTA_EXCEEDED';
     }
 
     const sessions = listSessions();
-    const id = sessionId || crypto.randomUUID();
+    const id = sessionId || (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
     const now = new Date().toISOString();
 
     const summary = {
@@ -98,7 +100,9 @@ export function loadSession(sessionId) {
   try {
     const raw = localStorage.getItem(`${CURRENT_KEY}-${sessionId}`);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    return parsed;
   } catch {
     return null;
   }

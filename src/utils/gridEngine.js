@@ -41,14 +41,14 @@ async function ensureGridData() {
   recipeList = _pokopiaDataset.recipes || [];
 
   pokemonList = [...(_pokopiaDataset.pokemon || [])].sort((a, b) => {
-    const na = parseInt(a.number.replace('#', ''), 10);
-    const nb = parseInt(b.number.replace('#', ''), 10);
+    const na = parseInt(a.number?.replace('#', ''), 10) || 0;
+    const nb = parseInt(b.number?.replace('#', ''), 10) || 0;
     return na - nb;
   });
 
   habitatList = [...(_pokopiaDataset.habitats || [])].sort((a, b) => {
-    const na = parseInt(a.number, 10);
-    const nb = parseInt(b.number, 10);
+    const na = parseInt(a.number, 10) || 0;
+    const nb = parseInt(b.number, 10) || 0;
     return na - nb;
   });
 
@@ -80,6 +80,7 @@ let itemTypeMap = new Map();
 // ─── Scaled grid parameters ─────────────────────────────────────────────────
 
 export function detectGridParams(videoWidth, videoHeight) {
+  if (!videoWidth || !videoHeight) throw new Error('Invalid video dimensions');
   const sx = videoWidth  / REF_WIDTH;
   const sy = videoHeight / REF_HEIGHT;
   return {
@@ -319,13 +320,16 @@ function classifyPokemonTile(imageData, cx, cy, half) {
  */
 function extractVerticalProfile(imageData, stripX, stripW, yStart, yEnd) {
   const { data, width } = imageData;
-  const len = yEnd - yStart;
+  const safeStripX = Math.max(0, stripX);
+  const safeYEnd = Math.min(yEnd, imageData.height);
+  const len = safeYEnd - yStart;
+  if (len <= 0) return new Float64Array(0);
   const profile = new Float64Array(len);
 
-  for (let py = yStart; py < yEnd; py++) {
+  for (let py = yStart; py < safeYEnd; py++) {
     let sum = 0;
     let cnt = 0;
-    for (let px = stripX; px < stripX + stripW && px < width; px++) {
+    for (let px = safeStripX; px < safeStripX + stripW && px < width; px++) {
       const idx = (py * width + px) * 4;
       // Grayscale
       sum += 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
@@ -341,6 +345,7 @@ function extractVerticalProfile(imageData, stripX, stripW, yStart, yEnd) {
  */
 function normalizeProfile(profile) {
   const n = profile.length;
+  if (n === 0) return new Float64Array(0);
   let mean = 0;
   for (let i = 0; i < n; i++) mean += profile[i];
   mean /= n;
@@ -395,6 +400,9 @@ function measurePixelShift(prevProfile, currProfile, maxShift) {
 
 function extractTileFingerprint(imageData, tx, ty, tw, th) {
   const { data, width } = imageData;
+  const safeTw = Math.min(tw, width - tx);
+  const safeTh = Math.min(th, Math.floor(data.length / 4 / width) - ty);
+  if (safeTw <= 0 || safeTh <= 0) return null;
 
   let minX = tw, maxX = 0, minY = th, maxY = 0;
   let hasIcon = false;
@@ -476,6 +484,7 @@ function extractTileFingerprint(imageData, tx, ty, tw, th) {
 }
 
 function matchFingerprint(tileFp) {
+  if (!tileFp || fpNames.length === 0) return null;
   const dim = FP_SIZE * FP_SIZE;
   let bestIdx   = -1;
   let bestScore = -Infinity;
@@ -569,12 +578,13 @@ const yieldToBrowser = () => new Promise(r => setTimeout(r, 0));
 function seekVideo(vid, t, timeoutMs = 3000) {
   return new Promise((resolve) => {
     let settled = false;
-    const done = () => {
+    const done = (timedOut = false) => {
       if (settled) return;
       settled = true;
+      if (timedOut) console.warn(`[gridEngine] seekVideo timed out at t=${t.toFixed(2)}s`);
       resolve();
     };
-    const timer = setTimeout(done, timeoutMs);
+    const timer = setTimeout(() => done(true), timeoutMs);
     vid.addEventListener('seeked', () => {
       clearTimeout(timer);
       done();
@@ -587,7 +597,7 @@ function seekVideo(vid, t, timeoutMs = 3000) {
 
 async function scanItemRecipe(video, settings, onProgress, onMatch, signal) {
   const { frameIntervalMs = 100, scanMode = 'item' } = settings;
-  const frameIntervalSec = frameIntervalMs / 1000;
+  const frameIntervalSec = Math.max(0.001, frameIntervalMs / 1000);
   const duration    = video.duration;
   const totalFrames = Math.ceil(duration / frameIntervalSec);
   const gp          = getModeParams(video.videoWidth, video.videoHeight, scanMode);
@@ -596,6 +606,7 @@ async function scanItemRecipe(video, settings, onProgress, onMatch, signal) {
   frameCanvas.width  = video.videoWidth;
   frameCanvas.height = video.videoHeight;
   const frameCtx = frameCanvas.getContext('2d', { willReadFrequently: true });
+  if (!frameCtx) throw new Error('Canvas context unavailable');
 
   const results       = new Map();
   let absRowOffset    = 0;

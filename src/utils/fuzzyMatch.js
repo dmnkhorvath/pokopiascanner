@@ -43,6 +43,7 @@ export function levenshtein(a, b) {
  * @returns {Object} Lookup structure with methods
  */
 export function buildFuzzyMatcher(ocrLookup) {
+  if (!ocrLookup || typeof ocrLookup !== 'object') return { findMatch: () => null, exactMatch: () => null, fuzzyMatch: () => null };
   const keys = Object.keys(ocrLookup);
   const lowerKeys = keys.map(k => k.toLowerCase());
 
@@ -50,7 +51,8 @@ export function buildFuzzyMatcher(ocrLookup) {
   const prefixIndex = {};
   for (let i = 0; i < keys.length; i++) {
     const lower = lowerKeys[i];
-    const prefix = lower.substring(0, 2);
+    if (lower.length === 0) continue;
+    const prefix = lower.length >= 2 ? lower.substring(0, 2) : lower;
     if (!prefixIndex[prefix]) prefixIndex[prefix] = [];
     prefixIndex[prefix].push(i);
     // Also index single char prefix for short strings

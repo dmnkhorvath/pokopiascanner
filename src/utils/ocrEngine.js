@@ -159,7 +159,7 @@ export async function detectVideoFPS(videoFile, sampleDurationMs = 2000) {
 
           intervals.sort((a, b) => a - b);
           const medianInterval = intervals[Math.floor(intervals.length / 2)];
-          const fps = Math.round(1 / medianInterval);
+          const fps = Math.min(240, Math.max(1, Math.round(1 / medianInterval)));
           const frameIntervalMs = Math.round(medianInterval * 1000);
 
           resolve({ fps, frameIntervalMs, detected: true });
@@ -273,13 +273,14 @@ function extractGreenChannel(imageData, threshold = 200) {
  */
 function extractFrameGreenChannel(video, canvas, cropRegion) {
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) throw new Error('Canvas 2D context unavailable');
   const vw = video.videoWidth;
   const vh = video.videoHeight;
 
   const sx = Math.floor((cropRegion.x / 100) * vw);
   const sy = Math.floor((cropRegion.y / 100) * vh);
-  const sw = Math.floor((cropRegion.w / 100) * vw);
-  const sh = Math.floor((cropRegion.h / 100) * vh);
+  const sw = Math.max(1, Math.floor((cropRegion.w / 100) * vw));
+  const sh = Math.max(1, Math.floor((cropRegion.h / 100) * vh));
 
   // Draw at original size first to extract pixels
   canvas.width = sw;
@@ -498,6 +499,7 @@ export function matchHabitatFrame(fullText, upperText, fuzzyTolerance = 2) {
   const lines = upperText.split('\n').map(l => l.trim()).filter(l => l.length > 2);
   for (const line of lines) {
     if (/No\.?\s*\d/i.test(line)) continue; // skip number lines
+    if (!_matcher) return null;
     const result = _matcher.findMatch(line, fuzzyTolerance);
     if (result && result.type === 'habitat') {
       return {
@@ -619,6 +621,7 @@ export function matchText(text, fuzzyTolerance = 2) {
 
   for (const line of lines) {
     // Try matching the full line
+    if (!_matcher) throw new Error('OCR data not initialized — call ensureOcrData first');
     const result = _matcher.findMatch(line, fuzzyTolerance);
     if (result && !seen.has(result.name)) {
       seen.add(result.name);
@@ -657,7 +660,7 @@ export function matchText(text, fuzzyTolerance = 2) {
  * @returns {Promise<Array>} Array of initialized Tesseract workers
  */
 async function createWorkerPool(poolSize, ocrParams = null) {
-  const workers = await Promise.all(
+  const results = await Promise.allSettled(
     Array.from({ length: poolSize }, async () => {
       const w = await createWorker('eng', 1, { logger: () => {} });
       if (ocrParams) {
@@ -666,7 +669,19 @@ async function createWorkerPool(poolSize, ocrParams = null) {
       return w;
     })
   );
-  return workers;
+  const fulfilled = [];
+  const rejected = [];
+  for (const r of results) {
+    if (r.status === 'fulfilled') fulfilled.push(r.value);
+    else rejected.push(r.reason);
+  }
+  if (rejected.length > 0 && fulfilled.length > 0) {
+    console.warn(`[ocrEngine] ${rejected.length}/${poolSize} workers failed to initialize; continuing with ${fulfilled.length}`);
+  }
+  if (fulfilled.length === 0) {
+    throw new Error('All OCR workers failed to initialize');
+  }
+  return fulfilled;
 }
 
 /**
@@ -674,7 +689,7 @@ async function createWorkerPool(poolSize, ocrParams = null) {
  * @param {Array} workers
  */
 async function terminateWorkerPool(workers) {
-  await Promise.all(workers.map(w => w.terminate()));
+  await Promise.allSettled(workers.map(w => w.terminate()));
 }
 
 /**
@@ -909,6 +924,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   });
 
   const duration = video.duration;
+  if (!isFinite(duration) || duration <= 0) throw new Error('Invalid video duration');
 
   // ─── Grid-based scanning for item/recipe modes ───────────────────────────
   // Items and recipes appear in a scrolling grid without text labels.
@@ -1002,7 +1018,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     }
   }
 
-  const frameIntervalSec = frameIntervalMs / 1000;
+  const frameIntervalSec = Math.max(0.001, frameIntervalMs / 1000);
   const framesToProcess = Math.floor(duration / frameIntervalSec);
 
   // Determine worker pool size — smaller on mobile to save memory
@@ -1033,6 +1049,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
 
   const previewCanvas = document.createElement('canvas');
   const previewCtx = previewCanvas.getContext('2d');
+  if (!previewCtx) console.warn('[ocrEngine] Preview canvas context unavailable; skipping preview');
 
   let processedCount = 0;
   let skippedCount = 0;
@@ -1208,10 +1225,12 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
       prevFrameHash = frameHash;
 
       // ─── Generate preview ────────────────────────────────────────────
-      previewCanvas.width = video.videoWidth;
-      previewCanvas.height = video.videoHeight;
-      previewCtx.drawImage(video, 0, 0);
-      const previewDataUrl = previewCanvas.toDataURL('image/jpeg', 0.5);
+      if (previewCtx) {
+        previewCanvas.width = video.videoWidth;
+        previewCanvas.height = video.videoHeight;
+        previewCtx.drawImage(video, 0, 0);
+      }
+      const previewDataUrl = previewCtx ? previewCanvas.toDataURL('image/jpeg', 0.5) : null;
 
       // FIX: Send first preview immediately BEFORE any OCR starts
       if (!firstPreviewSent) {
