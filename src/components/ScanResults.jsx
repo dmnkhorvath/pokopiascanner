@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { getCategoryTotals } from '../utils/ocrEngine.js';
+import { buildNewItemSet } from '../utils/scanDiff.js';
 import CategoryCard from './CategoryCard';
 import ProgressBar from './ProgressBar';
 import './ScanResults.css';
@@ -41,7 +42,7 @@ function RingChart({ percent, size = 120, strokeWidth = 12, color = '#f59e0b', c
   );
 }
 
-export default function ScanResults({ results, scanCount = 0, onAddMore, onStartFresh, onImportResults }) {
+export default function ScanResults({ results, scanCount = 0, onAddMore, onStartFresh, onImportResults, scanDiff }) {
   const isDebug = new URLSearchParams(window.location.search).get('debug') === 'true';
 
   const [activeTab, setActiveTab] = useState('all');
@@ -50,6 +51,8 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
   const [capturedFilter, setCapturedFilter] = useState('all');
   const [discoveredFilter, setDiscoveredFilter] = useState('all');
   const [copySuccess, setCopySuccess] = useState(false);
+  const [showNewOnly, setShowNewOnly] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   const [totals, setTotals] = useState({ pokemon: 300, items: 1254, habitats: 209, recipes: 743 });
   useEffect(() => {
@@ -62,6 +65,11 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
     habitats: results?.habitats || { found: 0, total: totals.habitats, items: [] },
     recipes: results?.recipes || { found: 0, total: totals.recipes, items: [] },
   }), [results, totals]);
+
+  // Build set of new item names for highlighting
+  const newItemNames = useMemo(() => buildNewItemSet(scanDiff), [scanDiff]);
+  const hasNewItems = scanDiff && scanDiff.totalNew > 0;
+
 
   const filteredItems = useMemo(() => {
     let items = [];
@@ -110,8 +118,16 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
       });
     }
 
+    // Filter to new items only if toggle is active
+    if (showNewOnly && newItemNames.size > 0) {
+      items = items.filter(item => {
+        const name = (item.name || '').toLowerCase();
+        return newItemNames.has(name);
+      });
+    }
+
     return items;
-  }, [activeTab, categories, searchQuery, builtFilter, capturedFilter, discoveredFilter]);
+  }, [activeTab, categories, searchQuery, builtFilter, capturedFilter, discoveredFilter, showNewOnly, newItemNames]);
 
   const handleExport = () => {
     const exportData = {
@@ -232,6 +248,44 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
           <span>📁 This session includes data merged from {scanCount} scans. Results are auto-saved to your browser.</span>
         </div>
       )}
+
+      {/* What's New Banner */}
+      {hasNewItems && !bannerDismissed && (
+        <div className="alert bg-success/15 border border-success/30 shadow-md">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full">
+            <div className="flex-1">
+              <h3 className="font-bold text-success">🎉 You found {scanDiff.totalNew} new item{scanDiff.totalNew !== 1 ? 's' : ''} since your last scan!</h3>
+              <div className="flex flex-wrap gap-3 text-sm mt-1">
+                {Object.entries(scanDiff.byCategory).map(([cat, data]) => {
+                  if (data.new === 0) return null;
+                  const meta = CATEGORY_META[cat];
+                  return (
+                    <span key={cat} className={meta?.textClass || ''}>
+                      {meta?.icon} {data.new} new {meta?.label}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                className={`btn btn-sm ${showNewOnly ? 'btn-success' : 'btn-outline btn-success'}`}
+                onClick={() => setShowNewOnly(prev => !prev)}
+              >
+                {showNewOnly ? '📋 Show All' : '✨ Show New Only'}
+              </button>
+              <button
+                className="btn btn-ghost btn-sm btn-circle"
+                onClick={() => setBannerDismissed(true)}
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* ═══════════════════════════════════════════════════════════ */}
       {/* Collection Dashboard */}
@@ -384,12 +438,15 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
             </div>
           ) : (
             <div className="space-y-1">
-              {filteredItems.map((item, i) => (
+              {filteredItems.map((item, i) => {
+                const isNew = newItemNames.has((item.name || '').toLowerCase());
+                return (
                 <div
                   key={`${item.name}-${i}`}
-                  className={`flex items-center gap-3 px-3 py-1.5 bg-base-200 rounded border-l-4 ${CATEGORY_META[item._category]?.borderClass || 'border-l-base-content/20'}`}
+                  className={`flex items-center gap-3 px-3 py-1.5 rounded border-l-4 ${isNew ? 'bg-success/10 border-l-success' : `bg-base-200 ${CATEGORY_META[item._category]?.borderClass || 'border-l-base-content/20'}`}`}
                 >
                   <span className="font-medium text-sm flex-1 truncate">{item.name}</span>
+                  {isNew && <span className="badge badge-xs badge-success gap-0.5">✨ NEW</span>}
                   {item.number && <span className="badge badge-ghost badge-xs">{item.number}</span>}
                   {item.category && <span className="badge badge-ghost badge-xs">{item.category}</span>}
                   {item._category === 'habitats' && item.built != null && (
@@ -409,7 +466,8 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
                   )}
                   <span className={`text-xs ${CATEGORY_META[item._category]?.textClass || ''}`}>{item._category}</span>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </>

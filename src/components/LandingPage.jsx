@@ -453,12 +453,19 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
         <section>
           <h2 className="text-xl font-bold mb-3">{"💾"} Previous Sessions</h2>
           <div className="space-y-2">
-            {savedSessions.slice(0, 5).map((session) => (
+            {savedSessions.slice(0, 5).map((session, idx) => {
+              // Compute simple diff against the next (older) session
+              const olderSession = savedSessions[idx + 1];
+              const newCount = olderSession ? session.totalFound - olderSession.totalFound : 0;
+              return (
               <div key={session.id} className="card bg-base-200">
                 <div className="card-body p-3 flex-row items-center gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">
+                    <p className="font-medium text-sm flex items-center gap-2">
                       {new Date(session.date).toLocaleDateString()} at {new Date(session.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {newCount > 0 && (
+                        <span className="badge badge-success badge-xs gap-0.5">+{newCount} new</span>
+                      )}
                     </p>
                     <div className="flex gap-3 text-xs text-base-content/50">
                       <span>🔴 {session.categories?.pokemon || 0}</span>
@@ -484,7 +491,8 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </section>
       )}

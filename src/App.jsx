@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react'
 import LandingPage from './components/LandingPage';
 import CookieConsent from './components/CookieConsent';
 import { mergeResults } from './utils/ocrEngine.js';
+import { computeScanDiff } from './utils/scanDiff.js';
 import { saveSession, loadLatestSession, listSessions, loadSession, deleteSession, clearAllSessions } from './utils/scanStorage.js';
 import AdBanner from './components/AdBanner';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -61,6 +62,7 @@ export default function App() {
   const [scanResults, setScanResults] = useState(null);
   const [scanCount, setScanCount] = useState(0);
   const [sessionId, setSessionId] = useState(null);
+  const [scanDiff, setScanDiff] = useState(null);
 
   const cookieSettingsRef = useRef(null);
 
@@ -117,21 +119,19 @@ export default function App() {
   }, [navigateTo]);
 
   const handleScanComplete = useCallback((results) => {
-    if (scanResults) {
-      setScanResults(mergeResults(scanResults, results));
-    } else {
-      setScanResults(results);
-    }
+    const previousResults = scanResults;
+    const newResults = scanResults ? mergeResults(scanResults, results) : results;
+    setScanResults(newResults);
+    setScanDiff(computeScanDiff(previousResults, newResults));
     setScanCount(prev => prev + 1);
     navigateTo(PAGES.RESULTS);
   }, [scanResults, navigateTo]);
 
   const handleImportResults = useCallback((imported) => {
-    if (scanResults) {
-      setScanResults(mergeResults(scanResults, imported));
-    } else {
-      setScanResults(imported);
-    }
+    const previousResults = scanResults;
+    const newResults = scanResults ? mergeResults(scanResults, imported) : imported;
+    setScanResults(newResults);
+    setScanDiff(computeScanDiff(previousResults, newResults));
     setScanCount(prev => prev + 1);
     navigateTo(PAGES.RESULTS);
   }, [scanResults, navigateTo]);
@@ -149,6 +149,7 @@ export default function App() {
     setVideoFiles([]);
     setSettings(null);
     setSessionId(null);
+    setScanDiff(null);
     navigateTo(PAGES.LANDING);
   }, [navigateTo]);
 
@@ -156,13 +157,21 @@ export default function App() {
   const handleLoadSession = useCallback((id) => {
     const data = loadSession(id);
     if (data && data.results) {
+      // Compare against the most recent OTHER session for diff
+      const sessions = listSessions();
+      const otherSession = sessions.find(s => s.id !== id);
+      let prevResults = null;
+      if (otherSession) {
+        const prevData = loadSession(otherSession.id);
+        prevResults = prevData?.results || null;
+      }
       setScanResults(data.results);
       setScanCount(data.scanCount || 1);
       setSessionId(id);
+      setScanDiff(computeScanDiff(prevResults, data.results));
       navigateTo(PAGES.RESULTS);
     }
   }, [navigateTo]);
-
   // Delete a saved session
   const handleDeleteSession = useCallback((id) => {
     deleteSession(id);
@@ -259,6 +268,7 @@ export default function App() {
                 onAddMore={handleAddMore}
                 onStartFresh={handleStartFresh}
                 onImportResults={handleImportResults}
+                scanDiff={scanDiff}
               />
               <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />
             </>
