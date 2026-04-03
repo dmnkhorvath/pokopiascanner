@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react';
 import LandingPage from './components/LandingPage';
 import CookieConsent from './components/CookieConsent';
+import InstallPrompt from './components/InstallPrompt';
 import { mergeResults } from './utils/ocrEngine.js';
 import { computeScanDiff } from './utils/scanDiff.js';
 import { saveSession, loadLatestSession, listSessions, loadSession, deleteSession, clearAllSessions } from './utils/scanStorage.js';
@@ -310,6 +311,7 @@ export default function App() {
       </footer>
 
       {/* Cookie Consent Banner */}
+      <InstallPrompt />
       <CookieConsent onOpenSettings={cookieSettingsRef} onNavigatePrivacy={() => navigateTo(PAGES.PRIVACY)} />
     </div>
   );

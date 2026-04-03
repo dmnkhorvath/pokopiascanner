@@ -31,6 +31,7 @@
     "sharp": "^0.34.5",
     "tailwindcss": "^4.2.2",
     "vite": "^6.0.5",
+    "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.1.2"
   },
   "description": "Pokopia Progress Scanner - OCR-based collection tracker for Pokémon Pokopia"
