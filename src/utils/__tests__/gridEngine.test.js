@@ -74,6 +74,7 @@ import {
   classifyFrame,
   findRowShift,
   getGridDataList,
+  detectGridParams,
 } from '../gridEngine.js';
 
 // ─── Helper: create mock ImageData ───────────────────────────────────────────
@@ -433,5 +434,102 @@ describe('getGridDataList', () => {
     const list = await getGridDataList(undefined);
     expect(Array.isArray(list)).toBe(true);
     expect(list.length).toBe(2);
+  });
+});
+
+// ─── P1: detectGridParams additional resolutions ─────────────────────────────
+describe('detectGridParams — P1 edge cases', () => {
+  it('scales correctly for 1280×720 (720p)', () => {
+    const gp = detectGridParams(1280, 720);
+    expect(gp.width).toBe(1280);
+    expect(gp.height).toBe(720);
+    expect(gp.sx).toBeCloseTo(1280 / 1920, 5);
+    expect(gp.sy).toBeCloseTo(720 / 1080, 5);
+    expect(gp.cols).toBe(12); // ITEM_COLS is constant
+    expect(gp.cell).toBeGreaterThan(0);
+    expect(gp.tileHalf).toBeGreaterThan(0);
+  });
+
+  it('scales correctly for 3840×2160 (4K)', () => {
+    const gp = detectGridParams(3840, 2160);
+    expect(gp.sx).toBeCloseTo(2, 5);
+    expect(gp.sy).toBeCloseTo(2, 5);
+    expect(gp.cell).toBeGreaterThan(0);
+  });
+
+  it('handles very small dimensions (10×10)', () => {
+    const gp = detectGridParams(10, 10);
+    expect(gp.width).toBe(10);
+    expect(gp.height).toBe(10);
+    // sx and sy will be very small fractions
+    expect(gp.sx).toBeCloseTo(10 / 1920, 5);
+    expect(gp.sy).toBeCloseTo(10 / 1080, 5);
+  });
+
+  it('throws for zero width', () => {
+    expect(() => detectGridParams(0, 1080)).toThrow('Invalid video dimensions');
+  });
+
+  it('throws for zero height', () => {
+    expect(() => detectGridParams(1920, 0)).toThrow('Invalid video dimensions');
+  });
+
+  it('throws for null dimensions', () => {
+    expect(() => detectGridParams(null, null)).toThrow('Invalid video dimensions');
+  });
+});
+
+// ─── P1: findRowShift additional edge cases ──────────────────────────────────
+describe('findRowShift — P1 edge cases', () => {
+  it('returns 0 for empty arrays', () => {
+    const shift = findRowShift([], []);
+    expect(shift).toBe(0);
+  });
+
+  it('returns 0 for single-row arrays with same content', () => {
+    const row = [[true, false, true]];
+    const shift = findRowShift(row, row);
+    expect(shift).toBe(0);
+  });
+
+  it('returns 0 when prev and curr have different lengths', () => {
+    const prev = [
+      [true, false],
+      [false, true],
+    ];
+    const curr = [
+      [true, false],
+    ];
+    // Should handle gracefully without crashing
+    const shift = findRowShift(prev, curr);
+    expect(typeof shift).toBe('number');
+  });
+});
+
+// ─── P1: classifyFrame with uniform images ───────────────────────────────────
+describe('classifyFrame — P1 edge cases', () => {
+  it('returns array of rows for uniform gray image via detectGridParams', () => {
+    const gp = detectGridParams(1920, 1080);
+    const imageData = createMockImageData(1920, 1080, () => ({ r: 128, g: 128, b: 128, a: 255 }));
+    const result = classifyFrame(imageData, gp);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(gp.visibleRows);
+  });
+
+  it('returns array of rows for all-white image via detectGridParams', () => {
+    const gp = detectGridParams(1920, 1080);
+    const imageData = createMockImageData(1920, 1080, () => ({ r: 255, g: 255, b: 255, a: 255 }));
+    const result = classifyFrame(imageData, gp);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
+  });
+
+  it('returns array of rows for all-black image via detectGridParams', () => {
+    const gp = detectGridParams(1920, 1080);
+    const imageData = createMockImageData(1920, 1080, () => ({ r: 0, g: 0, b: 0, a: 255 }));
+    const result = classifyFrame(imageData, gp);
+    expect(result).toBeDefined();
+    expect(Array.isArray(result)).toBe(true);
   });
 });

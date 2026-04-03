@@ -101,3 +101,67 @@ describe('detectVideoType', () => {
     expect(result.detectedMode).toBe('all');
   });
 });
+
+// ─── P1: Additional detectVideoType edge cases & contract tests ──────────────
+describe('detectVideoType — P1 edge cases', () => {
+  beforeEach(() => {
+    globalThis.URL.createObjectURL = vi.fn(() => { throw new Error('JSDOM: no createObjectURL'); });
+    globalThis.URL.revokeObjectURL = vi.fn();
+  });
+
+  afterEach(() => {
+    globalThis.URL.createObjectURL = origCreateObjectURL;
+    globalThis.URL.revokeObjectURL = origRevokeObjectURL;
+    vi.restoreAllMocks();
+  });
+
+  it('P1-04: unrecognized input (number) falls back to "all"', async () => {
+    const result = await detectVideoType(42);
+    expect(result.detectedMode).toBe('all');
+    expect(result.confidence).toBe('low');
+  });
+
+  it('P1-04: unrecognized input (plain object) falls back to "all"', async () => {
+    const result = await detectVideoType({ not: 'a file' });
+    expect(result.detectedMode).toBe('all');
+    expect(result.confidence).toBe('low');
+  });
+
+  it('P1-04: unrecognized input (array) falls back to "all"', async () => {
+    const result = await detectVideoType([1, 2, 3]);
+    expect(result.detectedMode).toBe('all');
+  });
+
+  it('P1-04: empty string input falls back to "all"', async () => {
+    const result = await detectVideoType('');
+    expect(result.detectedMode).toBe('all');
+  });
+
+  it('P1-08: fallback result always includes all required properties', async () => {
+    const result = await detectVideoType(new Blob([], { type: 'video/mp4' }));
+    expect(result).toHaveProperty('detectedMode');
+    expect(result).toHaveProperty('confidence');
+    expect(result).toHaveProperty('detectedAt');
+    // detectedMode must be a valid scan mode string
+    expect(typeof result.detectedMode).toBe('string');
+    expect(result.detectedMode.length).toBeGreaterThan(0);
+  });
+
+  it('P1-09: concurrent calls do not interfere with each other', async () => {
+    const blob1 = new Blob(['a'], { type: 'video/mp4' });
+    const blob2 = new Blob(['b'], { type: 'video/webm' });
+    const [r1, r2] = await Promise.all([
+      detectVideoType(blob1),
+      detectVideoType(blob2),
+    ]);
+    expect(r1.detectedMode).toBe('all');
+    expect(r2.detectedMode).toBe('all');
+    // Both should be independent results
+    expect(r1).not.toBe(r2);
+  });
+
+  it('P1-08: boolean input falls back gracefully', async () => {
+    const result = await detectVideoType(true);
+    expect(result.detectedMode).toBe('all');
+  });
+});

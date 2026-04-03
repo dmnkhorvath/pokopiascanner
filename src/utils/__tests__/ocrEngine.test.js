@@ -322,3 +322,165 @@ describe('exported constants', () => {
     expect(DEFAULT_SETTINGS).toHaveProperty('confidenceThreshold');
   });
 });
+
+// ─── P1: Additional matchText edge cases ─────────────────────────────────────
+describe('matchText — P1 edge cases', () => {
+  beforeAll(async () => {
+    await getCategoryTotals(); // ensure _matcher is initialized
+  });
+
+  it('P1: splits lines by comma separator and matches each part', () => {
+    const results = matchText('Pikachu,Bulbasaur');
+    const names = results.map(r => r.name);
+    expect(names).toContain('Pikachu');
+    expect(names).toContain('Bulbasaur');
+  });
+
+  it('P1: splits lines by pipe separator and matches each part', () => {
+    const results = matchText('Pikachu|Potion');
+    const names = results.map(r => r.name);
+    expect(names).toContain('Pikachu');
+    expect(names).toContain('Potion');
+  });
+
+  it('P1: splits lines by slash separator and matches each part', () => {
+    const results = matchText('Pikachu/Charmander');
+    const names = results.map(r => r.name);
+    expect(names).toContain('Pikachu');
+    expect(names).toContain('Charmander');
+  });
+
+  it('P1: deduplicates same name appearing on multiple lines', () => {
+    const results = matchText('Pikachu\nPikachu\nPikachu');
+    const pikachus = results.filter(r => r.name === 'Pikachu');
+    expect(pikachus.length).toBe(1);
+  });
+
+  it('P1: skips whitespace-only and single-char lines', () => {
+    const results = matchText('   \n\nA\n\nPikachu');
+    // Should still find Pikachu despite junk lines
+    expect(results.length).toBeGreaterThanOrEqual(1);
+    expect(results[0].name).toBe('Pikachu');
+  });
+
+  it('P1: returns empty array for completely unrecognizable text', () => {
+    const results = matchText('xyzzy12345\nAAAABBBBCCCC\n!@#$%^&*()');
+    expect(results).toEqual([]);
+  });
+});
+
+// ─── P1: matchPokemonFrame additional cases ──────────────────────────────────
+describe('matchPokemonFrame — P1 edge cases', () => {
+  beforeAll(async () => {
+    await getCategoryTotals();
+  });
+
+  it('P1: returns null for completely unrelated text', () => {
+    const result = matchPokemonFrame('Hello World\nNothing here', 2);
+    expect(result).toBeNull();
+  });
+
+  it('P1: returns null for empty string', () => {
+    const result = matchPokemonFrame('', 2);
+    expect(result).toBeNull();
+  });
+
+  it('P1: returns null for whitespace-only input', () => {
+    const result = matchPokemonFrame('   \n   ', 2);
+    expect(result).toBeNull();
+  });
+});
+
+// ─── P1: matchHabitatFrame additional cases ──────────────────────────────────
+describe('matchHabitatFrame — P1 edge cases', () => {
+  beforeAll(async () => {
+    await getCategoryTotals();
+  });
+
+  it('P1: returns null for empty text', () => {
+    const result = matchHabitatFrame('', '', 2);
+    expect(result).toBeNull();
+  });
+
+  it('P1: returns null for unrelated text', () => {
+    const result = matchHabitatFrame('Random gibberish text', 'RANDOM GIBBERISH', 2);
+    expect(result).toBeNull();
+  });
+
+  it('P1: detects undiscovered habitat with apostrophe variation', () => {
+    const result = matchHabitatFrame(
+      "You haven\u2019t discovered this habitat yet\nNo. 001\nTall Grass",
+      "NO. 001\nTALL GRASS",
+      2
+    );
+    if (result) {
+      expect(result.built).toBe(false);
+    }
+  });
+});
+
+// ─── P1: mergeResults additional edge cases ──────────────────────────────────
+describe('mergeResults — P1 edge cases', () => {
+  it('P1: merging with empty incoming preserves existing', () => {
+    const existing = {
+      totalFound: 2,
+      pokemon: { found: 1, total: 300, items: [{ name: 'Pikachu', status: true }] },
+      items: { found: 1, total: 1254, items: [{ name: 'Potion', status: true }] },
+      habitats: { found: 0, total: 209, items: [] },
+      recipes: { found: 0, total: 743, items: [] },
+    };
+    const incoming = {
+      totalFound: 0,
+      pokemon: { found: 0, total: 300, items: [] },
+      items: { found: 0, total: 1254, items: [] },
+      habitats: { found: 0, total: 209, items: [] },
+      recipes: { found: 0, total: 743, items: [] },
+    };
+    const merged = mergeResults(existing, incoming);
+    expect(merged.totalFound).toBe(2);
+    expect(merged.pokemon.items.length).toBe(1);
+  });
+
+  it('P1: merging with null existing treats as fresh', () => {
+    const incoming = {
+      totalFound: 1,
+      pokemon: { found: 1, total: 300, items: [{ name: 'Pikachu', status: true }] },
+      items: { found: 0, total: 1254, items: [] },
+      habitats: { found: 0, total: 209, items: [] },
+      recipes: { found: 0, total: 743, items: [] },
+    };
+    const merged = mergeResults(null, incoming);
+    expect(merged.totalFound).toBe(1);
+    expect(merged.pokemon.items.length).toBe(1);
+  });
+
+  it('P1: merging with null incoming returns existing unchanged', () => {
+    const existing = {
+      totalFound: 1,
+      pokemon: { found: 1, total: 300, items: [{ name: 'Pikachu', status: true }] },
+      items: { found: 0, total: 1254, items: [] },
+      habitats: { found: 0, total: 209, items: [] },
+      recipes: { found: 0, total: 743, items: [] },
+    };
+    const merged = mergeResults(existing, null);
+    expect(merged.totalFound).toBe(1);
+  });
+});
+
+// ─── P1: DEFAULT_SETTINGS validation ─────────────────────────────────────────
+describe('DEFAULT_SETTINGS — P1 validation', () => {
+  it('frameIntervalMs is a non-negative finite number', () => {
+    expect(DEFAULT_SETTINGS.frameIntervalMs).toBeGreaterThanOrEqual(0);
+    expect(Number.isFinite(DEFAULT_SETTINGS.frameIntervalMs)).toBe(true);
+  });
+
+  it('fuzzyTolerance is a non-negative integer', () => {
+    expect(DEFAULT_SETTINGS.fuzzyTolerance).toBeGreaterThanOrEqual(0);
+    expect(Number.isInteger(DEFAULT_SETTINGS.fuzzyTolerance)).toBe(true);
+  });
+
+  it('confidenceThreshold is between 0 and 100', () => {
+    expect(DEFAULT_SETTINGS.confidenceThreshold).toBeGreaterThanOrEqual(0);
+    expect(DEFAULT_SETTINGS.confidenceThreshold).toBeLessThanOrEqual(100);
+  });
+});

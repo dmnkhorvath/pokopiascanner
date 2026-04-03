@@ -20,7 +20,7 @@ Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock });
 let uuidCounter = 0;
 vi.stubGlobal('crypto', { randomUUID: () => `test-uuid-${++uuidCounter}` });
 
-import { saveSession, loadSession, deleteSession, listSessions, loadLatestSession, estimateStorageUsage } from '../scanStorage.js';
+import { saveSession, loadSession, deleteSession, listSessions, loadLatestSession, estimateStorageUsage, clearAllSessions } from '../scanStorage.js';
 
 beforeEach(() => {
   localStorageMock.clear();
@@ -93,5 +93,96 @@ describe('estimateStorageUsage', () => {
     const usage = estimateStorageUsage();
     expect(typeof usage).toBe('number');
     expect(usage).toBeGreaterThan(0);
+  });
+});
+
+// ─── P1: MAX_SESSIONS eviction, QUOTA_EXCEEDED, loadLatestSession, clearAllSessions, corrupted JSON ──
+describe('saveSession — P1 edge cases', () => {
+  it('evicts oldest sessions when exceeding MAX_SESSIONS (20)', () => {
+    const ids = [];
+    for (let i = 0; i < 22; i++) {
+      ids.push(saveSession({ ...mockResults, totalFound: i }, i + 1));
+    }
+    const sessions = listSessions();
+    expect(sessions.length).toBe(20);
+    expect(sessions.find(s => s.id === ids[0])).toBeUndefined();
+    expect(sessions.find(s => s.id === ids[1])).toBeUndefined();
+    expect(sessions.find(s => s.id === ids[21])).toBeDefined();
+  });
+
+  it('returns QUOTA_EXCEEDED for oversized payload (> 4 MB)', () => {
+    const hugeResults = {
+      ...mockResults,
+      pokemon: { found: 1, total: 300, items: [{ name: 'x'.repeat(1500000) }] },
+      items: { found: 1, total: 1254, items: [{ name: 'y'.repeat(1500000) }] },
+      habitats: { found: 1, total: 209, items: [{ name: 'z'.repeat(1500000) }] },
+      recipes: { found: 1, total: 743, items: [] },
+    };
+    const result = saveSession(hugeResults, 1);
+    expect(result).toBe('QUOTA_EXCEEDED');
+  });
+
+  it('returns QUOTA_EXCEEDED when localStorage.setItem throws QuotaExceededError', () => {
+    localStorageMock.setItem.mockImplementation((key, value) => {
+      const err = new Error('quota exceeded');
+      err.name = 'QuotaExceededError';
+      throw err;
+    });
+    const result = saveSession(mockResults, 1);
+    expect(result).toBe('QUOTA_EXCEEDED');
+    // Restore original implementation so subsequent tests work
+    localStorageMock.setItem.mockImplementation((key, value) => {
+      localStorageMock._store[key] = String(value);
+    });
+  });
+});
+
+describe('loadLatestSession — P1', () => {
+  it('returns the most recently saved session', () => {
+    saveSession(mockResults, 1);
+    saveSession({ ...mockResults, totalFound: 99 }, 2);
+    const latest = loadLatestSession();
+    expect(latest).not.toBeNull();
+    expect(latest.results.totalFound).toBe(99);
+  });
+
+  it('returns null when no sessions exist', () => {
+    expect(loadLatestSession()).toBeNull();
+  });
+});
+
+describe('clearAllSessions — P1', () => {
+  it('removes all sessions and their data', () => {
+    saveSession(mockResults, 1);
+    saveSession({ ...mockResults, totalFound: 10 }, 2);
+    expect(listSessions().length).toBe(2);
+    clearAllSessions();
+    expect(listSessions()).toEqual([]);
+  });
+});
+
+describe('listSessions — P1 corrupted data', () => {
+  it('returns empty array when localStorage contains invalid JSON', () => {
+    localStorageMock._store['pokopia-scan-sessions'] = '{invalid json!!!';
+    expect(listSessions()).toEqual([]);
+  });
+
+  it('returns empty array when localStorage contains non-array JSON', () => {
+    localStorageMock._store['pokopia-scan-sessions'] = '"just a string"';
+    expect(listSessions()).toEqual([]);
+  });
+});
+
+describe('estimateStorageUsage — P1 additional', () => {
+  it('returns 0 when no pokopia keys exist', () => {
+    const usage = estimateStorageUsage();
+    expect(usage).toBe(0);
+  });
+
+  it('increases after saving sessions', () => {
+    const before = estimateStorageUsage();
+    saveSession(mockResults, 1);
+    const after = estimateStorageUsage();
+    expect(after).toBeGreaterThan(before);
   });
 });
