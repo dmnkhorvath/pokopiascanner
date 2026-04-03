@@ -1,14 +1,17 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, lazy, Suspense } from 'react';
 import LandingPage from './components/LandingPage';
-import VideoScanner from './components/VideoScanner';
-import ScanResults from './components/ScanResults';
-import PrivacyPolicy from './components/PrivacyPolicy';
-import TermsConditions from './components/TermsConditions';
-import HowToGuide from './components/HowToGuide';
 import CookieConsent from './components/CookieConsent';
 import { mergeResults } from './utils/ocrEngine.js';
+import { saveSession, loadLatestSession, listSessions, loadSession, deleteSession, clearAllSessions } from './utils/scanStorage.js';
 import AdBanner from './components/AdBanner';
 import './App.css';
+
+// Lazy-loaded components for code splitting
+const VideoScanner = lazy(() => import('./components/VideoScanner'));
+const ScanResults = lazy(() => import('./components/ScanResults'));
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
+const TermsConditions = lazy(() => import('./components/TermsConditions'));
+const HowToGuide = lazy(() => import('./components/HowToGuide'));
 
 const PAGES = {
   LANDING: 'landing',
@@ -37,14 +40,42 @@ function getPageFromHash() {
   return HASH_TO_PAGE[hash] || null;
 }
 
+// Loading fallback for lazy components
+function LoadingFallback() {
+  return (
+    <div className="flex items-center justify-center py-20">
+      <span className="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+  );
+}
+
 export default function App() {
   const [page, setPage] = useState(() => getPageFromHash() || PAGES.LANDING);
   const [videoFiles, setVideoFiles] = useState([]);
   const [settings, setSettings] = useState(null);
   const [scanResults, setScanResults] = useState(null);
   const [scanCount, setScanCount] = useState(0);
+  const [sessionId, setSessionId] = useState(null);
 
   const cookieSettingsRef = useRef(null);
+
+  // Load latest session from localStorage on startup
+  useEffect(() => {
+    const latest = loadLatestSession();
+    if (latest && latest.results) {
+      setScanResults(latest.results);
+      setScanCount(latest.scanCount || 1);
+      setSessionId(latest.id);
+    }
+  }, []);
+
+  // Auto-save to localStorage whenever results change
+  useEffect(() => {
+    if (scanResults && scanResults.totalFound > 0) {
+      const id = saveSession(scanResults, scanCount, sessionId);
+      if (id && !sessionId) setSessionId(id);
+    }
+  }, [scanResults, scanCount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync hash -> page on browser back/forward
   useEffect(() => {
@@ -112,8 +143,31 @@ export default function App() {
     setScanCount(0);
     setVideoFiles([]);
     setSettings(null);
+    setSessionId(null);
     navigateTo(PAGES.LANDING);
   }, [navigateTo]);
+
+  // Load a specific saved session
+  const handleLoadSession = useCallback((id) => {
+    const data = loadSession(id);
+    if (data && data.results) {
+      setScanResults(data.results);
+      setScanCount(data.scanCount || 1);
+      setSessionId(id);
+      navigateTo(PAGES.RESULTS);
+    }
+  }, [navigateTo]);
+
+  // Delete a saved session
+  const handleDeleteSession = useCallback((id) => {
+    deleteSession(id);
+    // If we deleted the current session, clear state
+    if (id === sessionId) {
+      setScanResults(null);
+      setScanCount(0);
+      setSessionId(null);
+    }
+  }, [sessionId]);
 
   const handleCancelScan = useCallback(() => {
     navigateTo(scanResults ? PAGES.RESULTS : PAGES.LANDING);
@@ -164,49 +218,54 @@ export default function App() {
               scanCount={scanCount}
               onStartFresh={handleStartFresh}
               onViewResults={() => navigateTo(PAGES.RESULTS)}
+              savedSessions={listSessions()}
+              onLoadSession={handleLoadSession}
+              onDeleteSession={handleDeleteSession}
             />
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_LANDING_BOTTOM} position="bottom" />
           </>
         )}
 
-        {page === PAGES.SCANNING && videoFiles.length > 0 && settings && (
-          <>
-            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_TOP} position="top" />
-            <VideoScanner
-              videoFiles={videoFiles}
-              settings={settings}
-              onScanComplete={handleScanComplete}
-              onCancel={handleCancelScan}
-            />
-            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />
-          </>
-        )}
+        <Suspense fallback={<LoadingFallback />}>
+          {page === PAGES.SCANNING && videoFiles.length > 0 && settings && (
+            <>
+              <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_TOP} position="top" />
+              <VideoScanner
+                videoFiles={videoFiles}
+                settings={settings}
+                onScanComplete={handleScanComplete}
+                onCancel={handleCancelScan}
+              />
+              <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />
+            </>
+          )}
 
-        {page === PAGES.RESULTS && (
-          <>
-            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_TOP} position="top" />
-            <ScanResults
-              results={scanResults}
-              scanCount={scanCount}
-              onAddMore={handleAddMore}
-              onStartFresh={handleStartFresh}
-              onImportResults={handleImportResults}
-            />
-            <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />
-          </>
-        )}
+          {page === PAGES.RESULTS && (
+            <>
+              <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_TOP} position="top" />
+              <ScanResults
+                results={scanResults}
+                scanCount={scanCount}
+                onAddMore={handleAddMore}
+                onStartFresh={handleStartFresh}
+                onImportResults={handleImportResults}
+              />
+              <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_SCANNER_BOTTOM} position="bottom" />
+            </>
+          )}
 
-        {page === PAGES.HOWTO && (
-          <HowToGuide onBack={handleBackToScanner} />
-        )}
+          {page === PAGES.HOWTO && (
+            <HowToGuide onBack={handleBackToScanner} />
+          )}
 
-        {page === PAGES.PRIVACY && (
-          <PrivacyPolicy onBack={handleBackToScanner} />
-        )}
+          {page === PAGES.PRIVACY && (
+            <PrivacyPolicy onBack={handleBackToScanner} />
+          )}
 
-        {page === PAGES.TERMS && (
-          <TermsConditions onBack={handleBackToScanner} />
-        )}
+          {page === PAGES.TERMS && (
+            <TermsConditions onBack={handleBackToScanner} />
+          )}
+        </Suspense>
       </main>
 
       {/* Footer */}

@@ -11,19 +11,34 @@ const TABS = [
   { key: 'recipes', label: 'Recipes', icon: '📋' },
 ];
 
-const CATEGORY_BORDER = {
-  pokemon: 'border-l-primary',
-  items: 'border-l-secondary',
-  habitats: 'border-l-info',
-  recipes: 'border-l-accent',
+const CATEGORY_META = {
+  pokemon: { label: 'Pokémon', icon: '🔴', color: '#f87171', bgClass: 'bg-error/10', borderClass: 'border-l-primary', textClass: 'text-primary' },
+  items: { label: 'Items', icon: '🎒', color: '#a78bfa', bgClass: 'bg-secondary/10', borderClass: 'border-l-secondary', textClass: 'text-secondary' },
+  habitats: { label: 'Habitats', icon: '🏠', color: '#38bdf8', bgClass: 'bg-info/10', borderClass: 'border-l-info', textClass: 'text-info' },
+  recipes: { label: 'Recipes', icon: '📋', color: '#34d399', bgClass: 'bg-accent/10', borderClass: 'border-l-accent', textClass: 'text-accent' },
 };
 
-const CATEGORY_TEXT = {
-  pokemon: 'text-primary',
-  items: 'text-secondary',
-  habitats: 'text-info',
-  recipes: 'text-accent',
-};
+/** CSS-only ring chart using conic-gradient */
+function RingChart({ percent, size = 120, strokeWidth = 12, color = '#f59e0b', children }) {
+  const p = Math.min(100, Math.max(0, percent));
+  return (
+    <div
+      className="relative rounded-full flex items-center justify-center"
+      style={{
+        width: size,
+        height: size,
+        background: `conic-gradient(${color} ${p * 3.6}deg, oklch(var(--b3)) ${p * 3.6}deg)`,
+      }}
+    >
+      <div
+        className="rounded-full bg-base-100 flex items-center justify-center"
+        style={{ width: size - strokeWidth * 2, height: size - strokeWidth * 2 }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function ScanResults({ results, scanCount = 0, onAddMore, onStartFresh, onImportResults }) {
   const isDebug = new URLSearchParams(window.location.search).get('debug') === 'true';
@@ -178,19 +193,21 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
 
   const totalFound = results?.totalFound || 0;
   const totalPossible = 300 + 1254 + 209 + 743;
+  const overallPercent = totalPossible > 0 ? Math.round((totalFound / totalPossible) * 100) : 0;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold">Scan Results</h2>
+          <h2 className="text-2xl font-bold">📊 Collection Dashboard</h2>
           <p className="text-sm text-base-content/50">
             {scanCount > 0
-              ? `Accumulated from ${scanCount} video${scanCount > 1 ? 's' : ''}`
+              ? `Accumulated from ${scanCount} scan${scanCount > 1 ? 's' : ''}`
               : results?.scanDate
                 ? `Scanned: ${new Date(results.scanDate).toLocaleString()}`
                 : 'No scan data'}
+            {' · Auto-saved'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -206,30 +223,85 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
       {/* Session info banner */}
       {scanCount > 1 && (
         <div className="alert alert-info">
-          <span>📁 This session includes data merged from {scanCount} video scans. Upload more videos or export when done.</span>
+          <span>📁 This session includes data merged from {scanCount} scans. Results are auto-saved to your browser.</span>
         </div>
       )}
 
-      {/* Overall Progress */}
-      <div className="space-y-4">
-        <div className="card bg-base-200">
-          <div className="card-body p-4">
-            <h3 className="card-title text-sm">Overall Collection Progress</h3>
-            <ProgressBar value={totalFound} max={totalPossible} size="lg" color="primary" />
+      {/* ═══════════════════════════════════════════════════════════ */}
+      {/* Collection Dashboard */}
+      {/* ═══════════════════════════════════════════════════════════ */}
+
+      {/* Overall Ring + Category Rings */}
+      <div className="card bg-base-200">
+        <div className="card-body p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            {/* Main ring */}
+            <div className="flex flex-col items-center gap-2">
+              <RingChart percent={overallPercent} size={140} strokeWidth={14} color="#f59e0b">
+                <div className="text-center">
+                  <span className="text-2xl font-bold">{overallPercent}%</span>
+                  <p className="text-[10px] text-base-content/50 leading-tight">Complete</p>
+                </div>
+              </RingChart>
+              <p className="text-sm font-medium">{totalFound} / {totalPossible} found</p>
+            </div>
+
+            {/* Category breakdown */}
+            <div className="flex-1 w-full">
+              <div className="grid grid-cols-2 gap-3">
+                {Object.entries(categories).map(([key, cat]) => {
+                  const meta = CATEGORY_META[key];
+                  const pct = cat.total > 0 ? Math.round((cat.found / cat.total) * 100) : 0;
+                  return (
+                    <div key={key} className={`flex items-center gap-3 rounded-xl p-3 ${meta.bgClass}`}>
+                      <RingChart percent={pct} size={56} strokeWidth={6} color={meta.color}>
+                        <span className="text-xs font-bold">{pct}%</span>
+                      </RingChart>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm flex items-center gap-1">
+                          <span>{meta.icon}</span> {meta.label}
+                        </p>
+                        <p className="text-xs text-base-content/50">
+                          {cat.found} / {cat.total}
+                        </p>
+                        {/* Sub-stats */}
+                        {key === 'pokemon' && cat.items.length > 0 && (
+                          <p className="text-[10px] text-base-content/40">
+                            ✅ {cat.items.filter(i => i.captured).length} captured · 👁️ {cat.items.filter(i => !i.captured).length} sensed
+                          </p>
+                        )}
+                        {key === 'habitats' && cat.items.length > 0 && (
+                          <p className="text-[10px] text-base-content/40">
+                            ✅ {cat.items.filter(i => i.built).length} built · ❌ {cat.items.filter(i => !i.built).length} not built
+                          </p>
+                        )}
+                        {(key === 'items' || key === 'recipes') && cat.items.length > 0 && (
+                          <p className="text-[10px] text-base-content/40">
+                            ✅ {cat.items.filter(i => i.discovered).length} discovered · ❓ {cat.items.filter(i => !i.discovered).length} undiscovered
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {Object.entries(categories).map(([key, cat]) => (
-            <CategoryCard
-              key={key}
-              category={key}
-              found={cat.found}
-              total={cat.total}
-              items={cat.items}
-              onClick={() => isDebug && setActiveTab(key)}
-            />
-          ))}
-        </div>
+      </div>
+
+      {/* Category Progress Bars */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {Object.entries(categories).map(([key, cat]) => (
+          <CategoryCard
+            key={key}
+            category={key}
+            found={cat.found}
+            total={cat.total}
+            items={cat.items}
+            onClick={() => isDebug && setActiveTab(key)}
+          />
+        ))}
       </div>
 
       {/* Debug-only: Detailed item browser */}
@@ -299,7 +371,7 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
             )}
           </div>
 
-          {/* Items list (simple, no cards) */}
+          {/* Items list */}
           {filteredItems.length === 0 ? (
             <div className="text-center py-8 text-base-content/40">
               <p>{searchQuery ? 'No items match your search.' : 'No items found in this category.'}</p>
@@ -309,7 +381,7 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
               {filteredItems.map((item, i) => (
                 <div
                   key={`${item.name}-${i}`}
-                  className={`flex items-center gap-3 px-3 py-1.5 bg-base-200 rounded border-l-4 ${CATEGORY_BORDER[item._category] || 'border-l-base-content/20'}`}
+                  className={`flex items-center gap-3 px-3 py-1.5 bg-base-200 rounded border-l-4 ${CATEGORY_META[item._category]?.borderClass || 'border-l-base-content/20'}`}
                 >
                   <span className="font-medium text-sm flex-1 truncate">{item.name}</span>
                   {item.number && <span className="badge badge-ghost badge-xs">{item.number}</span>}
@@ -329,7 +401,7 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
                       {item.discovered ? '✅ Discovered' : '❓ Undiscovered'}
                     </span>
                   )}
-                  <span className={`text-xs ${CATEGORY_TEXT[item._category] || ''}`}>{item._category}</span>
+                  <span className={`text-xs ${CATEGORY_META[item._category]?.textClass || ''}`}>{item._category}</span>
                 </div>
               ))}
             </div>

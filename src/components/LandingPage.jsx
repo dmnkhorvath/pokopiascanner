@@ -5,7 +5,7 @@ import './LandingPage.css';
 // Check for debug mode via URL query parameter
 const isDebugMode = new URLSearchParams(window.location.search).get('debug') === 'true';
 
-export default function LandingPage({ onStartScan, onImportResults, onShowHowTo, existingResults, scanCount = 0, onStartFresh, onViewResults }) {
+export default function LandingPage({ onStartScan, onImportResults, onShowHowTo, existingResults, scanCount = 0, onStartFresh, onViewResults, savedSessions = [], onLoadSession, onDeleteSession }) {
   const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS });
   const [videoFiles, setVideoFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
@@ -436,6 +436,46 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
           hidden
         />
       </div>
+
+      {/* Saved Sessions */}
+      {savedSessions.length > 0 && !existingResults && (
+        <section>
+          <h2 className="text-xl font-bold mb-3">{"💾"} Previous Sessions</h2>
+          <div className="space-y-2">
+            {savedSessions.slice(0, 5).map((session) => (
+              <div key={session.id} className="card bg-base-200">
+                <div className="card-body p-3 flex-row items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm">
+                      {new Date(session.date).toLocaleDateString()} at {new Date(session.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                    <div className="flex gap-3 text-xs text-base-content/50">
+                      <span>🔴 {session.categories?.pokemon || 0}</span>
+                      <span>🎒 {session.categories?.items || 0}</span>
+                      <span>🏠 {session.categories?.habitats || 0}</span>
+                      <span>📋 {session.categories?.recipes || 0}</span>
+                      <span className="font-medium">= {session.totalFound} total</span>
+                    </div>
+                  </div>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => onLoadSession(session.id)}
+                  >
+                    Load
+                  </button>
+                  <button
+                    className="btn btn-ghost btn-sm btn-circle text-error"
+                    onClick={() => onDeleteSession(session.id)}
+                    title="Delete session"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* How It Works - Inline Guide */}
       <section>
