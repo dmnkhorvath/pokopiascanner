@@ -86,7 +86,7 @@ const steps = [
   },
 ];
 
-export default function HowToGuide({ onBack }) {
+export default function HowToGuide({ onBack, onShowGuide }) {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Back button */}
@@ -146,6 +146,22 @@ export default function HowToGuide({ onBack }) {
           </div>
         ))}
       </div>
+
+      {/* Recording Guide CTA */}
+      {onShowGuide && (
+        <div className="card bg-base-200 shadow-md mt-8">
+          <div className="card-body items-center text-center">
+            <span className="text-3xl">{"📹"}</span>
+            <h2 className="card-title">Need help recording?</h2>
+            <p className="text-sm text-base-content/60">
+              Check our Smart Recording Guide for step-by-step instructions per category.
+            </p>
+            <button className="btn btn-primary btn-sm gap-2 mt-2" onClick={onShowGuide}>
+              📹 Recording Guide
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* CTA */}
       <div className="text-center mt-10 mb-6">

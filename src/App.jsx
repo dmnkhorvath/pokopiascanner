@@ -13,6 +13,7 @@ const ScanResults = lazy(() => import('./components/ScanResults'));
 const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
 const TermsConditions = lazy(() => import('./components/TermsConditions'));
 const HowToGuide = lazy(() => import('./components/HowToGuide'));
+const RecordingGuide = lazy(() => import('./components/RecordingGuide'));
 
 const PAGES = {
   LANDING: 'landing',
@@ -21,6 +22,7 @@ const PAGES = {
   PRIVACY: 'privacy',
   TERMS: 'terms',
   HOWTO: 'howto',
+  GUIDE: 'guide',
 };
 
 // Map hash routes to pages
@@ -28,12 +30,14 @@ const HASH_TO_PAGE = {
   '#/privacy': PAGES.PRIVACY,
   '#/terms': PAGES.TERMS,
   '#/how-to': PAGES.HOWTO,
+  '#/recording-guide': PAGES.GUIDE,
 };
 
 const PAGE_TO_HASH = {
   [PAGES.PRIVACY]: '#/privacy',
   [PAGES.TERMS]: '#/terms',
   [PAGES.HOWTO]: '#/how-to',
+  [PAGES.GUIDE]: '#/recording-guide',
 };
 
 function getPageFromHash() {
@@ -219,6 +223,7 @@ export default function App() {
               onStartScan={handleStartScan}
               onImportResults={handleImportResults}
               onShowHowTo={() => navigateTo(PAGES.HOWTO)}
+              onShowGuide={() => navigateTo(PAGES.GUIDE)}
               existingResults={scanResults}
               scanCount={scanCount}
               onStartFresh={handleStartFresh}
@@ -260,7 +265,11 @@ export default function App() {
           )}
 
           {page === PAGES.HOWTO && (
-            <HowToGuide onBack={handleBackToScanner} />
+            <HowToGuide onBack={handleBackToScanner} onShowGuide={() => navigateTo(PAGES.GUIDE)} />
+          )}
+
+          {page === PAGES.GUIDE && (
+            <RecordingGuide onBack={handleBackToScanner} />
           )}
 
           {page === PAGES.PRIVACY && (
@@ -279,6 +288,8 @@ export default function App() {
         <p className="text-sm opacity-70">Pokopia Progress Scanner &mdash; Track your Pokémon Pokopia collection</p>
         <nav className="flex flex-wrap justify-center gap-2">
           <button className="btn btn-ghost btn-xs" onClick={() => navigateTo(PAGES.HOWTO)}>How to Use</button>
+          <span className="opacity-30">|</span>
+          <button className="btn btn-ghost btn-xs" onClick={() => navigateTo(PAGES.GUIDE)}>Recording Guide</button>
           <span className="opacity-30">|</span>
           <button className="btn btn-ghost btn-xs" onClick={() => navigateTo(PAGES.PRIVACY)}>Privacy Policy</button>
           <span className="opacity-30">|</span>

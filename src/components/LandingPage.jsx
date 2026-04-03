@@ -5,7 +5,7 @@ import './LandingPage.css';
 // Check for debug mode via URL query parameter
 const isDebugMode = new URLSearchParams(window.location.search).get('debug') === 'true';
 
-export default function LandingPage({ onStartScan, onImportResults, onShowHowTo, existingResults, scanCount = 0, onStartFresh, onViewResults, savedSessions = [], onLoadSession, onDeleteSession }) {
+export default function LandingPage({ onStartScan, onImportResults, onShowHowTo, onShowGuide, existingResults, scanCount = 0, onStartFresh, onViewResults, savedSessions = [], onLoadSession, onDeleteSession }) {
   const [settings, setSettings] = useState({ ...DEFAULT_SETTINGS });
   const [videoFiles, setVideoFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
@@ -560,6 +560,8 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
         <p className="text-center text-xs text-base-content/40 mt-4">
           Supports Pokédex, Habitats, Items & Recipes • Choose category per video or auto-detect •{" "}
           <button className="link link-primary" onClick={onShowHowTo}>Full guide →</button>
+          {" "}•{" "}
+          <button className="link link-primary" onClick={onShowGuide}>📹 Recording tips</button>
         </p>
       </section>
     </div>
