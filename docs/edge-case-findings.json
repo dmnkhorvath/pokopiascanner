@@ -1,0 +1,182 @@
+[
+  {
+    "location": "ocrEngine.js:275",
+    "trigger_condition": "canvas.getContext('2d') returns null in offscreen/test environments",
+    "guard_snippet": "const ctx = canvas.getContext('2d', opts); if (!ctx) throw new Error('Canvas 2D context unavailable');",
+    "potential_consequence": "TypeError on ctx.drawImage at 10+ call sites"
+  },
+  {
+    "location": "ocrEngine.js:281",
+    "trigger_condition": "cropRegion w or h is 0 \u2192 sw/sh = 0",
+    "guard_snippet": "const sw = Math.max(1, Math.floor((cropRegion.w / 100) * vw));",
+    "potential_consequence": "Zero-size canvas; getImageData throws InvalidStateError"
+  },
+  {
+    "location": "ocrEngine.js:622",
+    "trigger_condition": "matchText called before ensureOcrData completes; _matcher is null",
+    "guard_snippet": "if (!_matcher) throw new Error('OCR data not initialized \u2014 call ensureOcrData first');",
+    "potential_consequence": "TypeError: Cannot read property findMatch of null"
+  },
+  {
+    "location": "ocrEngine.js:911",
+    "trigger_condition": "video.duration is NaN, Infinity, or 0 after loadedmetadata",
+    "guard_snippet": "if (!isFinite(duration) || duration <= 0) throw new Error('Invalid video duration');",
+    "potential_consequence": "Infinite loop or NaN propagation through frame calculations"
+  },
+  {
+    "location": "ocrEngine.js:1006",
+    "trigger_condition": "frameIntervalSec is 0 when autoDetect fails silently",
+    "guard_snippet": "const frameIntervalSec = Math.max(0.001, frameIntervalMs / 1000);",
+    "potential_consequence": "framesToProcess = Infinity \u2192 infinite allocation and OOM"
+  },
+  {
+    "location": "ocrEngine.js:661",
+    "trigger_condition": "One worker in Promise.all fails; already-created workers leak",
+    "guard_snippet": "Use Promise.allSettled, terminate fulfilled workers on any rejection",
+    "potential_consequence": "Orphaned Tesseract workers consuming memory indefinitely"
+  },
+  {
+    "location": "ocrEngine.js:676",
+    "trigger_condition": "One worker.terminate() throws; Promise.all rejects, rest not terminated",
+    "guard_snippet": "await Promise.allSettled(workers.map(w => w.terminate()));",
+    "potential_consequence": "Remaining workers leak on partial termination failure"
+  },
+  {
+    "location": "ocrEngine.js:130",
+    "trigger_condition": "FPS detection: medianInterval near 0 \u2192 fps rounds to Infinity",
+    "guard_snippet": "const fps = Math.min(240, Math.max(1, Math.round(1 / medianInterval)));",
+    "potential_consequence": "frameIntervalMs = 0 \u2192 downstream division by zero"
+  },
+  {
+    "location": "ocrEngine.js:501",
+    "trigger_condition": "matchHabitatFrame calls _matcher.findMatch but _matcher may be null",
+    "guard_snippet": "if (!_matcher) return null;",
+    "potential_consequence": "TypeError crash during habitat scanning"
+  },
+  {
+    "location": "ocrEngine.js:1035",
+    "trigger_condition": "previewCanvas.getContext('2d') returns null",
+    "guard_snippet": "const previewCtx = previewCanvas.getContext('2d'); if (!previewCtx) { /* skip preview */ }",
+    "potential_consequence": "TypeError on drawImage crashes entire scan loop"
+  },
+  {
+    "location": "gridEngine.js:342",
+    "trigger_condition": "normalizeProfile receives empty profile (n=0)",
+    "guard_snippet": "if (n === 0) return new Float64Array(0);",
+    "potential_consequence": "mean /= 0 \u2192 NaN; all downstream correlations become NaN"
+  },
+  {
+    "location": "gridEngine.js:320",
+    "trigger_condition": "yEnd exceeds imageData height \u2192 OOB pixel read",
+    "guard_snippet": "const safeYEnd = Math.min(yEnd, imageData.height);",
+    "potential_consequence": "Reading undefined bytes from data array; silent garbage values"
+  },
+  {
+    "location": "gridEngine.js:320",
+    "trigger_condition": "stripX is negative \u2192 pixel index underflows",
+    "guard_snippet": "const safeStripX = Math.max(0, stripX);",
+    "potential_consequence": "Negative array index reads undefined \u2192 NaN in profile"
+  },
+  {
+    "location": "gridEngine.js:396",
+    "trigger_condition": "tx+tw or ty+th exceeds imageData dimensions",
+    "guard_snippet": "const safeTw = Math.min(tw, width - tx); const safeTh = Math.min(th, Math.floor(data.length / 4 / width) - ty);",
+    "potential_consequence": "OOB pixel access reads undefined \u2192 wrong fingerprint or crash"
+  },
+  {
+    "location": "gridEngine.js:590",
+    "trigger_condition": "frameIntervalMs=0 in settings \u2192 frameIntervalSec=0 \u2192 infinite loop",
+    "guard_snippet": "const frameIntervalSec = Math.max(0.001, frameIntervalMs / 1000);",
+    "potential_consequence": "for-loop never terminates; browser tab hangs"
+  },
+  {
+    "location": "gridEngine.js:44",
+    "trigger_condition": "Dataset entry has missing/malformed number field \u2192 parseInt returns NaN",
+    "guard_snippet": "const na = parseInt(a.number?.replace('#', ''), 10) || 0;",
+    "potential_consequence": "NaN comparison \u2192 unstable sort order; position mapping breaks"
+  },
+  {
+    "location": "gridEngine.js:82",
+    "trigger_condition": "videoWidth or videoHeight is 0 \u2192 all scaled params become 0",
+    "guard_snippet": "if (!videoWidth || !videoHeight) throw new Error('Invalid video dimensions');",
+    "potential_consequence": "Zero-size grid params \u2192 no tiles detected; silent empty results"
+  },
+  {
+    "location": "gridEngine.js:598",
+    "trigger_condition": "canvas.getContext('2d') returns null",
+    "guard_snippet": "const frameCtx = frameCanvas.getContext('2d', opts); if (!frameCtx) throw new Error('Canvas context unavailable');",
+    "potential_consequence": "TypeError on drawImage crashes scan pipeline"
+  },
+  {
+    "location": "gridEngine.js:569",
+    "trigger_condition": "seekVideo: 'seeked' event never fires and timeout resolves \u2192 frame not at expected time",
+    "guard_snippet": "Log warning when timeout fires; consider rejecting or flagging stale frame",
+    "potential_consequence": "Silent wrong-frame processing; incorrect tile classification"
+  },
+  {
+    "location": "gridEngine.js:1053",
+    "trigger_condition": "getGridDataList called before ensureGridData; lists are empty arrays",
+    "guard_snippet": "export async function getGridDataList(scanMode) { await ensureGridData(); ... }",
+    "potential_consequence": "Returns empty array; UI shows 0 total items"
+  },
+  {
+    "location": "gridEngine.js:478",
+    "trigger_condition": "fpNames is empty (fingerprint data missing) \u2192 bestIdx stays -1",
+    "guard_snippet": "if (fpNames.length === 0) return null;",
+    "potential_consequence": "Always returns null; no items ever matched"
+  },
+  {
+    "location": "fuzzyMatch.js:52",
+    "trigger_condition": "ocrLookup key is empty string \u2192 lower[0] is undefined",
+    "guard_snippet": "if (lower.length === 0) continue;",
+    "potential_consequence": "prefixIndex[undefined] created; pollutes index with bad entries"
+  },
+  {
+    "location": "fuzzyMatch.js:53",
+    "trigger_condition": "ocrLookup key is single char \u2192 substring(0,2) returns 1 char",
+    "guard_snippet": "const prefix = lower.length >= 2 ? lower.substring(0, 2) : lower;",
+    "potential_consequence": "Duplicate index entries; minor memory waste and search overhead"
+  },
+  {
+    "location": "fuzzyMatch.js:45",
+    "trigger_condition": "ocrLookup is null/undefined \u2192 Object.keys throws",
+    "guard_snippet": "if (!ocrLookup || typeof ocrLookup !== 'object') return { findMatch: () => null, exactMatch: () => null, fuzzyMatch: () => null };",
+    "potential_consequence": "TypeError crashes matcher initialization"
+  },
+  {
+    "location": "scanStorage.js:19",
+    "trigger_condition": "Corrupted localStorage: JSON.parse returns non-array (e.g. object)",
+    "guard_snippet": "const sessions = JSON.parse(raw); if (!Array.isArray(sessions)) return [];",
+    "potential_consequence": "sessions.sort is not a function \u2192 TypeError crash"
+  },
+  {
+    "location": "scanStorage.js:44",
+    "trigger_condition": "crypto.randomUUID unavailable in insecure context (HTTP)",
+    "guard_snippet": "const id = sessionId || (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);",
+    "potential_consequence": "TypeError: crypto.randomUUID is not a function"
+  },
+  {
+    "location": "scanStorage.js:101",
+    "trigger_condition": "Corrupted session payload: JSON.parse returns unexpected shape",
+    "guard_snippet": "const parsed = JSON.parse(raw); if (!parsed || typeof parsed !== 'object') return null;",
+    "potential_consequence": "Caller destructures missing properties \u2192 undefined propagation"
+  },
+  {
+    "location": "scanStorage.js:37",
+    "trigger_condition": "results contains circular references \u2192 JSON.stringify throws",
+    "guard_snippet": "Wrap JSON.stringify in try/catch; return null on serialization failure",
+    "potential_consequence": "Unhandled TypeError; saveSession returns undefined instead of null"
+  },
+  {
+    "location": "videoDetector.js:105",
+    "trigger_condition": "canvas.getContext('2d') returns null",
+    "guard_snippet": "const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('Canvas context unavailable');",
+    "potential_consequence": "TypeError on drawImage; frame extraction fails silently"
+  },
+  {
+    "location": "videoDetector.js:126",
+    "trigger_condition": "Negative x or y passed to regionAvgRGB \u2192 OOB pixel index",
+    "guard_snippet": "const x1 = Math.max(0, x); const y1 = Math.max(0, y);",
+    "potential_consequence": "Reads garbage pixel data; misclassifies video type"
+  }
+]
