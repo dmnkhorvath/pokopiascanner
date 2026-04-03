@@ -20,6 +20,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Run tests
+        run: npm test
       - run: npm run build
         env:
           VITE_ADSENSE_CLIENT: ${{ secrets.VITE_ADSENSE_CLIENT }}
