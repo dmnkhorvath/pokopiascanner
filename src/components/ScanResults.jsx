@@ -4,6 +4,7 @@ import { buildNewItemSet } from '../utils/scanDiff.js';
 import { getMissingItems, getMissingStats, getClosestToCompletion, getWikiUrl, getIconPath } from '../utils/missingItems.js';
 import CategoryCard from './CategoryCard';
 import ProgressBar from './ProgressBar';
+import SpriteIcon from './SpriteIcon';
 import './ScanResults.css';
 
 const TABS = [
@@ -535,19 +536,16 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
                     className={`flex items-center gap-3 px-3 py-2 rounded-lg border border-base-content/10 bg-base-200/50 opacity-75 hover:opacity-100 transition-opacity`}
                   >
                     {/* Icon */}
-                    {iconSrc ? (
-                      <img
-                        src={iconSrc}
-                        alt={item.name}
-                        className="w-8 h-8 object-contain rounded flex-shrink-0"
-                        loading="lazy"
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                      />
-                    ) : (
-                      <span className="w-8 h-8 flex items-center justify-center text-lg flex-shrink-0 opacity-40">
-                        {meta?.icon || '❓'}
-                      </span>
-                    )}
+                    <SpriteIcon
+                      item={item}
+                      category={item._category}
+                      iconMap={iconMap}
+                      fallbackSrc={iconSrc}
+                      fallbackEmoji={meta?.icon || '❓'}
+                      size={32}
+                      className="rounded"
+                      alt={item.name}
+                    />
 
                     {/* Name & metadata */}
                     <div className="flex-1 min-w-0">
