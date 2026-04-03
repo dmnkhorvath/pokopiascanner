@@ -5,27 +5,38 @@
 import { createWorker } from 'tesseract.js';
 import { buildFuzzyMatcher } from './fuzzyMatch.js';
 import { scanGridVideo, getGridDataList } from './gridEngine.js';
-import ocrLookup from '../assets/ocrLookup.json';
 
-// Pre-build the fuzzy matcher once
-const matcher = buildFuzzyMatcher(ocrLookup);
+// ─── Lazy-loaded JSON assets (loaded on first scan to reduce initial bundle) ──
+let _ocrLookup = null;
+let _matcher = null;
+let _habitatByNumber = null;
+let _pokemonByNumber = null;
+let _datasetMeta = null;
 
-// Pre-build habitat number → entry lookup for reliable number-based matching.
-// OCR reliably reads "No. XXX" even when the habitat name is garbled.
-const habitatByNumber = {};
-for (const [name, entry] of Object.entries(ocrLookup)) {
-  if (entry.type === 'habitat' && entry.number) {
-    habitatByNumber[entry.number] = { ...entry, name };
+async function ensureOcrData() {
+  if (_ocrLookup) return;
+  const [lookupMod, datasetMod] = await Promise.all([
+    import('../assets/ocrLookup.json'),
+    import('../assets/pokopiaDataset.json'),
+  ]);
+  _ocrLookup = lookupMod.default;
+  _datasetMeta = datasetMod.default.metadata;
+
+  _matcher = buildFuzzyMatcher(_ocrLookup);
+
+  _habitatByNumber = {};
+  for (const [name, entry] of Object.entries(_ocrLookup)) {
+    if (entry.type === 'habitat' && entry.number) {
+      _habitatByNumber[entry.number] = { ...entry, name };
+    }
   }
-}
 
-// Pre-build Pokémon number → entry lookup for reliable number-based matching.
-// ocrLookup stores Pokémon numbers as '#001' format; we strip the '#' for lookup.
-const pokemonByNumber = {};
-for (const [name, entry] of Object.entries(ocrLookup)) {
-  if (entry.type === 'pokemon' && entry.number) {
-    const num = entry.number.replace('#', '');
-    pokemonByNumber[num] = { ...entry, name };
+  _pokemonByNumber = {};
+  for (const [name, entry] of Object.entries(_ocrLookup)) {
+    if (entry.type === 'pokemon' && entry.number) {
+      const num = entry.number.replace('#', '');
+      _pokemonByNumber[num] = { ...entry, name };
+    }
   }
 }
 
@@ -471,7 +482,7 @@ export function matchHabitatFrame(fullText, upperText, fuzzyTolerance = 2) {
   const noMatch = flatUpper.match(/No\.?\s*(\d{1,3})/i);
   if (noMatch) {
     const habitatNumber = noMatch[1].padStart(3, '0');
-    const entry = habitatByNumber[habitatNumber];
+    const entry = _habitatByNumber[habitatNumber];
     if (entry) {
       return {
         name: entry.name,
@@ -487,7 +498,7 @@ export function matchHabitatFrame(fullText, upperText, fuzzyTolerance = 2) {
   const lines = upperText.split('\n').map(l => l.trim()).filter(l => l.length > 2);
   for (const line of lines) {
     if (/No\.?\s*\d/i.test(line)) continue; // skip number lines
-    const result = matcher.findMatch(line, fuzzyTolerance);
+    const result = _matcher.findMatch(line, fuzzyTolerance);
     if (result && result.type === 'habitat') {
       return {
         ...result,
@@ -521,7 +532,7 @@ export function matchPokemonFrame(bannerText, fuzzyTolerance = 2) {
   const noMatch = flatText.match(/No\.?\s*(\d{1,3})/i);
   if (noMatch) {
     const pokemonNumber = noMatch[1].padStart(3, '0');
-    const entry = pokemonByNumber[pokemonNumber];
+    const entry = _pokemonByNumber[pokemonNumber];
     if (entry) {
       // Determine captured status from the name portion of the banner
       const captured = !isSensedPokemon(bannerText, noMatch[0]);
@@ -538,7 +549,7 @@ export function matchPokemonFrame(bannerText, fuzzyTolerance = 2) {
   const lines = bannerText.split('\n').map(l => l.trim()).filter(l => l.length > 2);
   for (const line of lines) {
     if (/No\.?\s*\d/i.test(line)) continue; // skip number lines
-    const result = matcher.findMatch(line, fuzzyTolerance);
+    const result = _matcher.findMatch(line, fuzzyTolerance);
     if (result && result.type === 'pokemon') {
       return {
         ...result,
@@ -608,7 +619,7 @@ export function matchText(text, fuzzyTolerance = 2) {
 
   for (const line of lines) {
     // Try matching the full line
-    const result = matcher.findMatch(line, fuzzyTolerance);
+    const result = _matcher.findMatch(line, fuzzyTolerance);
     if (result && !seen.has(result.name)) {
       seen.add(result.name);
       matches.push(result);
@@ -618,7 +629,7 @@ export function matchText(text, fuzzyTolerance = 2) {
     // Try splitting by common separators and matching parts
     const parts = line.split(/[,;|/]/).map(p => p.trim()).filter(p => p.length > 1);
     for (const part of parts) {
-      const partResult = matcher.findMatch(part, fuzzyTolerance);
+      const partResult = _matcher.findMatch(part, fuzzyTolerance);
       if (partResult && !seen.has(partResult.name)) {
         seen.add(partResult.name);
         matches.push(partResult);
@@ -858,6 +869,11 @@ function getOcrParams(scanMode) {
  * @returns {Promise<Object>} Final scan results
  */
 export async function scanVideo(videoFile, settings, onProgress, onMatch, signal) {
+  // Lazy-load OCR data on first scan
+  await ensureOcrData();
+  const _t = _datasetMeta?.counts || {};
+  const _totals = { pokemon: _t.pokemon ?? 300, items: _t.items ?? 1254, habitats: _t.habitats ?? 209, recipes: _t.recipes ?? 743 };
+
   let {
     frameIntervalMs = 0,
     autoDetectFPS = true,
@@ -925,7 +941,7 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     }, onProgress, onMatch, signal);
 
     // Convert grid results to standard format
-    const dataList = getGridDataList(scanMode);
+    const dataList = await getGridDataList(scanMode);
     const categoryKey = scanMode === 'recipe' ? 'recipe'
                       : scanMode === 'pokemon' ? 'pokemon'
                       : scanMode === 'habitat' ? 'habitat'
@@ -943,10 +959,10 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     const finalResults = {
       scanDate: new Date().toISOString(),
       totalFound: gridResults.size,
-      pokemon: { found: results.pokemon.size, total: 300, items: Array.from(results.pokemon.values()) },
-      items: { found: results.item.size, total: 1254, items: Array.from(results.item.values()) },
-      habitats: { found: results.habitat.size, total: 209, items: Array.from(results.habitat.values()) },
-      recipes: { found: results.recipe.size, total: 743, items: Array.from(results.recipe.values()) },
+      pokemon: { found: results.pokemon.size, total: _totals.pokemon, items: Array.from(results.pokemon.values()) },
+      items: { found: results.item.size, total: _totals.items, items: Array.from(results.item.values()) },
+      habitats: { found: results.habitat.size, total: _totals.habitats, items: Array.from(results.habitat.values()) },
+      recipes: { found: results.recipe.size, total: _totals.recipes, items: Array.from(results.recipe.values()) },
     };
     finalResults.totalFound = finalResults.pokemon.found + finalResults.items.found + finalResults.habitats.found + finalResults.recipes.found;
 
@@ -1232,11 +1248,14 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
         job.canvases.full = extractFrameToCanvas(video, cropRegion, 'standard');
       }
 
+      // Yield after canvas preprocessing to keep UI responsive
+      await yieldToBrowser();
+
       batch.push(job);
       frameIdx++;
 
-      // Yield periodically during extraction so UI stays responsive
-      if (frameIdx % 4 === 0) await yieldToBrowser();
+      // Yield every 2 frames during extraction so UI stays responsive
+      if (frameIdx % 2 === 0) await yieldToBrowser();
 
       // When batch is full, process it and free memory
       if (batch.length >= batchSize) {
@@ -1263,22 +1282,22 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
     totalFound: 0,
     pokemon: {
       found: results.pokemon.size,
-      total: 300,
+      total: _totals.pokemon,
       items: Array.from(results.pokemon.values()),
     },
     items: {
       found: results.item.size,
-      total: 1254,
+      total: _totals.items,
       items: Array.from(results.item.values()),
     },
     habitats: {
       found: results.habitat.size,
-      total: 209,
+      total: _totals.habitats,
       items: Array.from(results.habitat.values()),
     },
     recipes: {
       found: results.recipe.size,
-      total: 743,
+      total: _totals.recipes,
       items: Array.from(results.recipe.values()),
     },
   };
@@ -1304,12 +1323,14 @@ export async function scanVideo(videoFile, settings, onProgress, onMatch, signal
   return finalResults;
 }
 
-export function getCategoryTotals() {
+export async function getCategoryTotals() {
+  await ensureOcrData();
+  const counts = _datasetMeta?.counts;
   return {
-    pokemon: 300,
-    items: 1254,
-    habitats: 209,
-    recipes: 743,
+    pokemon: counts?.pokemon ?? 300,
+    items: counts?.items ?? 1254,
+    habitats: counts?.habitats ?? 209,
+    recipes: counts?.recipes ?? 743,
   };
 }
 

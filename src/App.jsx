@@ -4,6 +4,7 @@ import CookieConsent from './components/CookieConsent';
 import { mergeResults } from './utils/ocrEngine.js';
 import { saveSession, loadLatestSession, listSessions, loadSession, deleteSession, clearAllSessions } from './utils/scanStorage.js';
 import AdBanner from './components/AdBanner';
+import ErrorBoundary from './components/ErrorBoundary';
 import './App.css';
 
 // Lazy-loaded components for code splitting
@@ -75,7 +76,7 @@ export default function App() {
       const id = saveSession(scanResults, scanCount, sessionId);
       if (id && !sessionId) setSessionId(id);
     }
-  }, [scanResults, scanCount]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [scanResults, scanCount, sessionId]);
 
   // Sync hash -> page on browser back/forward
   useEffect(() => {
@@ -185,6 +186,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-base-100">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-primary focus:text-primary-content">
+        Skip to content
+      </a>
       {/* Header - shown on scanning, results, and legal pages */}
       {page !== PAGES.LANDING && (
         <div className="navbar bg-base-200 shadow-md sticky top-0 z-40">
@@ -206,7 +210,8 @@ export default function App() {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
+      <ErrorBoundary>
+      <main id="main-content" className="flex-1 w-full max-w-6xl mx-auto px-4 py-6">
         {page === PAGES.LANDING && (
           <>
             <AdBanner adSlot={import.meta.env.VITE_AD_SLOT_LANDING_TOP} position="top" />
@@ -267,6 +272,7 @@ export default function App() {
           )}
         </Suspense>
       </main>
+      </ErrorBoundary>
 
       {/* Footer */}
       <footer className="footer footer-center bg-base-200 text-base-content p-6">
@@ -283,7 +289,7 @@ export default function App() {
       </footer>
 
       {/* Cookie Consent Banner */}
-      <CookieConsent onOpenSettings={cookieSettingsRef} />
+      <CookieConsent onOpenSettings={cookieSettingsRef} onNavigatePrivacy={() => navigateTo(PAGES.PRIVACY)} />
     </div>
   );
 }

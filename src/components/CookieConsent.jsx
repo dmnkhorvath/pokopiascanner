@@ -29,7 +29,7 @@ function grantConsent() {
   }
 }
 
-export default function CookieConsent({ onOpenSettings }) {
+export default function CookieConsent({ onOpenSettings, onNavigatePrivacy }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function CookieConsent({ onOpenSettings }) {
           <p className="text-sm text-base-content/80">
             We use cookies for analytics (Google Analytics) and advertising (Google AdSense).
             You can accept all cookies or reject non-essential ones.
-            See our <button className="link link-primary text-sm" onClick={() => { /* handled by parent */ }}>Privacy Policy</button> for details.
+            See our <button className="link link-primary text-sm" onClick={() => { if (onNavigatePrivacy) onNavigatePrivacy(); }}>Privacy Policy</button> for details.
           </p>
         </div>
         <div className="flex gap-2 shrink-0">

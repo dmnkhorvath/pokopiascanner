@@ -54,14 +54,25 @@ function AdsterraBanner({ position }) {
 
   useEffect(() => {
     if (!activeKey || !containerRef.current) return;
+    // Validate key format to prevent script injection
+    if (!/^[a-f0-9]+$/.test(activeKey)) {
+      console.warn('[AdBanner] Invalid Adsterra key format:', activeKey);
+      return;
+    }
 
     // Clear previous ad when switching mobile/desktop
     const container = containerRef.current;
     container.innerHTML = '';
     loadedRef.current = false;
 
+    let rafRetries = 0;
+    const MAX_RAF_RETRIES = 50;
     const tryLoad = () => {
       if (container.offsetWidth <= 0) {
+        if (++rafRetries >= MAX_RAF_RETRIES) {
+          console.warn('[AdBanner] Gave up waiting for container width after', MAX_RAF_RETRIES, 'frames');
+          return;
+        }
         requestAnimationFrame(tryLoad);
         return;
       }
@@ -71,7 +82,7 @@ function AdsterraBanner({ position }) {
       // Inject atOptions + invoke script
       const optScript = document.createElement('script');
       optScript.type = 'text/javascript';
-      optScript.text = `atOptions = { 'key': '${activeKey}', 'format': 'iframe', 'height': ${height}, 'width': ${width}, 'params': {} };`;
+      optScript.textContent = `atOptions = { 'key': '${activeKey}', 'format': 'iframe', 'height': ${height}, 'width': ${width}, 'params': {} };`;
       container.appendChild(optScript);
 
       const invokeScript = document.createElement('script');

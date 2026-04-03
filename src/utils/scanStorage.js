@@ -5,6 +5,8 @@
 
 const STORAGE_KEY = 'pokopia-scan-sessions';
 const CURRENT_KEY = 'pokopia-current-session';
+const MAX_SESSIONS = 20;
+const MAX_PAYLOAD_BYTES = 4 * 1024 * 1024; // 4 MB safety limit
 
 /**
  * Get all saved sessions (metadata only, sorted newest first)
@@ -22,14 +24,22 @@ export function listSessions() {
 }
 
 /**
- * Save or update the current session
+ * Save or update the current session.
+ * Returns the session ID on success, 'QUOTA_EXCEEDED' if payload > 4 MB, or null on error.
  * @param {Object} results - The scan results object
  * @param {number} scanCount - Number of scans in this session
  * @param {string|null} sessionId - Existing session ID to update, or null for new
- * @returns {string} The session ID
+ * @returns {string|null} The session ID, 'QUOTA_EXCEEDED', or null
  */
 export function saveSession(results, scanCount, sessionId = null) {
   try {
+    // Estimate payload size before saving
+    const payload = JSON.stringify({ results, scanCount, savedAt: new Date().toISOString() });
+    if (payload.length > MAX_PAYLOAD_BYTES) {
+      console.warn(`[scanStorage] Payload too large (${(payload.length / 1024 / 1024).toFixed(1)} MB). Skipping save.`);
+      return 'QUOTA_EXCEEDED';
+    }
+
     const sessions = listSessions();
     const id = sessionId || crypto.randomUUID();
     const now = new Date().toISOString();
@@ -55,19 +65,25 @@ export function saveSession(results, scanCount, sessionId = null) {
       sessions.unshift(summary);
     }
 
-    // Keep max 20 sessions
-    const trimmed = sessions.slice(0, 20);
+    // Keep max sessions — remove full result data for evicted sessions
+    if (sessions.length > MAX_SESSIONS) {
+      const evicted = sessions.slice(MAX_SESSIONS);
+      for (const s of evicted) {
+        localStorage.removeItem(`${CURRENT_KEY}-${s.id}`);
+      }
+    }
+    const trimmed = sessions.slice(0, MAX_SESSIONS);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
 
     // Save full results for current session
-    localStorage.setItem(`${CURRENT_KEY}-${id}`, JSON.stringify({
-      results,
-      scanCount,
-      savedAt: now,
-    }));
+    localStorage.setItem(`${CURRENT_KEY}-${id}`, payload);
 
     return id;
   } catch (e) {
+    if (e?.name === 'QuotaExceededError' || e?.code === 22) {
+      console.warn('[scanStorage] localStorage quota exceeded:', e);
+      return 'QUOTA_EXCEEDED';
+    }
     console.warn('Failed to save session:', e);
     return null;
   }
@@ -128,4 +144,24 @@ export function clearAllSessions() {
   } catch (e) {
     console.warn('Failed to clear sessions:', e);
   }
+}
+
+/**
+ * Estimate total localStorage usage for pokopia-* keys (in bytes).
+ * @returns {number} Approximate bytes used
+ */
+export function estimateStorageUsage() {
+  let total = 0;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('pokopia')) {
+        const val = localStorage.getItem(key);
+        total += (key.length + (val ? val.length : 0)) * 2; // UTF-16 chars = 2 bytes each
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return total;
 }

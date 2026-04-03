@@ -9,104 +9,73 @@
  * Works entirely with canvas pixel operations — no ML dependencies.
  */
 
-import pokopiaDataset from '../assets/pokopiaDataset.json';
-import fingerprintData from '../assets/iconFingerprints.json';
+// ─── Lazy-loaded JSON assets (loaded on first scan to reduce initial bundle) ──
+let _pokopiaDataset = null;
+let _fingerprintData = null;
 
-// ─── Reference resolution ────────────────────────────────────────────────────
-
-const REF_WIDTH  = 1920;
-const REF_HEIGHT = 1080;
-
-// ─── Item/Recipe grid layout (1920×1080) ─────────────────────────────────────
-
-const ITEM_CELL      = 138;
-const ITEM_COL0_X    = 201;
-const ITEM_ROW0_Y    = 298;
-const ITEM_COLS      = 12;
-const ITEM_VIS_ROWS  = 5;
-const ITEM_TILE_HALF = 55;
-const SAT_THRESHOLD  = 15;
-
-// ─── Pokémon grid layout (1920×1080) ─────────────────────────────────────────
-
-const POKE_COLS      = 8;
-const POKE_VIS_ROWS  = 5;
-const POKE_TILE_XS   = [310, 505, 700, 895, 1090, 1285, 1480, 1675];
-const POKE_ROW0_Y    = 270;
-const POKE_ROW_SPACE = 155;
-const POKE_TILE_HALF = 50;
-const POKE_SAT_THRESH = 20;
-
-// ─── Habitat grid layout (1920×1080) ─────────────────────────────────────────
-
-const HAB_COLS       = 4;
-const HAB_VIS_ROWS   = 3;
-const HAB_TILE_XS    = [454, 777, 1098, 1421];
-const HAB_ROW0_Y     = 305;
-const HAB_ROW_SPACE  = 240;
-const HAB_TILE_HW    = 100; // half-width
-const HAB_TILE_HH    = 70;  // half-height
-
-// ─── Cross-correlation parameters ────────────────────────────────────────────
-
-const XCORR_Y_START     = 150;
-const XCORR_Y_END       = 900;
-const XCORR_MAX_SHIFT   = 200;
-const XCORR_MIN_CORR    = 0.2;
-const POKE_STRIP_X      = 400;
-const POKE_STRIP_W      = 300;
-const HAB_STRIP_X       = 400;
-const HAB_STRIP_W       = 200;
-
-// ─── Fingerprint matching (item/recipe) ──────────────────────────────────────
-
-const FP_SIZE  = fingerprintData.size;
-const FP_SCALE = fingerprintData.scale;
+let FP_SIZE = 0;
+let FP_SCALE = 1;
 const MIN_MATCH_SCORE = 0.65;
 
-// ─── Dataset ordering ────────────────────────────────────────────────────────
+let itemList = [];
+let recipeList = [];
+let pokemonList = [];
+let habitatList = [];
 
-const itemList   = pokopiaDataset.items   || [];
-const recipeList = pokopiaDataset.recipes || [];
+let fpNames = [];
+let fpVectors = null;
 
-// Sort pokemon by number (strip '#' prefix, parse as int)
-const pokemonList = [...(pokopiaDataset.pokemon || [])].sort((a, b) => {
-  const na = parseInt(a.number.replace('#', ''), 10);
-  const nb = parseInt(b.number.replace('#', ''), 10);
-  return na - nb;
-});
+async function ensureGridData() {
+  if (_pokopiaDataset) return;
+  const [dsMod, fpMod] = await Promise.all([
+    import('../assets/pokopiaDataset.json'),
+    import('../assets/iconFingerprints.json'),
+  ]);
+  _pokopiaDataset = dsMod.default;
+  _fingerprintData = fpMod.default;
 
-// Sort habitats by number (parse as int)
-const habitatList = [...(pokopiaDataset.habitats || [])].sort((a, b) => {
-  const na = parseInt(a.number, 10);
-  const nb = parseInt(b.number, 10);
-  return na - nb;
-});
+  FP_SIZE = _fingerprintData.size;
+  FP_SCALE = _fingerprintData.scale;
 
-// ─── Pre-process fingerprint database ────────────────────────────────────────
+  itemList = _pokopiaDataset.items || [];
+  recipeList = _pokopiaDataset.recipes || [];
 
-const fpNames = Object.keys(fingerprintData.fingerprints);
-const fpVectors = new Float32Array(fpNames.length * FP_SIZE * FP_SIZE);
+  pokemonList = [...(_pokopiaDataset.pokemon || [])].sort((a, b) => {
+    const na = parseInt(a.number.replace('#', ''), 10);
+    const nb = parseInt(b.number.replace('#', ''), 10);
+    return na - nb;
+  });
 
-(function initFingerprints() {
+  habitatList = [...(_pokopiaDataset.habitats || [])].sort((a, b) => {
+    const na = parseInt(a.number, 10);
+    const nb = parseInt(b.number, 10);
+    return na - nb;
+  });
+
+  // Pre-process fingerprint database
+  fpNames = Object.keys(_fingerprintData.fingerprints);
+  fpVectors = new Float32Array(fpNames.length * FP_SIZE * FP_SIZE);
   const dim = FP_SIZE * FP_SIZE;
   for (let i = 0; i < fpNames.length; i++) {
-    const quantized = fingerprintData.fingerprints[fpNames[i]];
+    const quantized = _fingerprintData.fingerprints[fpNames[i]];
     const offset = i * dim;
     for (let j = 0; j < dim; j++) {
       fpVectors[offset + j] = quantized[j] / FP_SCALE;
     }
   }
-})();
 
-// Build a lookup from item name → type info
-const itemTypeMap = new Map();
-for (const entry of itemList) {
-  itemTypeMap.set(entry.name, { type: 'item', category: entry.category || 'Unknown' });
+  // Build item type lookup
+  itemTypeMap = new Map();
+  for (const entry of itemList) {
+    itemTypeMap.set(entry.name, { type: 'item', category: entry.category || 'Unknown' });
+  }
+  for (const entry of recipeList) {
+    itemTypeMap.set(entry.name, { type: 'recipe', category: entry.category || 'Unknown' });
+  }
 }
-for (const entry of recipeList) {
-  itemTypeMap.set(entry.name, { type: 'recipe', category: entry.category || 'Unknown' });
-}
+
+// Build a lookup from item name → type info (populated by ensureGridData)
+let itemTypeMap = new Map();
 
 // ─── Scaled grid parameters ─────────────────────────────────────────────────
 
@@ -1068,6 +1037,7 @@ async function scanHabitat(video, settings, onProgress, onMatch, signal) {
 export async function scanGridVideo(
   video, settings, onProgress, onMatch, signal,
 ) {
+  await ensureGridData();
   const { scanMode = 'item' } = settings;
 
   if (scanMode === 'pokemon') {
@@ -1083,7 +1053,8 @@ export async function scanGridVideo(
 /**
  * Get the dataset list for a scan mode.
  */
-export function getGridDataList(scanMode) {
+export async function getGridDataList(scanMode) {
+  await ensureGridData();
   if (scanMode === 'pokemon') return pokemonList;
   if (scanMode === 'habitat') return habitatList;
   if (scanMode === 'recipe')  return recipeList;

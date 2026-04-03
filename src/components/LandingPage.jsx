@@ -146,6 +146,10 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
+          role="button"
+          tabIndex={0}
+          aria-label="Upload video files by clicking or dragging"
         >
           <div className="card-body items-center text-center py-6">
             <input
@@ -182,6 +186,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
                         className="btn btn-ghost btn-xs btn-circle text-error"
                         onClick={(e) => { e.stopPropagation(); removeFile(i); }}
                         title="Remove"
+                        aria-label={`Remove ${v.file.name}`}
                       >
                         ✕
                       </button>
@@ -290,6 +295,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
               {!settings.autoDetectFPS && (
                 <div className="mt-2 flex items-center gap-3">
                   <input
+                    id="frame-interval"
                     type="range"
                     min="10"
                     max="500"
@@ -297,6 +303,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
                     onChange={(e) => updateSetting('frameIntervalMs', Number(e.target.value))}
                     step="10"
                     className="range range-primary range-xs flex-1"
+                    aria-label="Frame interval in milliseconds"
                   />
                   <span className="text-xs font-mono whitespace-nowrap">
                     {settings.frameIntervalMs || 33}ms ({Math.round(1000 / (settings.frameIntervalMs || 33))} FPS)
@@ -307,12 +314,13 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
 
             {/* Processing Delay */}
             <div className="bg-base-200 rounded-lg p-4">
-              <label className="block mb-1">
+              <label className="block mb-1" htmlFor="processing-delay">
                 <span className="font-medium text-sm">Processing Delay</span>
                 <span className="block text-xs text-base-content/50">Delay between frames (ms)</span>
               </label>
               <div className="flex items-center gap-3 mt-2">
                 <input
+                  id="processing-delay"
                   type="range"
                   min="0"
                   max="200"
@@ -327,12 +335,13 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
 
             {/* OCR Confidence */}
             <div className="bg-base-200 rounded-lg p-4">
-              <label className="block mb-1">
+              <label className="block mb-1" htmlFor="ocr-confidence">
                 <span className="font-medium text-sm">OCR Confidence Threshold</span>
                 <span className="block text-xs text-base-content/50">Minimum confidence to accept text</span>
               </label>
               <div className="flex items-center gap-3 mt-2">
                 <input
+                  id="ocr-confidence"
                   type="range"
                   min="0"
                   max="100"
@@ -346,12 +355,13 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
 
             {/* Fuzzy Tolerance */}
             <div className="bg-base-200 rounded-lg p-4">
-              <label className="block mb-1">
+              <label className="block mb-1" htmlFor="fuzzy-tolerance">
                 <span className="font-medium text-sm">Fuzzy Match Tolerance</span>
                 <span className="block text-xs text-base-content/50">Max character distance for matching</span>
               </label>
               <div className="flex items-center gap-3 mt-2">
                 <input
+                  id="fuzzy-tolerance"
                   type="range"
                   min="0"
                   max="5"
@@ -400,6 +410,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
                         value={settings.customCrop[dim]}
                         onChange={(e) => updateCustomCrop(dim, e.target.value)}
                         className="range range-xs flex-1"
+                        aria-label={`Custom crop ${dim.toUpperCase()} percentage`}
                       />
                     </div>
                   ))}
@@ -467,6 +478,7 @@ export default function LandingPage({ onStartScan, onImportResults, onShowHowTo,
                     className="btn btn-ghost btn-sm btn-circle text-error"
                     onClick={() => onDeleteSession(session.id)}
                     title="Delete session"
+                    aria-label="Delete session"
                   >
                     ✕
                   </button>

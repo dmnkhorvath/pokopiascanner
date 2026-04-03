@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { getCategoryTotals } from '../utils/ocrEngine.js';
 import CategoryCard from './CategoryCard';
 import ProgressBar from './ProgressBar';
 import './ScanResults.css';
@@ -50,12 +51,17 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
   const [discoveredFilter, setDiscoveredFilter] = useState('all');
   const [copySuccess, setCopySuccess] = useState(false);
 
+  const [totals, setTotals] = useState({ pokemon: 300, items: 1254, habitats: 209, recipes: 743 });
+  useEffect(() => {
+    getCategoryTotals().then(setTotals).catch(() => {});
+  }, []);
+
   const categories = useMemo(() => ({
-    pokemon: results?.pokemon || { found: 0, total: 300, items: [] },
-    items: results?.items || { found: 0, total: 1254, items: [] },
-    habitats: results?.habitats || { found: 0, total: 209, items: [] },
-    recipes: results?.recipes || { found: 0, total: 743, items: [] },
-  }), [results]);
+    pokemon: results?.pokemon || { found: 0, total: totals.pokemon, items: [] },
+    items: results?.items || { found: 0, total: totals.items, items: [] },
+    habitats: results?.habitats || { found: 0, total: totals.habitats, items: [] },
+    recipes: results?.recipes || { found: 0, total: totals.recipes, items: [] },
+  }), [results, totals]);
 
   const filteredItems = useMemo(() => {
     let items = [];
@@ -192,7 +198,7 @@ export default function ScanResults({ results, scanCount = 0, onAddMore, onStart
   };
 
   const totalFound = results?.totalFound || 0;
-  const totalPossible = 300 + 1254 + 209 + 743;
+  const totalPossible = totals.pokemon + totals.items + totals.habitats + totals.recipes;
   const overallPercent = totalPossible > 0 ? Math.round((totalFound / totalPossible) * 100) : 0;
 
   return (
