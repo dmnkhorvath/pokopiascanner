@@ -19,3 +19,36 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+
+  cache-purge:
+    image: curlimages/curl:latest
+    depends_on:
+      pokopia-scanner:
+        condition: service_started
+    env_file:
+      - .env
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        if [ -z "$$CF_ZONE_ID" ] || [ -z "$$CF_API_TOKEN" ]; then
+          echo "⏭️  Skipping Cloudflare cache purge (CF_ZONE_ID or CF_API_TOKEN not set)"
+          exit 0
+        fi
+        DOMAIN="$${CF_PURGE_DOMAIN:-https://dominikh.com}"
+        echo "☁️  Purging Cloudflare cache for $$DOMAIN ..."
+        RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+          "https://api.cloudflare.com/client/v4/zones/$$CF_ZONE_ID/purge_cache" \
+          -H "Authorization: Bearer $$CF_API_TOKEN" \
+          -H "Content-Type: application/json" \
+          --data "{\"files\": [\"$$DOMAIN/\", \"$$DOMAIN/index.html\", \"$$DOMAIN/ads.txt\", \"$$DOMAIN/manifest.webmanifest\"]}")
+        HTTP_CODE=$(echo "$$RESPONSE" | tail -1)
+        BODY=$(echo "$$RESPONSE" | head -n -1)
+        if [ "$$HTTP_CODE" = "200" ]; then
+          echo "✅ Cache purged successfully!"
+          echo "$$BODY" | head -c 200
+        else
+          echo "❌ Cache purge failed (HTTP $$HTTP_CODE)"
+          echo "$$BODY"
+          exit 1
+        fi
+    restart: "no"
